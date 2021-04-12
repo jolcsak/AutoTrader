@@ -136,11 +136,7 @@ namespace AutoTrader.Traders
 
         private bool Buy(double btc, double actualPrice, double actualAmount)
         {
-            bool buy = Ao.Previous()?.Value < 0 && Ao.Last().Value > 0;
-            buy |= Ao.Last().Value > 0 && Ao.Previous(2).Color == AoColor.Green && Ao.Previous().Color == AoColor.Red && Ao.Last().Color == AoColor.Green;
-            buy |= Ao.Last().Value < 0 && Ao.Last().Value > Ao.Previous().Value && Ao.Previous().Color == AoColor.Red && Ao.Last().Color == AoColor.Green;
-
-            if (buy)
+            if (Ao.LastOrDefault()?.Buy == true)
             {
                 Logger.Info($"Time to buy at price {actualPrice}, amount: {btc}");
                 StoreTradeOrder(actualPrice, btc, actualPrice * 0.005, TargetCurrency);
@@ -158,7 +154,7 @@ namespace AutoTrader.Traders
                 return false;
             }
 
-            if (actualPrice < MaxPeriodPrice * TradeSettings.SellRatio)
+            if (Ao.LastOrDefault()?.Sell == true)
             {
                 Logger.Info($"Time to sell at price {actualPrice}");
                 foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))
