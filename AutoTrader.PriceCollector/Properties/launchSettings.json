@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "AutoTrader.PriceCollector": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

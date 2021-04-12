@@ -1,0 +1,117 @@
+﻿<Window x:Class="AutoTrader.Desktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AutoTrader.Desktop"
+        mc:Ignorable="d"
+        Title="NiceHash AutoTrader v0.1" Height="941" Width="1446">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="300"/>
+        </Grid.RowDefinitions>
+        <DockPanel LastChildFill="true" Margin="10,10,10,10" Grid.Row="0">
+            <DockPanel DockPanel.Dock="Top" LastChildFill="true">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="98"/>
+                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="55"/>
+                        <ColumnDefinition Width="66"/>
+                        <ColumnDefinition Width="125"/>
+                        <ColumnDefinition Width="65"/>
+                        <ColumnDefinition Width="125"/>
+                        <ColumnDefinition Width="96"/>
+                        <ColumnDefinition Width="125"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Current balance:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="0"/>
+                    <Label x:Name="balance" FontWeight="ExtraBold" Grid.Column="1"/>
+                    <CheckBox x:Name="canBuy" FontWeight="SemiBold" IsChecked="True" VerticalAlignment="Center" Checked="CanBuy_Checked" Unchecked="CanBuy_Unchecked" Grid.Column="2">
+                        Buy
+                    </CheckBox>
+                    <Label Content="Buy Ratio:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="3"/>
+                    <TextBox x:Name="buyRatio" TextWrapping="Wrap" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" TextChanged="BuyRatio_TextChanged" Grid.Column="4" />
+                    <Label Content="Sell Ratio:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="5"/>
+                    <TextBox x:Name="sellRatio" TextWrapping="Wrap" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" TextChanged="SellRatio_TextChanged" Grid.Column="6" />
+                    <Label Content="Minimum Yield:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="7"/>
+                    <TextBox x:Name="minYield" TextWrapping="Wrap" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" TextChanged="MinYield_TextChanged" Grid.Column="8"/>
+                </Grid>
+            </DockPanel>
+            <Grid Margin="4,4,4,4">
+                <!-- Define Columns -->
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="680"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <DockPanel Grid.Column="0" DockPanel.Dock="Left" LastChildFill="True" Margin="5,5,5,5">
+                    <Label Content="Currencies" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="86" DockPanel.Dock="Top" FontWeight="SemiBold"/>
+                    <DataGrid x:Name="currencies" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" SelectedCellsChanged="currencies_SelectedCellsChanged">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Name}" Header="Date" />
+                            <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N10}}" Header="Price" />
+                            <DataGridTextColumn Binding="{Binding Amount}" Header="Amount" />
+                            <DataGridTextColumn Binding="{Binding Change}" Header="Change" FontWeight="ExtraBold"/>
+                            <DataGridTextColumn Binding="{Binding MinPeriodPrice, StringFormat={}{0:N10}}" Header="Min Period Price" />
+                            <DataGridTextColumn Binding="{Binding MaxPeriodPrice, StringFormat={}{0:N10}}" Header="Max Period Price" />
+                            <DataGridTextColumn Binding="{Binding BuyRatio, StringFormat={}{0:N4}}" Header="Buy Ratio" />
+                            <DataGridTextColumn Binding="{Binding SellRatio, StringFormat={}{0:N4}}" Header="Sell Ratio" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+                <DockPanel Grid.Column="1" DockPanel.Dock="Left" LastChildFill="True" Margin="5,5,5,5">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <DockPanel Grid.Column="0" Grid.Row="0" LastChildFill="True">
+                            <Label Content="Opened Orders" DockPanel.Dock="Top" FontWeight="SemiBold"/>
+                            <DataGrid x:Name="openedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" >
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding BuyDate}" Header="BuyDate" />
+                                    <DataGridTextColumn Binding="{Binding Currency}" Header="Currency" />
+                                    <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N10}}" Header="Price" />
+                                    <DataGridTextColumn Binding="{Binding Amount}" Header="Amount" />
+                                    <DataGridTextColumn Binding="{Binding Fee, StringFormat={}{0:N10}}" Header="Fee" />
+                                    <DataGridTextColumn Binding="{Binding ActualPrice, StringFormat={}{0:N10}}" Header="Actual Price" />
+                                    <DataGridTextColumn Binding="{Binding ActualYield, StringFormat={}{0:N2}%}" Header="Actual Yield" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                        <DockPanel Grid.Column="0" Grid.Row="1" LastChildFill="True" >
+                            <Label Content="Closed Orders" DockPanel.Dock="Top" FontWeight="SemiBold"/>
+                            <DataGrid x:Name="closedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding BuyDate}" Header="Buy Date" />
+                                    <DataGridTextColumn Binding="{Binding SellDate}" Header="Sell Date" />
+                                    <DataGridTextColumn Binding="{Binding Currency}" Header="Currency" />
+                                    <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N10}}" Header="Price" />
+                                    <DataGridTextColumn Binding="{Binding Amount}" Header="Amount" />
+                                    <DataGridTextColumn Binding="{Binding Fee, StringFormat={}{0:N10}}" Header="Fee" />
+                                    <DataGridTextColumn Binding="{Binding SellPrice, StringFormat={}{0:N10}}" Header="Sell Price" />
+                                    <DataGridTextColumn Binding="{Binding Yield, StringFormat={}{0:N2}%}" Header="Yield" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </Grid>
+                </DockPanel>
+            </Grid>
+        </DockPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="110"/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+            <Label Content="Selected Currency:" FontWeight="SemiBold" Grid.Column="0"/>
+            <Label x:Name="selectedCurrency" Grid.Column="1" FontWeight="Bold" HorizontalAlignment="Left"/>
+        </Grid>
+        <Canvas x:Name="graph" Margin="5,5,5,5" Grid.Row="2" RenderTransformOrigin="0.5,0.5">
+        </Canvas>
+    </Grid>
+</Window>
