@@ -69,8 +69,9 @@ namespace AutoTrader.Traders
             var actualOrder = new ActualPrice { Currency = TargetCurrency, Price = orderBooks.sell[0][0], Amount = orderBooks.sell[0][1] };
             //Store.Prices.ClearOldPrices();
             Store.Prices.Save(new Price(DateTime.Now, TargetCurrency, actualOrder.Price));
+            Store.LastPrices.Save(new LastPrice { Currency = TargetCurrency, Price = actualOrder.Price, Amount = actualOrder.Amount, Date = DateTime.Now });
 
-            Logger.Info($"{TargetCurrency} -> price: {actualOrder.Price}, amount: {actualOrder.Amount}");
+            Logger.Info($"{TargetCurrency} price: {actualOrder.Price}, amount: {actualOrder.Amount}");
 
             return actualOrder;
         }
@@ -86,15 +87,15 @@ namespace AutoTrader.Traders
 
             Logger.LogBalance(BTC, btcBalance);
 
-            var lastPrice = Store.Prices.GetLastPriceForTrader(this);
+            var lastPrice = Store.LastPrices.GetLastPriceForTrader(this);
 
             if (lastPrice == null)
             {
                 return;
             }
 
-            double actualPrice = lastPrice.Value;
-            double actualAmount = 10;
+            double actualPrice = lastPrice.Price;
+            double actualAmount = lastPrice.Amount;
 
             bool hasChanged = previousPrice == double.MaxValue;
             if (hasChanged)

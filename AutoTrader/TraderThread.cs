@@ -72,6 +72,7 @@ namespace AutoTrader
                     }
                 }
                 Thread.Sleep(WAIT);
+                Logger.Info($"Waiting {WAIT / 1000} seconds...");
             } while (true);
         }
 
@@ -99,6 +100,7 @@ namespace AutoTrader
                         Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
                     }
                 }
+                Logger.Info($"Waiting {WAIT / 1000} seconds...");
                 Thread.Sleep(WAIT);
             } while (true);
 

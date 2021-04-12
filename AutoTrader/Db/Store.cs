@@ -13,6 +13,8 @@ namespace AutoTrader.Db
 
         public Prices Prices { get; private set; }
 
+        public LastPrices LastPrices { get; private set; }
+
         public OrderBooks OrderBooks { get; private set; }
 
         private Store()
@@ -27,6 +29,7 @@ namespace AutoTrader.Db
 
             Prices = new Prices();
             OrderBooks = new OrderBooks();
+            LastPrices = new LastPrices();
         }
 
         public static Store Connect()
