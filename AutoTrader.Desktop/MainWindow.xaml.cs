@@ -133,5 +133,10 @@ namespace AutoTrader.Desktop
                 }
             }
         }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            currencies_SelectedCellsChanged(sender, null);
+        }
     }
 }

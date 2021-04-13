@@ -57,14 +57,20 @@ namespace AutoTrader.Desktop
                 SolidColorBrush pointFillGreenBrush = new SolidColorBrush();
                 pointFillGreenBrush.Color = Colors.Green;
 
-                double priceHeight = maxValue - minValue;
                 double width = graph.ActualWidth;
                 double height = graph.ActualHeight;
+                double zeroY = height / 2;
+                double priceHeight = maxValue - minValue;
                 double priceWidth = values.Count - 1;
                 double cWidth = width / priceWidth;
-                double cHeight = height / priceHeight;
+                
+                double cHeight = zeroY / Math.Abs(maxValue);
+                if (Math.Abs(minValue) > Math.Abs(maxValue))
+                {
+                    cHeight = zeroY / Math.Abs(minValue);
+                }
+
                 double currentX = 0;
-                double zeroY = height / 2;
                 double cXOffset = xOffset * cWidth;
 
                 foreach (AoValue value in values)

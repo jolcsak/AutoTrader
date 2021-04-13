@@ -97,6 +97,7 @@ namespace AutoTrader.Traders
             double actualPrice = lastPrice.Price;
             double actualAmount = lastPrice.Amount;
 
+
             bool hasChanged = previousPrice == double.MaxValue;
             if (hasChanged)
             {
@@ -127,6 +128,16 @@ namespace AutoTrader.Traders
             hasChanged |= Sell(actualPrice);
             previousPrice = actualPrice;
 
+
+            foreach (TradeOrder tradeOrder in TradeOrders.Where(to => to.ActualPrice != actualPrice))
+            {
+                if (actualPrice != tradeOrder.ActualPrice)
+                {
+                    tradeOrder.ActualPrice = actualPrice;
+                    Store.OrderBooks.SaveOrUpdate(tradeOrder);
+                }
+            }
+
             if (hasChanged)
             {
                 Logger.LogTradeOrders(AllTradeOrders, TargetCurrency, actualPrice);
@@ -150,11 +161,6 @@ namespace AutoTrader.Traders
 
         private bool Sell(double actualPrice)
         {
-            if (actualPrice >= previousPrice)
-            {
-                return false;
-            }
-
             if (Ao.LastOrDefault()?.Sell == true)
             {
                 Logger.Info($"Time to sell at price {actualPrice}");
@@ -171,7 +177,6 @@ namespace AutoTrader.Traders
                     }
                 }
             }
-
             return true;
         }
 

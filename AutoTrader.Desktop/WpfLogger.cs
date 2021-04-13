@@ -105,19 +105,6 @@ namespace AutoTrader.Desktop
 
         public void LogTradeOrders(IList<TradeOrder> traderOrders, string currency, double actualPrice)
         {
-            var tradeOrdersForCurrency = traderOrders.Where(t => t.Currency == currency && t.ActualPrice != actualPrice); 
-            if (tradeOrdersForCurrency.Any())
-            {
-                foreach (TradeOrder tradeOrder in tradeOrdersForCurrency)
-                {
-                    if (actualPrice != tradeOrder.ActualPrice)
-                    {
-                        tradeOrder.ActualPrice = actualPrice;
-                        Store.Instance.OrderBooks.SaveOrUpdate(tradeOrder);
-                    }
-                }
-            }
-
             Dispatcher?.BeginInvoke(() => {
                 openedOrders.ItemsSource = traderOrders.Where(o => o.Type == TradeOrderType.OPEN).OrderByDescending(o => o.ActualYield);
                 closedOrders.ItemsSource = traderOrders.Where(o => o.Type == TradeOrderType.CLOSED).OrderByDescending(o => o.SellDate);

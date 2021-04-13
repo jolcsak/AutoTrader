@@ -10,6 +10,6 @@
 
         public static double SellRatio { get; set; } = 0.90;
 
-        public static double MinSellYield { get; set; } = 1.10;
+        public static double MinSellYield { get; set; } = 1.05;
     }
 }
