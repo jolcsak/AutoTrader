@@ -134,11 +134,12 @@ namespace AutoTrader.Desktop
                 if (currencyInst.Refresh(price, amount, minPeriodPrice, maxPeriodPrice, buyRatio, sellRatio))
                 {
                     RefreshCurrencyList();
-                    RefreshPrices(currency);
-                    RefreshSma(currency);
-                    RefreshAo(currency);
                 }
             }
+
+            RefreshPrices(currency);
+            RefreshSma(currency);
+            RefreshAo(currency);
         }
 
         private void RefreshCurrencyList()

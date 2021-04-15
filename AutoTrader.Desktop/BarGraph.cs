@@ -19,7 +19,6 @@ namespace AutoTrader.Desktop
 
         private IList<AoValue> values;
         private string graphName;
-
         private string toolTipFormat = "N10";
 
         protected Dispatcher Dispatcher => Application.Current != null ? Application.Current.Dispatcher : null;
@@ -41,6 +40,10 @@ namespace AutoTrader.Desktop
             }
             Dispatcher?.BeginInvoke(() =>
             {
+                if (!values.Any())
+                {
+                    return;
+                }
                 double maxValue = values.Max(v => v.Value);
                 double minValue = values.Min(v => v.Value);
                 if (maxValue == minValue)
@@ -48,67 +51,68 @@ namespace AutoTrader.Desktop
                     return;
                 }
 
-                SolidColorBrush buyFillColor = new SolidColorBrush();
-                buyFillColor.Color = buyColor;
-                SolidColorBrush sellFillColor = new SolidColorBrush();
-                sellFillColor.Color = sellColor;
-                SolidColorBrush pointFillRedBrush = new SolidColorBrush();
-                pointFillRedBrush.Color = Colors.Red;
-                SolidColorBrush pointFillGreenBrush = new SolidColorBrush();
-                pointFillGreenBrush.Color = Colors.Green;
+                SolidColorBrush buyFillColor = new SolidColorBrush { Color = buyColor };
+                SolidColorBrush sellFillColor = new SolidColorBrush { Color = sellColor };
+                SolidColorBrush pointFillRedBrush = new SolidColorBrush { Color = Colors.Red };
+                SolidColorBrush pointFillGreenBrush = new SolidColorBrush { Color = Colors.Green };
 
                 double width = graph.ActualWidth;
                 double height = graph.ActualHeight;
                 double zeroY = height / 2;
                 double priceHeight = maxValue - minValue;
                 double priceWidth = values.Count - 1;
-                double cWidth = width / priceWidth;
-                
-                double cHeight = zeroY / Math.Abs(maxValue);
-                if (Math.Abs(minValue) > Math.Abs(maxValue))
-                {
-                    cHeight = zeroY / Math.Abs(minValue);
-                }
-
+                double cWidth = width / priceWidth;                
+                double cHeight = Math.Abs(minValue) > Math.Abs(maxValue) ? zeroY / Math.Abs(minValue) : zeroY / Math.Abs(maxValue);
+                double rectWidth = cWidth < 1 ? 1 : cWidth;
                 double currentX = 0;
-                double cXOffset = xOffset * cWidth;
 
                 foreach (AoValue value in values)
                 {
+                    SetAttributes(buyFillColor, sellFillColor, pointFillRedBrush, pointFillGreenBrush, value, out var fill, out var toolTip);
+
                     double y = value.Value * cHeight;
                     double absY = Math.Abs(y);
-                    var rect = new Rectangle();
-                    if (value.Buy)
+
+                    if (rectWidth == 1)
                     {
-                        rect.Fill = buyFillColor;
-                        rect.ToolTip = $"Buy at: {value.Value.ToString(toolTipFormat)}";
-                    }
-                    else if (value.Sell)
-                    {
-                        rect.Fill = sellFillColor;
-                        rect.ToolTip = $"Sell at: {value.Value.ToString(toolTipFormat)}";
+                        graph.Children.Add(new Line { X1 = currentX, X2 = currentX, Y1 = zeroY, Y2 = zeroY + y, Stroke = fill, ToolTip = toolTip });
                     }
                     else
                     {
-                        rect.Fill = value.Color == AoColor.Red ? pointFillRedBrush : pointFillGreenBrush;
-                        rect.ToolTip = value.Value.ToString(toolTipFormat);
+                        var rect = new Rectangle { Width = rectWidth, Height = absY < 1 ? 1 : absY, Fill = fill, ToolTip = toolTip };
+                        Canvas.SetLeft(rect, currentX);
+                        if (Math.Sign(value.Value) >= 0)
+                        {
+                            Canvas.SetTop(rect, zeroY - y);
+                        }
+                        else
+                        {
+                            Canvas.SetBottom(rect, zeroY + y);
+                        }
+                        graph.Children.Add(rect);
                     }
-                    rect.Width = cWidth < 1 ? 1 : cWidth;
-                    rect.Height = absY < 1 ? 1 : absY;
-                    Canvas.SetLeft(rect, currentX + cXOffset);
-                    if (Math.Sign(value.Value) >= 0)
-                    {
-                        Canvas.SetTop(rect, zeroY - y);
-                    }
-                    else
-                    {
-                        Canvas.SetBottom(rect, zeroY + y);
-                    }
-                    graph.Children.Add(rect);
                     currentX += cWidth;
                 }
             });
         }
 
+        private void SetAttributes(SolidColorBrush buyFillColor, SolidColorBrush sellFillColor, SolidColorBrush pointFillRedBrush, SolidColorBrush pointFillGreenBrush, AoValue value, out Brush fill, out string toolTip)
+        {
+            if (value.Buy)
+            {
+                fill = buyFillColor;
+                toolTip = $"Buy at: {value.Value.ToString(toolTipFormat)}";
+            }
+            else if (value.Sell)
+            {
+                fill = sellFillColor;
+                toolTip = $"Sell at: {value.Value.ToString(toolTipFormat)}";
+            }
+            else
+            {
+                fill = value.Color == AoColor.Red ? pointFillRedBrush : pointFillGreenBrush;
+                toolTip = value.Value.ToString(toolTipFormat);
+            }
+        }
     }
 }

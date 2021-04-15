@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace AutoTrader.GraphProviders
 {
@@ -6,56 +8,112 @@ namespace AutoTrader.GraphProviders
     {
         private const double ratio = 10;
 
-        public IList<AoValue> GetAo(IList<double> data, int slowPeriod = 34, int fastPeriod = 5)
+        private int slowPeriod;
+        private int fastPeriod;
+        private IList<double> data;
+
+        double previousMa = -1;
+
+        private SmaProvider slowSmaProvider;
+        private SmaProvider fastSmaProvider;
+
+        public IList<AoValue> Ao { get; } = new List<AoValue>();
+
+        private int AoIndex => Ao.Count - 1;
+        private int DataIndex => data.Count - 1;
+
+        public bool HasChanged { get; private set; } = false;
+
+        public AoValue Current => Ao.Any() ? Ao.Last() : null;
+
+        public AoProvider(int slowPeriod = 34, int fastPeriod = 5)
         {
-            var smaProvider = new SmaProvider();
+            this.slowPeriod = slowPeriod;
+            this.fastPeriod = fastPeriod;
+        }
 
-            IList<AoValue> ao = new List<AoValue>();
+        public void SetData(ObservableCollection<double> data)
+        {
+            this.data = data;
 
-            double previousMa = -1;
+            slowSmaProvider = new SmaProvider(slowPeriod);
+            fastSmaProvider = new SmaProvider(fastPeriod);
+            slowSmaProvider.SetData(data);
+            fastSmaProvider.SetData(data);
 
+            slowSmaProvider.Sma.CollectionChanged += SmaChanged;
+            fastSmaProvider.Sma.CollectionChanged += SmaChanged;
+
+            Calculate();
+        }
+
+        public void Calculate()
+        {
             for (int i = 0; i < data.Count; i++)
             {
-                double slowMa = smaProvider.GetMa(slowPeriod, i, data);
-                double fastMa = smaProvider.GetMa(fastPeriod, i, data);
+                double slowMa = slowSmaProvider.Sma[i];
+                double fastMa = fastSmaProvider.Sma[i];
                 var ma = fastMa - slowMa;
-                if (slowMa > -1 && fastMa > -1)
+                if (fastMa > -1 && slowMa > -1)
                 {
-                    var aoValue = new AoValue { Value = fastMa - slowMa, Color = previousMa > ma ? AoColor.Red : AoColor.Green };
-                    ao.Add(aoValue);
-                    aoValue.Buy = IsBuy(ao);
-                    aoValue.Sell = IsSell(ao);
+                    Ao.Add(CreateAo(ma));
                 }
                 previousMa = ma;
             }
-            return ao;
         }
 
-        public bool IsBuy(IList<AoValue> ao)
+        public bool IsBuy()
         {
-            int i = ao.Count - 1;
+            int i = AoIndex;
             if (i >= 2)
             {
-                bool buy = ao[i - 1]?.Value < 0 && ao[i].Value > 0;
-                buy |= ao[i].Value > 0 && ao[i - 2].Color == AoColor.Green && ao[i - 1].Color == AoColor.Red && ao[i].Color == AoColor.Green && ao[i].Value > ao[i - 1].Value * ratio;
-                buy |= ao[i].Value < 0 && ao[i].Value > ao[i - 1].Value * ratio && ao[i - 1].Color == AoColor.Red && ao[i].Color == AoColor.Green;
+                bool buy = Ao[i - 1]?.Value < 0 && Ao[i].Value > 0;
+                buy |= Ao[i].Value > 0 && Ao[i - 2].Color == AoColor.Green && Ao[i - 1].Color == AoColor.Red && Ao[i].Color == AoColor.Green && Ao[i].Value > Ao[i - 1].Value * ratio;
+                buy |= Ao[i].Value < 0 && Ao[i].Value > Ao[i - 1].Value * ratio && Ao[i - 1].Color == AoColor.Red && Ao[i].Color == AoColor.Green;
                 return buy;
             }
             return false;
         }
 
-        public bool IsSell(IList<AoValue> ao)
+        public bool IsSell()
         {
-            int i = ao.Count - 1;
+            int i = AoIndex;
             if (i >= 2)
             {
-                bool sell = ao[i - 1]?.Value > 0 && ao[i].Value < 0;
-                sell |= ao[i].Value < 0 && ao[i - 2].Color == AoColor.Red && ao[i - 1].Color == AoColor.Green && ao[i].Color == AoColor.Red && ao[i].Value < ao[i - 1].Value * ratio;
-                sell |= ao[i].Value > 0 && ao[i].Value < ao[i - 1].Value * ratio && ao[i - 1].Color == AoColor.Green && ao[i].Color == AoColor.Red;
+                bool sell = Ao[i - 1]?.Value > 0 && Ao[i].Value < 0;
+                sell |= Ao[i].Value < 0 && Ao[i - 2].Color == AoColor.Red && Ao[i - 1].Color == AoColor.Green && Ao[i].Color == AoColor.Red && Ao[i].Value < Ao[i - 1].Value * ratio;
+                sell |= Ao[i].Value > 0 && Ao[i].Value < Ao[i - 1].Value * ratio && Ao[i - 1].Color == AoColor.Green && Ao[i].Color == AoColor.Red;
                 return sell;
             }
             return false;
         }
 
+        public void Refresh()
+        {
+            int i = DataIndex;
+            if (i >= 2 && slowSmaProvider.Sma.Count == fastSmaProvider.Sma.Count)
+            {
+                double slowMa = slowSmaProvider.Current;
+                double fastMa = fastSmaProvider.Current;
+                var ma = fastMa - slowMa;
+
+                if (fastMa > -1 && slowMa > -1)
+                {
+                    Ao.Add(CreateAo(ma));
+                }
+                HasChanged = true;
+            }
+
+        }
+
+        private void SmaChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            Refresh();
+        }
+
+        private AoValue CreateAo(double ma)
+        {
+            return new AoValue { Value = ma, Color = previousMa > ma ? AoColor.Red : AoColor.Green, Buy = IsBuy(), Sell = IsSell() };
+        }
     }
 }

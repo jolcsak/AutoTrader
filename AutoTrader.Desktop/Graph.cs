@@ -48,52 +48,37 @@ namespace AutoTrader.Desktop
                     return;
                 }
 
-                SolidColorBrush lineBrush = new SolidColorBrush();
-                SolidColorBrush pointOutlineBrush = new SolidColorBrush();
-                SolidColorBrush pointFillBrush = new SolidColorBrush();
-
-                lineBrush.Color = lineColor;
-                pointOutlineBrush.Color = Colors.Black;
-                pointFillBrush.Color = Colors.Orange;
+                SolidColorBrush lineBrush = new SolidColorBrush { Color = lineColor };
 
                 int halfPointSize = pointSize / 2;
-
                 double priceHeight = maxValue - minValue;
                 double width = graph.ActualWidth;
                 double height = graph.ActualHeight;
                 double priceWidth = values.Count - 1;
                 double cWidth = width / priceWidth;
                 double cHeight = height / priceHeight;
+                var cXOffset = cWidth * xOffset;
                 double currentX = 0;
 
                 var points = new PointCollection();
-                var cXOffset = cWidth * xOffset;
                 foreach (double value in values)
                 {
                     double y = (value - minValue) * cHeight;
                     points.Add(new Point(currentX + cXOffset, height - y));
                     currentX += cWidth;
                 }
-
-                var polyline = new Polyline();
-                polyline.Stroke = lineBrush;
-                polyline.StrokeThickness = lineWeight;
-                polyline.Points = points;
-                polyline.ToolTip = graphName;
-                graph.Children.Add(polyline);
+                graph.Children.Add(new Polyline { Stroke = lineBrush, StrokeThickness = lineWeight, Points = points, ToolTip = graphName });
 
                 if (showPoints)
                 {
+                    SolidColorBrush pointOutlineBrush = new SolidColorBrush { Color = Colors.Black };
+                    SolidColorBrush pointFillBrush = new SolidColorBrush { Color = Colors.Orange };
+
                     currentX = 0;
                     foreach (double value in values)
                     {
                         double y = (value - minValue) * cHeight;
-                        var rect = new Rectangle();
-                        rect.Stroke = pointOutlineBrush;
-                        rect.Fill = pointFillBrush;
-                        rect.Width = pointSize;
-                        rect.Height = pointSize;
-                        rect.ToolTip = value.ToString(toolTipFormat);
+                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = pointFillBrush, Width = pointSize, Height = pointSize, ToolTip = value.ToString(toolTipFormat) };
                         Canvas.SetLeft(rect, currentX - halfPointSize);
                         Canvas.SetBottom(rect, y - halfPointSize);
                         graph.Children.Add(rect);

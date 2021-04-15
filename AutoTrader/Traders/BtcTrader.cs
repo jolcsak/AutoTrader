@@ -1,10 +1,9 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using AutoTrader.Api;
 using AutoTrader.Db.Entities;
-using AutoTrader.GraphProviders;
 using AutoTrader.Log;
-using AutoTrader.Utils;
 
 namespace AutoTrader.Traders
 {
@@ -13,6 +12,9 @@ namespace AutoTrader.Traders
         public const string BTC = "BTC";
         protected const double MIN_BTC_SELL_AMOUNT = 0.000001;
 
+
+        protected double actualPrice;
+        protected double actualAmount;
         protected double previousPrice = double.MaxValue;
         protected double changeRatio;
         protected double buyRatio;
@@ -94,9 +96,8 @@ namespace AutoTrader.Traders
                 return;
             }
 
-            double actualPrice = lastPrice.Price;
-            double actualAmount = lastPrice.Amount;
-
+            actualPrice = lastPrice.Price;
+            actualAmount = lastPrice.Amount;
 
             bool hasChanged = previousPrice == double.MaxValue;
             if (hasChanged)
@@ -106,13 +107,19 @@ namespace AutoTrader.Traders
 
             lock (PastPrices)
             {
-                if (!PastPrices.Any())
+                if (!pastPrices.Any())
                 {
-                    PastPrices = Store.Prices.GetPricesForTrader(this, DateTime.MinValue).Select(p => p.Value).ToList();
-                    Sma = new SmaProvider().GetSma(PastPrices);
-                    Ao = new AoProvider().GetAo(PastPrices);
-                    PastPrices = PastPrices.Skip(PastPrices.Count - Ao.Count).ToList();
-                    Sma = Sma.Skip(Sma.Count - Ao.Count).ToList();
+                    pastPrices = new ObservableCollection<double>(Store.Prices.GetPricesForTrader(this, DateTime.MinValue).Select(p => p.Value).ToList());
+                    smaProvider.SetData(pastPrices);
+                    aoProvider.SetData(pastPrices);
+                    sma = smaProvider.Sma.Skip(smaProvider.Sma.Count - Ao.Count).ToList();
+                    pp = pastPrices.Skip(pastPrices.Count - Ao.Count).ToList();
+                    pastPrices.CollectionChanged += PastPricesChanged;
+                    Logger.LogCurrency(TargetCurrency, actualPrice, actualAmount, MinPeriodPrice, MaxPeriodPrice, buyRatio, sellRatio);
+                }
+                else
+                {                    
+                    pastPrices.Add(actualPrice);
                 }
             }
 
@@ -128,7 +135,6 @@ namespace AutoTrader.Traders
             hasChanged |= Sell(actualPrice);
             previousPrice = actualPrice;
 
-
             foreach (TradeOrder tradeOrder in TradeOrders.Where(to => to.ActualPrice != actualPrice))
             {
                 if (actualPrice != tradeOrder.ActualPrice)
@@ -141,9 +147,19 @@ namespace AutoTrader.Traders
             if (hasChanged)
             {
                 Logger.LogTradeOrders(AllTradeOrders, TargetCurrency, actualPrice);
-                Logger.LogCurrency(TargetCurrency, actualPrice, actualAmount, MinPeriodPrice, MaxPeriodPrice, buyRatio, sellRatio);
                 Logger.Info($"Change: {changeRatio}, Cur: {actualPrice} x {actualAmount}");
             }
+
+            if (aoProvider.HasChanged)
+            {
+                Logger.LogCurrency(TargetCurrency, actualPrice, actualAmount, MinPeriodPrice, MaxPeriodPrice, buyRatio, sellRatio);
+            }
+        }
+
+        private void PastPricesChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            pp.Add(actualPrice);
+            sma.Add(smaProvider.Current);
         }
 
         private bool Buy(double btc, double actualPrice, double actualAmount)

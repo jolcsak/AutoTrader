@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using AutoTrader.Api;
 using AutoTrader.Db;
 using AutoTrader.Db.Entities;
@@ -13,6 +15,16 @@ namespace AutoTrader.Traders
 
         protected static Store Store => Store.Instance;
 
+        protected ObservableCollection<double> pastPrices = new ObservableCollection<double>();
+
+        protected IList<double> pp = new List<double>();
+
+        protected IList<double> sma = new List<double>();
+
+        protected SmaProvider smaProvider = new SmaProvider();
+
+        protected AoProvider aoProvider = new AoProvider();
+
         public string TargetCurrency { get; protected set; }
 
         protected virtual ITradeLogger Logger => TradeLogManager.GetLogger(GetType());
@@ -23,9 +35,9 @@ namespace AutoTrader.Traders
 
         public virtual IList<TradeOrder> AllTradeOrders => Store.OrderBooks.GetAllOrders(this);
 
-        public IList<double> PastPrices { get; set; } = new List<double>();
-        public IList<double> Sma { get; set; } = new List<double>();
-        public IList<AoValue> Ao { get; set; } = new List<AoValue>();
+        public IList<double> PastPrices => pp;
+        public IList<double> Sma => sma;
+        public IList<AoValue> Ao => aoProvider.Ao;
 
         public virtual void Trade()
         {
