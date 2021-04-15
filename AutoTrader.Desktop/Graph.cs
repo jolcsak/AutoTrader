@@ -33,7 +33,7 @@ namespace AutoTrader.Desktop
             this.showPoints = showPoints;
         }
 
-        public void Draw(int xOffset = 0)
+        public void Draw()
         {
             if (!values.Any())
             {
@@ -57,14 +57,13 @@ namespace AutoTrader.Desktop
                 double priceWidth = values.Count - 1;
                 double cWidth = width / priceWidth;
                 double cHeight = height / priceHeight;
-                var cXOffset = cWidth * xOffset;
                 double currentX = 0;
 
                 var points = new PointCollection();
                 foreach (double value in values)
                 {
                     double y = (value - minValue) * cHeight;
-                    points.Add(new Point(currentX + cXOffset, height - y));
+                    points.Add(new Point(currentX, height - y));
                     currentX += cWidth;
                 }
                 graph.Children.Add(new Polyline { Stroke = lineBrush, StrokeThickness = lineWeight, Points = points, ToolTip = graphName });

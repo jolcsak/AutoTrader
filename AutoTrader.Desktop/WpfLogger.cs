@@ -186,6 +186,8 @@ namespace AutoTrader.Desktop
             {
                 return;
             }
+            Dispatcher?.Invoke(() => graph.Children.Clear());
+
             new Graph(graph, "BTC Price ratio", currentPastPrices, Colors.DarkGray, showPoints: false).Draw();
         }
 

@@ -15,7 +15,7 @@ namespace AutoTrader.Traders
 
         protected static Store Store => Store.Instance;
 
-        protected ObservableCollection<double> pastPrices = new ObservableCollection<double>();
+        protected ObservableCollection<double> pastPrices = null;
 
         protected IList<double> pp = new List<double>();
 

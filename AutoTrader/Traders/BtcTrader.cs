@@ -107,9 +107,9 @@ namespace AutoTrader.Traders
 
             lock (PastPrices)
             {
-                if (!pastPrices.Any())
+                if (pastPrices == null)
                 {
-                    pastPrices = new ObservableCollection<double>(Store.Prices.GetPricesForTrader(this, DateTime.MinValue).Select(p => p.Value).ToList());
+                    pastPrices = new ObservableCollection<double>(Store.Prices.GetPricesForTrader(this, DateTime.MinValue).Select(p => p.Value));
                     smaProvider.SetData(pastPrices);
                     aoProvider.SetData(pastPrices);
                     sma = smaProvider.Sma.Skip(smaProvider.Sma.Count - Ao.Count).ToList();

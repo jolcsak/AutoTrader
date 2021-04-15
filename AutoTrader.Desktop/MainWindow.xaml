@@ -48,7 +48,7 @@
                 </Grid.ColumnDefinitions>
                 <DockPanel Grid.Column="0" DockPanel.Dock="Left" LastChildFill="True" Margin="5,5,5,5">
                     <Label Content="Currencies" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="86" DockPanel.Dock="Top" FontWeight="SemiBold"/>
-                    <DataGrid x:Name="currencies" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" SelectedCellsChanged="currencies_SelectedCellsChanged">
+                    <DataGrid x:Name="currencies" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" SelectedCellsChanged="currencies_SelectedCellsChanged" ScrollViewer.IsDeferredScrollingEnabled="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding Name}" Header="Date" />
                             <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N10}}" Header="Price" />
@@ -72,7 +72,7 @@
                         </Grid.RowDefinitions>
                         <DockPanel Grid.Column="0" Grid.Row="0" LastChildFill="True">
                             <Label Content="Opened Orders" DockPanel.Dock="Top" FontWeight="SemiBold"/>
-                            <DataGrid x:Name="openedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" >
+                            <DataGrid x:Name="openedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" ScrollViewer.IsDeferredScrollingEnabled="True">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Binding="{Binding BuyDate}" Header="BuyDate" />
                                     <DataGridTextColumn Binding="{Binding Currency}" Header="Currency" />
@@ -86,7 +86,7 @@
                         </DockPanel>
                         <DockPanel Grid.Column="0" Grid.Row="1" LastChildFill="True" >
                             <Label Content="Closed Orders" DockPanel.Dock="Top" FontWeight="SemiBold"/>
-                            <DataGrid x:Name="closedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True">
+                            <DataGrid x:Name="closedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" ScrollViewer.IsDeferredScrollingEnabled="True">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Binding="{Binding BuyDate}" Header="Buy Date" />
                                     <DataGridTextColumn Binding="{Binding SellDate}" Header="Sell Date" />

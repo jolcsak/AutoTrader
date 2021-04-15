@@ -126,9 +126,8 @@ namespace AutoTrader.Desktop
                 var traderForCurrency = traderThread.GetTrader(selectedCurrency.Name);
                 if (traderForCurrency != null)
                 {
-                    graph.Children.Clear();
-                    Logger.LogAo(selectedCurrency.Name, traderForCurrency.Ao);
                     Logger.LogPastPrices(selectedCurrency.Name, traderForCurrency.PastPrices);
+                    Logger.LogAo(selectedCurrency.Name, traderForCurrency.Ao);
                     Logger.LogSma(selectedCurrency.Name, traderForCurrency.Sma);
                 }
             }
