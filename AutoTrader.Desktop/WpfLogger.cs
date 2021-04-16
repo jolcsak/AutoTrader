@@ -116,7 +116,7 @@ namespace AutoTrader.Desktop
             Dispatcher?.BeginInvoke(() => balanceText.Content = $"{balance:N10} {currency}");
         }
 
-        public void LogCurrency(string currency, double price, double amount, double minPeriodPrice, double maxPeriodPrice, double buyRatio, double sellRatio)
+        public void LogCurrency(string currency, double price, double amount, double minPeriodPrice, double maxPeriodPrice, double buyRatio, double sellRatio, int smaSkip, int pricesSkip)
         {
             if (currencies.ItemsSource == null)
             {
@@ -137,8 +137,8 @@ namespace AutoTrader.Desktop
                 }
             }
 
-            RefreshPrices(currency);
-            RefreshSma(currency);
+            RefreshPrices(currency, pricesSkip);
+            RefreshSma(currency, smaSkip);
             RefreshAo(currency);
         }
 
@@ -158,19 +158,19 @@ namespace AutoTrader.Desktop
             });
         }
 
-        public void LogPastPrices(string currency, IList<double> pastPrices)
+        public void LogPastPrices(string currency, IList<double> pastPrices, int pricesSkip)
         {
             currentPastPrices = pastPrices;
             selectedCurrency = currency;
             Dispatcher?.BeginInvoke(() => selectedCurrencyLabel.Content = currency);
-            RefreshPrices(currency);
+            RefreshPrices(currency, pricesSkip);
         }
 
-        public void LogSma(string currency, IList<double> sma)
+        public void LogSma(string currency, IList<double> sma, int smaSkip)
         {
             currentSma = sma;
             selectedCurrency = currency;
-            RefreshSma(currency);
+            RefreshSma(currency, smaSkip);
         }
 
         public void LogAo(string currency, IList<AoValue> ao)
@@ -180,7 +180,7 @@ namespace AutoTrader.Desktop
             RefreshAo(currency);
         }
 
-        public void RefreshPrices(string currency)
+        public void RefreshPrices(string currency, int pricesSkip)
         {
             if (selectedCurrency != currency)
             {
@@ -188,16 +188,16 @@ namespace AutoTrader.Desktop
             }
             Dispatcher?.Invoke(() => graph.Children.Clear());
 
-            new Graph(graph, "BTC Price ratio", currentPastPrices, Colors.DarkGray, showPoints: false).Draw();
+            new Graph(graph, "BTC Price ratio", currentPastPrices, Colors.DarkGray, showPoints: false).Draw(pricesSkip);
         }
 
-        public void RefreshSma(string currency)
+        public void RefreshSma(string currency, int smaSkip)
         {
             if (selectedCurrency != currency)
             {
                 return;
             }
-            new Graph(graph, "Simple Moving Average", currentSma, Colors.Blue, showPoints: false).Draw();
+            new Graph(graph, "Simple Moving Average", currentSma, Colors.Blue, showPoints: false).Draw(smaSkip);
         }
 
         public void RefreshAo(string currency)

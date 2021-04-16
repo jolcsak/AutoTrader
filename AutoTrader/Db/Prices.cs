@@ -24,7 +24,7 @@ namespace AutoTrader.Db
         public IList<Price> GetPricesForTrader(ITrader trader, DateTime dateFrom)
         {
             var prices = Table.
-                Filter(doc => R.Or(doc["Currency"].Eq(trader.TargetCurrency)).And(doc["Time"].Gt(dateFrom))).OrderBy("Time")
+                Filter(doc => R.Or(doc["Currency"].Eq(trader.TargetCurrency)).And(doc["Time"].Gt(dateFrom))).OrderBy("Time").Limit(1000)
                 .RunResult<IList<Price>>(conn);
             return prices;
         }

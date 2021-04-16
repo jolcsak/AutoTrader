@@ -12,8 +12,10 @@ namespace AutoTrader
 {
     public class TraderThread
     {
-        private const int WAIT = 5 * 60 * 1000;
-        private const int DELAY_TIME = 333;
+        private const int COLLECTOR_WAIT = 5 * 60 * 1000;
+        private const int TRADE_WAIT = 2 * 60 * 1000;
+        private const int COLLECTOR_TRADER_DELAY_TIME = 333;
+        private const int APP_TRADER_DELAY_TIME = 10;
         private ITradeLogger Logger = TradeLogManager.GetLogger("AutoTrader");
 
         private static List<ITrader> traders = new List<ITrader>();
@@ -64,15 +66,15 @@ namespace AutoTrader
                     try
                     {
                         trader.Trade();
-                        Thread.Sleep(DELAY_TIME);
+                        Thread.Sleep(APP_TRADER_DELAY_TIME);
                     }
                     catch (Exception ex)
                     {
                         Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
                     }
                 }
-                Thread.Sleep(WAIT);
-                Logger.Info($"Waiting {WAIT / 1000} seconds...");
+                Logger.Info($"Waiting {TRADE_WAIT / 1000} seconds...");
+                Thread.Sleep(TRADE_WAIT);
             } while (true);
         }
 
@@ -92,16 +94,16 @@ namespace AutoTrader
                 {
                     try
                     {
-                        trader.GetandStoreCurrentOrders();
-                        Thread.Sleep(DELAY_TIME);
+                        trader.GetAndStoreCurrentOrders();
+                        Thread.Sleep(COLLECTOR_TRADER_DELAY_TIME);
                     }
                     catch (Exception ex)
                     {
                         Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
                     }
                 }
-                Logger.Info($"Waiting {WAIT / 1000} seconds...");
-                Thread.Sleep(WAIT);
+                Logger.Info($"Waiting {COLLECTOR_WAIT / 1000} seconds...");
+                Thread.Sleep(COLLECTOR_WAIT);
             } while (true);
 
         }

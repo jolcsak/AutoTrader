@@ -20,20 +20,27 @@ namespace AutoTrader.Desktop
         
         protected IList<double> values;
 
-        private Color lineColor;
         private string graphName;
         private bool showPoints;
+
+        private SolidColorBrush lineBrush;
+        private SolidColorBrush pointOutlineBrush = new SolidColorBrush { Color = Colors.Black };
+        private SolidColorBrush pointFillBrush = new SolidColorBrush { Color = Colors.Orange };
 
         public Graph(Canvas graph, string graphName, IList<double> values, Color lineColor, bool showPoints)
         {
             this.graph = graph;
             this.values = values;
-            this.lineColor = lineColor;
             this.graphName = graphName;
             this.showPoints = showPoints;
+
+            lineBrush = new SolidColorBrush { Color = lineColor };
+            lineBrush.Freeze();
+            pointOutlineBrush.Freeze();
+            pointFillBrush.Freeze();
         }
 
-        public void Draw()
+        public void Draw(int skip)
         {
             if (!values.Any())
             {
@@ -41,26 +48,26 @@ namespace AutoTrader.Desktop
             }
             Dispatcher?.BeginInvoke(() =>
             {
-                double maxValue = values.Max();
-                double minValue = values.Min();
+                var drawValues = values.Skip(skip);
+
+                double maxValue = drawValues.Max();
+                double minValue = drawValues.Min();
                 if (maxValue == minValue)
                 {
                     return;
                 }
 
-                SolidColorBrush lineBrush = new SolidColorBrush { Color = lineColor };
-
                 int halfPointSize = pointSize / 2;
                 double priceHeight = maxValue - minValue;
                 double width = graph.ActualWidth;
                 double height = graph.ActualHeight;
-                double priceWidth = values.Count - 1;
+                double priceWidth = values.Count - 1 - skip;
                 double cWidth = width / priceWidth;
                 double cHeight = height / priceHeight;
                 double currentX = 0;
 
                 var points = new PointCollection();
-                foreach (double value in values)
+                foreach (double value in drawValues)
                 {
                     double y = (value - minValue) * cHeight;
                     points.Add(new Point(currentX, height - y));
@@ -70,11 +77,8 @@ namespace AutoTrader.Desktop
 
                 if (showPoints)
                 {
-                    SolidColorBrush pointOutlineBrush = new SolidColorBrush { Color = Colors.Black };
-                    SolidColorBrush pointFillBrush = new SolidColorBrush { Color = Colors.Orange };
-
                     currentX = 0;
-                    foreach (double value in values)
+                    foreach (double value in drawValues)
                     {
                         double y = (value - minValue) * cHeight;
                         var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = pointFillBrush, Width = pointSize, Height = pointSize, ToolTip = value.ToString(toolTipFormat) };

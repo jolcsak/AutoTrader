@@ -12,14 +12,13 @@ namespace AutoTrader.Traders
         public const string BTC = "BTC";
         protected const double MIN_BTC_SELL_AMOUNT = 0.000001;
 
-
+        protected DateTime lastPriceDate = DateTime.MinValue;
         protected double actualPrice;
         protected double actualAmount;
         protected double previousPrice = double.MaxValue;
         protected double changeRatio;
         protected double buyRatio;
         protected double sellRatio;
-
         protected static double minBtcTradeAmount = 0.0001;
         protected static double btcBalance = 0.001;
 
@@ -30,36 +29,11 @@ namespace AutoTrader.Traders
 
         protected override ITradeLogger Logger => TradeLogManager.GetLogger(BTC + "->" + TargetCurrency);
 
-        protected double MaxPeriodPrice
-        {
-            get
-            {
-                lock (PastPrices)
-                {
-                    if (PastPrices.Any())
-                    {
-                        return PastPrices.ToList().Max();
-                    }
-                    return 0;
-                }
-            }
-        }
+        protected double MaxPeriodPrice => PastPrices.Any() ? PastPrices.Max() : 0;
 
-        protected double MinPeriodPrice
-        {
-            get
-            {
-                lock (PastPrices) {
-                    if (PastPrices.Any())
-                    {
-                        return PastPrices.ToList().Min();
-                    }
-                    return 0;
-                }
-            }
-        }
+        protected double MinPeriodPrice => PastPrices.Any() ? PastPrices.Min() : 0;
 
-        public override ActualPrice GetandStoreCurrentOrders()
+        public override ActualPrice GetAndStoreCurrentOrders()
         {
             OrderBooks orderBooks = NiceHashApi.GetOrderBook(TargetCurrency, BTC);
             if (orderBooks == null)
@@ -69,9 +43,12 @@ namespace AutoTrader.Traders
             }
 
             var actualOrder = new ActualPrice { Currency = TargetCurrency, Price = orderBooks.sell[0][0], Amount = orderBooks.sell[0][1] };
-            //Store.Prices.ClearOldPrices();
+
+            LastPrice lastPrice = Store.LastPrices.GetLastPriceForTrader(this) ?? new LastPrice { Currency = TargetCurrency, Price = actualOrder.Price, Amount = actualOrder.Amount };
+            lastPrice.Date = DateTime.Now;
+
             Store.Prices.Save(new Price(DateTime.Now, TargetCurrency, actualOrder.Price));
-            Store.LastPrices.Save(new LastPrice { Currency = TargetCurrency, Price = actualOrder.Price, Amount = actualOrder.Amount, Date = DateTime.Now });
+            Store.LastPrices.SaveOrUpdate(lastPrice);
 
             Logger.Info($"{TargetCurrency} price: {actualOrder.Price}, amount: {actualOrder.Amount}");
 
@@ -91,36 +68,32 @@ namespace AutoTrader.Traders
 
             var lastPrice = Store.LastPrices.GetLastPriceForTrader(this);
 
-            if (lastPrice == null)
+            if (lastPrice == null || lastPrice.Date == lastPriceDate)
             {
                 return;
             }
 
             actualPrice = lastPrice.Price;
             actualAmount = lastPrice.Amount;
+            lastPriceDate = lastPrice.Date;
+
+            if (PastPrices == null)
+            {
+                PastPrices = new ObservableCollection<double>(Store.Prices.GetPricesForTrader(this, DateTime.MinValue).Select(p => p.Value));
+                smaProvider.SetData(PastPrices);
+                aoProvider.SetData(PastPrices);
+                SmaSkip = smaProvider.Sma.Count - Ao.Count;
+                PastPricesSkip = PastPrices.Count - Ao.Count;
+            }
+            else
+            {                    
+                PastPrices.Add(actualPrice);
+            }
 
             bool hasChanged = previousPrice == double.MaxValue;
             if (hasChanged)
             {
                 previousPrice = actualPrice;
-            }
-
-            lock (PastPrices)
-            {
-                if (pastPrices == null)
-                {
-                    pastPrices = new ObservableCollection<double>(Store.Prices.GetPricesForTrader(this, DateTime.MinValue).Select(p => p.Value));
-                    smaProvider.SetData(pastPrices);
-                    aoProvider.SetData(pastPrices);
-                    sma = smaProvider.Sma.Skip(smaProvider.Sma.Count - Ao.Count).ToList();
-                    pp = pastPrices.Skip(pastPrices.Count - Ao.Count).ToList();
-                    pastPrices.CollectionChanged += PastPricesChanged;
-                    Logger.LogCurrency(TargetCurrency, actualPrice, actualAmount, MinPeriodPrice, MaxPeriodPrice, buyRatio, sellRatio);
-                }
-                else
-                {                    
-                    pastPrices.Add(actualPrice);
-                }
             }
 
             changeRatio = actualPrice / previousPrice;
@@ -150,16 +123,7 @@ namespace AutoTrader.Traders
                 Logger.Info($"Change: {changeRatio}, Cur: {actualPrice} x {actualAmount}");
             }
 
-            if (aoProvider.HasChanged)
-            {
-                Logger.LogCurrency(TargetCurrency, actualPrice, actualAmount, MinPeriodPrice, MaxPeriodPrice, buyRatio, sellRatio);
-            }
-        }
-
-        private void PastPricesChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            pp.Add(actualPrice);
-            sma.Add(smaProvider.Current);
+            Logger.LogCurrency(TargetCurrency, actualPrice, actualAmount, MinPeriodPrice, MaxPeriodPrice, buyRatio, sellRatio, SmaSkip, PastPricesSkip);
         }
 
         private bool Buy(double btc, double actualPrice, double actualAmount)
@@ -169,9 +133,7 @@ namespace AutoTrader.Traders
                 Logger.Info($"Time to buy at price {actualPrice}, amount: {btc}");
                 StoreTradeOrder(actualPrice, btc, actualPrice * 0.005, TargetCurrency);
                 btcBalance -= btc + (actualPrice * 0.005);
-                //PastPrices.Clear();
             }
-
             return true;
         }
 

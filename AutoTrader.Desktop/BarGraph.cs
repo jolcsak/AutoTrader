@@ -14,12 +14,15 @@ namespace AutoTrader.Desktop
     public class BarGraph
     {
         private Canvas graph;
-        private Color buyColor;
-        private Color sellColor;
 
         private IList<AoValue> values;
         private string graphName;
         private string toolTipFormat = "N10";
+
+        SolidColorBrush buyFillColor;
+        SolidColorBrush sellFillColor;
+        SolidColorBrush pointFillRedBrush = new SolidColorBrush { Color = Colors.Red };
+        SolidColorBrush pointFillGreenBrush = new SolidColorBrush { Color = Colors.Green };
 
         protected Dispatcher Dispatcher => Application.Current != null ? Application.Current.Dispatcher : null;
 
@@ -27,9 +30,15 @@ namespace AutoTrader.Desktop
         {
             this.graph = graph;
             this.values = values;
-            this.buyColor = buyColor;
-            this.sellColor = sellColor;
             this.graphName = graphName;
+
+            buyFillColor = new SolidColorBrush { Color = buyColor };
+            sellFillColor = new SolidColorBrush { Color = sellColor };
+
+            buyFillColor.Freeze();
+            sellFillColor.Freeze();
+            pointFillRedBrush.Freeze();
+            pointFillGreenBrush.Freeze();
         }
 
         public void Draw(double xOffset = 0)
@@ -50,11 +59,6 @@ namespace AutoTrader.Desktop
                 {
                     return;
                 }
-
-                SolidColorBrush buyFillColor = new SolidColorBrush { Color = buyColor };
-                SolidColorBrush sellFillColor = new SolidColorBrush { Color = sellColor };
-                SolidColorBrush pointFillRedBrush = new SolidColorBrush { Color = Colors.Red };
-                SolidColorBrush pointFillGreenBrush = new SolidColorBrush { Color = Colors.Green };
 
                 double width = graph.ActualWidth;
                 double height = graph.ActualHeight;
