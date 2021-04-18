@@ -1,5 +1,7 @@
 ﻿using AutoTrader.Db.Entities;
+using AutoTrader.GraphProviders;
 using AutoTrader.Log;
+using AutoTrader.Traders;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,6 +17,15 @@ namespace AutoTrader.Desktop
         private TraderThread traderThread;
 
         protected ITradeLogger Logger => TradeLogManager.GetLogger(string.Empty);
+
+        protected ITrader CurrentTrader
+        {
+            get
+            {
+                var selectedCurrency = currencies?.SelectedItem as Currency;
+                return selectedCurrency != null ? traderThread.GetTrader(selectedCurrency.Name) : null;
+            }
+        }
 
         public MainWindow()
         {
@@ -40,8 +51,6 @@ namespace AutoTrader.Desktop
 
         private void SetRatios()
         {
-            buyRatio.Text = TradeSettings.BuyRatio.ToString();
-            sellRatio.Text = TradeSettings.SellRatio.ToString();
             minYield.Text = TradeSettings.MinSellYield.ToString();
         }
 
@@ -76,60 +85,22 @@ namespace AutoTrader.Desktop
             }
         }
 
-        private void BuyRatio_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            double buyRatioValue;
-            if (double.TryParse(buyRatio.Text, out buyRatioValue))
-            {
-                if (buyRatioValue > 0 && buyRatioValue < 5)
-                {
-                    TradeSettings.BuyRatio = buyRatioValue;
-                    buyRatio.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("White"));
-                }
-                else
-                {
-                    buyRatio.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("Red"));
-                }
-            }
-            else
-            {
-                buyRatio.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("Red"));
-            }
-        }
-
-        private void SellRatio_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            double sellRatioValue;
-            if (double.TryParse(sellRatio.Text, out sellRatioValue))
-            {
-                if (sellRatioValue > 0 && sellRatioValue < 5)
-                {
-                    TradeSettings.SellRatio = sellRatioValue;
-                    sellRatio.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("White"));
-                }
-                else
-                {
-                    sellRatio.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("Red"));
-                }
-            }
-            else
-            {
-                sellRatio.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("Red"));
-            }
-        }
-
         private void currencies_SelectedCellsChanged(object sender, System.Windows.Controls.SelectedCellsChangedEventArgs e)
         {
-            var selectedCurrency = currencies.SelectedItem as Currency;
-            if (selectedCurrency != null)
+            var currentTrader = CurrentTrader;
+            if (currentTrader != null)
             {
-                var traderForCurrency = traderThread.GetTrader(selectedCurrency.Name);
-                if (traderForCurrency != null)
-                {
-                    Logger.LogAo(selectedCurrency.Name, traderForCurrency.Ao);
-                    Logger.LogPastPrices(selectedCurrency.Name, traderForCurrency.PastPrices, traderForCurrency.PastPricesSkip);
-                    Logger.LogSma(selectedCurrency.Name, traderForCurrency.Sma, traderForCurrency.SmaSkip);
-                }
+                Logger.RefreshGraph(currentTrader);
+            }
+        }
+
+        private void aoRatio_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            AoProvider.Ratio = e.NewValue;
+            if (CurrentTrader != null)
+            {
+                CurrentTrader.GraphCollection.AoProvider.RefreshAll();
+                currencies_SelectedCellsChanged(sender, null);
             }
         }
 

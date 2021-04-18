@@ -22,22 +22,20 @@
                         <ColumnDefinition Width="55"/>
                         <ColumnDefinition Width="66"/>
                         <ColumnDefinition Width="125"/>
-                        <ColumnDefinition Width="65"/>
-                        <ColumnDefinition Width="125"/>
+                        <ColumnDefinition Width="190"/>
+                        <ColumnDefinition Width="0"/>
                         <ColumnDefinition Width="96"/>
                         <ColumnDefinition Width="125"/>
                     </Grid.ColumnDefinitions>
                     <Label Content="Current balance:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="0"/>
                     <Label x:Name="balance" FontWeight="ExtraBold" Grid.Column="1"/>
-                    <CheckBox x:Name="canBuy" FontWeight="SemiBold" IsChecked="True" VerticalAlignment="Center" Checked="CanBuy_Checked" Unchecked="CanBuy_Unchecked" Grid.Column="2">
+                    <CheckBox x:Name="canBuy" FontWeight="SemiBold" IsChecked="True" VerticalAlignment="Center" Checked="CanBuy_Checked" Unchecked="CanBuy_Unchecked" Grid.Column="2" Height="16">
                         Buy
                     </CheckBox>
-                    <Label Content="Buy Ratio:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="3"/>
-                    <TextBox x:Name="buyRatio" TextWrapping="Wrap" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" TextChanged="BuyRatio_TextChanged" Grid.Column="4" />
-                    <Label Content="Sell Ratio:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="5"/>
-                    <TextBox x:Name="sellRatio" TextWrapping="Wrap" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" TextChanged="SellRatio_TextChanged" Grid.Column="6" />
+                    <Label Content="Ao Ratio:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="3" Height="26" VerticalAlignment="Center"/>
+                    <Slider x:Name="aoRatio" VerticalAlignment="Center" Grid.Column="4" Minimum="1" Maximum="100" Grid.ColumnSpan="2" Height="18" Margin="0,0,3,0" ValueChanged="aoRatio_ValueChanged" Value="10" AutoToolTipPlacement="BottomRight"/>
                     <Label Content="Minimum Yield:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="7"/>
-                    <TextBox x:Name="minYield" TextWrapping="Wrap" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" TextChanged="MinYield_TextChanged" Grid.Column="8"/>
+                    <TextBox x:Name="minYield" TextWrapping="Wrap" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" TextChanged="MinYield_TextChanged" Grid.Column="8" Height="18"/>
                 </Grid>
             </DockPanel>
             <Grid Margin="4,4,4,4">
@@ -56,8 +54,6 @@
                             <DataGridTextColumn Binding="{Binding Change}" Header="Change" FontWeight="ExtraBold"/>
                             <DataGridTextColumn Binding="{Binding MinPeriodPrice, StringFormat={}{0:N10}}" Header="Min Period Price" />
                             <DataGridTextColumn Binding="{Binding MaxPeriodPrice, StringFormat={}{0:N10}}" Header="Max Period Price" />
-                            <DataGridTextColumn Binding="{Binding BuyRatio, StringFormat={}{0:N4}}" Header="Buy Ratio" />
-                            <DataGridTextColumn Binding="{Binding SellRatio, StringFormat={}{0:N4}}" Header="Sell Ratio" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>

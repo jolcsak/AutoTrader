@@ -23,7 +23,6 @@ namespace AutoTrader.Desktop
         SolidColorBrush sellFillColor;
         SolidColorBrush pointFillRedBrush = new SolidColorBrush { Color = Colors.Red };
         SolidColorBrush pointFillGreenBrush = new SolidColorBrush { Color = Colors.Green };
-
         protected Dispatcher Dispatcher => Application.Current != null ? Application.Current.Dispatcher : null;
 
         public BarGraph(Canvas graph, string graphName, IList<AoValue> values, Color buyColor, Color sellColor)

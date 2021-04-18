@@ -6,10 +6,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using AutoTrader.Db;
 using AutoTrader.Db.Entities;
-using AutoTrader.GraphProviders;
 using AutoTrader.Log;
+using AutoTrader.Traders;
 
 namespace AutoTrader.Desktop
 {
@@ -31,9 +30,6 @@ namespace AutoTrader.Desktop
         private static IList<Currency> currencyList = new List<Currency>();
 
         private static string selectedCurrency;
-        private static IList<double> currentPastPrices;
-        private static IList<double> currentSma;
-        private static IList<AoValue> currentAo;
 
         protected string Name { get; private set; }
 
@@ -116,12 +112,14 @@ namespace AutoTrader.Desktop
             Dispatcher?.BeginInvoke(() => balanceText.Content = $"{balance:N10} {currency}");
         }
 
-        public void LogCurrency(string currency, double price, double amount, double minPeriodPrice, double maxPeriodPrice, double buyRatio, double sellRatio, int smaSkip, int pricesSkip)
+        public void LogCurrency(ITrader trader, double price, double amount)
         {
             if (currencies.ItemsSource == null)
             {
                 Dispatcher?.BeginInvoke(() => currencies.ItemsSource = currencyList);
             }
+
+            string currency = trader.TargetCurrency;
 
             var currencyInst = currencyList.FirstOrDefault(c => c.Name == currency);
             if (currencyInst == null)
@@ -129,17 +127,31 @@ namespace AutoTrader.Desktop
                 currencyInst = new Currency { Name = currency, Price = price, Amount = amount };
                 currencyList.Add(currencyInst);
                 RefreshCurrencyList();
-            } else
+            }
+            else
             {
-                if (currencyInst.Refresh(price, amount, minPeriodPrice, maxPeriodPrice, buyRatio, sellRatio))
+                if (currencyInst.Refresh(price, amount, trader.GraphCollection.MinPeriodPrice, trader.GraphCollection.MaxPeriodPrice))
                 {
                     RefreshCurrencyList();
                 }
             }
 
-            RefreshPrices(currency, pricesSkip);
-            RefreshSma(currency, smaSkip);
-            RefreshAo(currency);
+            if (selectedCurrency != currency)
+            {
+                return;
+            }
+            RefreshGraph(trader);
+        }
+
+        public void RefreshGraph(ITrader trader)
+        {
+            Dispatcher?.Invoke(() => graph.Children.Clear());
+
+            GraphCollection graphCollection = trader.GraphCollection;
+            graphCollection.Refresh();
+            new Graph(graph, "BTC Price ratio", graphCollection.PastPrices, Colors.DarkGray, showPoints: false).Draw(graphCollection.PricesSkip);
+            new Graph(graph, "Simple Moving Average", graphCollection.Sma, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
+            new BarGraph(graph, "Awesome Oscillator", graphCollection.Ao, Colors.Yellow, Colors.Blue).Draw();
         }
 
         private void RefreshCurrencyList()
@@ -156,57 +168,6 @@ namespace AutoTrader.Desktop
                     row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
                 }
             });
-        }
-
-        public void LogPastPrices(string currency, IList<double> pastPrices, int pricesSkip)
-        {
-            currentPastPrices = pastPrices;
-            selectedCurrency = currency;
-            Dispatcher?.BeginInvoke(() => selectedCurrencyLabel.Content = currency);
-            RefreshPrices(currency, pricesSkip);
-        }
-
-        public void LogSma(string currency, IList<double> sma, int smaSkip)
-        {
-            currentSma = sma;
-            selectedCurrency = currency;
-            RefreshSma(currency, smaSkip);
-        }
-
-        public void LogAo(string currency, IList<AoValue> ao)
-        {
-            currentAo = ao;
-            selectedCurrency = currency;
-            RefreshAo(currency);
-        }
-
-        public void RefreshPrices(string currency, int pricesSkip)
-        {
-            if (selectedCurrency != currency)
-            {
-                return;
-            }
-            Dispatcher?.Invoke(() => graph.Children.Clear());
-
-            new Graph(graph, "BTC Price ratio", currentPastPrices, Colors.DarkGray, showPoints: false).Draw(pricesSkip);
-        }
-
-        public void RefreshSma(string currency, int smaSkip)
-        {
-            if (selectedCurrency != currency)
-            {
-                return;
-            }
-            new Graph(graph, "Simple Moving Average", currentSma, Colors.Blue, showPoints: false).Draw(smaSkip);
-        }
-
-        public void RefreshAo(string currency)
-        {
-            if (selectedCurrency != currency)
-            {
-                return;
-            }
-            new BarGraph(graph, "Awesome Oscillator", currentAo, Colors.Yellow, Colors.Blue).Draw();
         }
     }
 }

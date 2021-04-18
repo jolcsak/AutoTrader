@@ -40,6 +40,7 @@ namespace AutoTrader.GraphProviders
 
         public void Calculate()
         {
+            Sma.Clear();
             for (int i = 0; i < data.Count; i++)
             {
                 Sma.Add(GetMa(i));

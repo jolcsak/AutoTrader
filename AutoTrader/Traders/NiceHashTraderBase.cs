@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using AutoTrader.Api;
 using AutoTrader.Db;
 using AutoTrader.Db.Entities;
-using AutoTrader.GraphProviders;
 using AutoTrader.Log;
 
 namespace AutoTrader.Traders
@@ -13,11 +11,6 @@ namespace AutoTrader.Traders
         protected static NiceHashApi NiceHashApi => NiceHashApi.Instance;
 
         protected static Store Store => Store.Instance;
-
-
-        protected SmaProvider smaProvider = new SmaProvider();
-
-        protected AoProvider aoProvider = new AoProvider();
 
         public string TargetCurrency { get; protected set; }
 
@@ -29,12 +22,12 @@ namespace AutoTrader.Traders
 
         public virtual IList<TradeOrder> AllTradeOrders => Store.OrderBooks.GetAllOrders(this);
 
-        public ObservableCollection<double> PastPrices { get; set; }
-        public IList<double> Sma => smaProvider.Sma;
-        public IList<AoValue> Ao => aoProvider.Ao;
+        public GraphCollection GraphCollection { get; }
 
-        public int SmaSkip { get; set; } = 0;
-        public int PastPricesSkip { get; set; } = 0;
+        public NiceHashTraderBase()
+        {
+            GraphCollection = new GraphCollection(this);
+        }
 
         public virtual void Trade()
         {

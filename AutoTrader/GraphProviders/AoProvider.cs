@@ -6,11 +6,11 @@ namespace AutoTrader.GraphProviders
 {
     public class AoProvider
     {
-        private const double ratio = 10;
+        public static double Ratio { get; set; } = 10;
 
         private int slowPeriod;
         private int fastPeriod;
-        private IList<double> data;
+        private ObservableCollection<double> data;
 
         double previousMa = -1;
 
@@ -35,7 +35,11 @@ namespace AutoTrader.GraphProviders
         public void SetData(ObservableCollection<double> data)
         {
             this.data = data;
+            RefreshAll();
+        }
 
+        public void RefreshAll()
+        {
             slowSmaProvider = new SmaProvider(slowPeriod);
             fastSmaProvider = new SmaProvider(fastPeriod);
             slowSmaProvider.SetData(data);
@@ -49,6 +53,7 @@ namespace AutoTrader.GraphProviders
 
         public void Calculate()
         {
+            Ao.Clear();
             for (int i = 0; i < data.Count; i++)
             {
                 double slowMa = slowSmaProvider.Sma[i];
@@ -68,8 +73,8 @@ namespace AutoTrader.GraphProviders
             if (i >= 2)
             {
                 bool buy = Ao[i - 1]?.Value < 0 && Ao[i].Value > 0;
-                buy |= Ao[i].Value > 0 && Ao[i - 2].Color == AoColor.Green && Ao[i - 1].Color == AoColor.Red && Ao[i].Color == AoColor.Green && Ao[i].Value > Ao[i - 1].Value * ratio;
-                buy |= Ao[i].Value < 0 && Ao[i].Value > Ao[i - 1].Value * ratio && Ao[i - 1].Color == AoColor.Red && Ao[i].Color == AoColor.Green;
+                buy |= Ao[i].Value > 0 && Ao[i - 2].Color == AoColor.Green && Ao[i - 1].Color == AoColor.Red && Ao[i].Color == AoColor.Green && Ao[i].Value > Ao[i - 1].Value * Ratio;
+                buy |= Ao[i].Value < 0 && Ao[i].Value > Ao[i - 1].Value * Ratio && Ao[i - 1].Color == AoColor.Red && Ao[i].Color == AoColor.Green;
                 return buy;
             }
             return false;
@@ -81,8 +86,8 @@ namespace AutoTrader.GraphProviders
             if (i >= 2)
             {
                 bool sell = Ao[i - 1]?.Value > 0 && Ao[i].Value < 0;
-                sell |= Ao[i].Value < 0 && Ao[i - 2].Color == AoColor.Red && Ao[i - 1].Color == AoColor.Green && Ao[i].Color == AoColor.Red && Ao[i].Value < Ao[i - 1].Value * ratio;
-                sell |= Ao[i].Value > 0 && Ao[i].Value < Ao[i - 1].Value * ratio && Ao[i - 1].Color == AoColor.Green && Ao[i].Color == AoColor.Red;
+                sell |= Ao[i].Value < 0 && Ao[i - 2].Color == AoColor.Red && Ao[i - 1].Color == AoColor.Green && Ao[i].Color == AoColor.Red && Ao[i].Value < Ao[i - 1].Value * Ratio;
+                sell |= Ao[i].Value > 0 && Ao[i].Value < Ao[i - 1].Value * Ratio && Ao[i - 1].Color == AoColor.Green && Ao[i].Color == AoColor.Red;
                 return sell;
             }
             return false;

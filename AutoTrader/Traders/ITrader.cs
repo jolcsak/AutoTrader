@@ -1,7 +1,5 @@
 ﻿using AutoTrader.Db.Entities;
-using AutoTrader.GraphProviders;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace AutoTrader.Traders
 {
@@ -15,15 +13,7 @@ namespace AutoTrader.Traders
 
         public IList<TradeOrder> AllTradeOrders { get; }
 
-        public ObservableCollection<double> PastPrices { get; }
-
-        public IList<double> Sma { get; }
-
-        public IList<AoValue> Ao { get; }
-
-        public int SmaSkip { get; set; } 
-
-        public int PastPricesSkip { get; set; }
+        public GraphCollection GraphCollection { get; }
 
         public void Trade();
 

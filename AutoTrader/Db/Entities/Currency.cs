@@ -9,8 +9,6 @@
         public double Amount { get; set; }
         public double MinPeriodPrice { get; set; }
         public double MaxPeriodPrice { get; set; }
-        public double BuyRatio { get; set; }
-        public double SellRatio { get; set; }
 
         public string Change
         {
@@ -24,9 +22,9 @@
             }
         }
 
-        public bool Refresh(double price, double amount, double minPeriodPrice, double maxPeriodPrice, double buyRatio, double sellRatio)
+        public bool Refresh(double price, double amount, double minPeriodPrice, double maxPeriodPrice)
         {
-            bool hasChanged = price != Price || amount != Amount || previousPrice != Price || minPeriodPrice != MinPeriodPrice || maxPeriodPrice != MaxPeriodPrice || buyRatio != BuyRatio || sellRatio != SellRatio;
+            bool hasChanged = price != Price || amount != Amount || previousPrice != Price || minPeriodPrice != MinPeriodPrice || maxPeriodPrice != MaxPeriodPrice;
             if (hasChanged)
             {
                 previousPrice = Price;
@@ -34,8 +32,6 @@
                 Amount = amount;
                 MinPeriodPrice = minPeriodPrice;
                 MaxPeriodPrice = maxPeriodPrice;
-                BuyRatio = buyRatio;
-                SellRatio = sellRatio;
             }
             return hasChanged;
         }
