@@ -21,12 +21,12 @@ namespace AutoTrader.Db
             return lastPrice.FirstOrDefault();
         }
 
-        public IList<Price> GetPricesForTrader(ITrader trader, DateTime dateFrom)
+        public IList<Price> GetPricesForTrader(ITrader trader)
         {
             var prices = Table.
-                Filter(doc => R.Or(doc["Currency"].Eq(trader.TargetCurrency)).And(doc["Time"].Gt(dateFrom))).OrderBy("Time").Limit(1000)
+                Filter(doc => R.Or(doc["Currency"].Eq(trader.TargetCurrency))).OrderBy(R.Desc("Time")).Limit(1000)
                 .RunResult<IList<Price>>(conn);
-            return prices;
+            return prices.Reverse().ToList();
         }
 
         public void ClearOldPrices()

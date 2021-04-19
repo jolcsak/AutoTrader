@@ -12,24 +12,24 @@ namespace AutoTrader.Db
 
         public IList<TradeOrder> GetOrdersForTrader(ITrader trader)
         {
-            return Table.
+            var r = Table.
                 Filter(doc => 
                 R.Or(doc["Trader"].Eq(trader.TraderId)
                 .And(doc["Currency"].Eq(trader.TargetCurrency))))
-                .RunResult<IList<TradeOrder>>(conn);
+                .RunCursor<TradeOrder>(conn);
+
+            var ret = new List<TradeOrder>();
+            while (r.MoveNext())
+            {
+                ret.Add(r.Current);
+            }
+            return ret;
         }
 
         public IList<TradeOrder> GetAllOrders(ITrader trader)
         {
             var r = Table.Filter(R.HashMap("Trader", trader.TraderId)).RunCursor<TradeOrder>(conn);
-
-            //var r = Table.
-            //    Filter(doc =>
-            //    R.Or(doc["Trader"].Eq(trader.TraderId)
-            //    .And(doc["Currency"].Eq(trader.TargetCurrency))))
-            //    .RunCursor<TradeOrder>(conn);
-
-            IList<TradeOrder> ret = new List<TradeOrder>();
+            var ret = new List<TradeOrder>();
             while (r.MoveNext())
             {
                 ret.Add(r.Current);

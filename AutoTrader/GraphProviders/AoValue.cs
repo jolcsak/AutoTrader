@@ -15,5 +15,6 @@ namespace AutoTrader.GraphProviders
         public bool Buy { get; set; }
         public bool Sell { get; set; }
         public DateTime Date { get; set; }
+        public int SmaIndex { get; set; }
     }
 }

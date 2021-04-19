@@ -1,7 +1,6 @@
 ﻿using AutoTrader.Db;
 using AutoTrader.GraphProviders;
 using AutoTrader.Log;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -36,7 +35,7 @@ namespace AutoTrader.Traders
         {
             if (PastPrices == null)
             {
-                PastPrices = new ObservableCollection<double>(Store.Prices.GetPricesForTrader(trader, DateTime.MinValue).Select(p => p.Value));
+                PastPrices = new ObservableCollection<double>(Store.Prices.GetPricesForTrader(trader).Select(p => p.Value));
                 smaProvider.SetData(PastPrices);
                 AoProvider.SetData(PastPrices);
                 SmaSkip = smaProvider.Sma.Count - Ao.Count;

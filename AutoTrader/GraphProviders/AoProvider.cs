@@ -35,11 +35,6 @@ namespace AutoTrader.GraphProviders
         public void SetData(ObservableCollection<double> data)
         {
             this.data = data;
-            RefreshAll();
-        }
-
-        public void RefreshAll()
-        {
             slowSmaProvider = new SmaProvider(slowPeriod);
             fastSmaProvider = new SmaProvider(fastPeriod);
             slowSmaProvider.SetData(data);
@@ -51,43 +46,69 @@ namespace AutoTrader.GraphProviders
             Calculate();
         }
 
+        public void RefreshAll()
+        {
+            int i = 0;
+            foreach (var ao in Ao)
+            {
+                ao.Buy = IsBuy(i, ao.SmaIndex);
+                ao.Sell = IsSell(i, ao.SmaIndex);
+                i++;
+            }
+        }
+
         public void Calculate()
         {
             Ao.Clear();
-            for (int i = 0; i < data.Count; i++)
+            int aoIndex = 0;
+            for (int i = 0; i < slowSmaProvider.Sma.Count; i++)
             {
                 double slowMa = slowSmaProvider.Sma[i];
                 double fastMa = fastSmaProvider.Sma[i];
                 var ma = fastMa - slowMa;
                 if (fastMa > -1 && slowMa > -1)
                 {
-                    Ao.Add(CreateAo(ma));
+                    var aoValue = CreateAo(ma, i);
+                    Ao.Add(aoValue);
+                    aoValue.Buy = IsBuy(aoIndex, aoValue.SmaIndex);
+                    aoValue.Sell = IsSell(aoIndex, aoValue.SmaIndex);
+                    aoIndex++;
                 }
                 previousMa = ma;
             }
         }
 
-        public bool IsBuy()
+        public bool IsBuy(int i, int si)
         {
-            int i = AoIndex;
             if (i >= 2)
             {
                 bool buy = Ao[i - 1]?.Value < 0 && Ao[i].Value > 0;
-                buy |= Ao[i].Value > 0 && Ao[i - 2].Color == AoColor.Green && Ao[i - 1].Color == AoColor.Red && Ao[i].Color == AoColor.Green && Ao[i].Value > Ao[i - 1].Value * Ratio;
-                buy |= Ao[i].Value < 0 && Ao[i].Value > Ao[i - 1].Value * Ratio && Ao[i - 1].Color == AoColor.Red && Ao[i].Color == AoColor.Green;
+                if (!buy)
+                {
+                    buy |= Ao[i].Value > 0 && Ao[i - 2].Color == AoColor.Green && Ao[i - 1].Color == AoColor.Red && Ao[i].Color == AoColor.Green && fastSmaProvider.Sma[si] > fastSmaProvider.Sma[si - 1] * Ratio;
+                }
+                if (!buy)
+                {
+                    buy |= Ao[i].Value < 0 && fastSmaProvider.Sma[si] > fastSmaProvider.Sma[si - 1] * Ratio && Ao[i - 1].Color == AoColor.Red && Ao[i].Color == AoColor.Green;
+                }
                 return buy;
             }
             return false;
         }
 
-        public bool IsSell()
+        public bool IsSell(int i, int si)
         {
-            int i = AoIndex;
             if (i >= 2)
             {
                 bool sell = Ao[i - 1]?.Value > 0 && Ao[i].Value < 0;
-                sell |= Ao[i].Value < 0 && Ao[i - 2].Color == AoColor.Red && Ao[i - 1].Color == AoColor.Green && Ao[i].Color == AoColor.Red && Ao[i].Value < Ao[i - 1].Value * Ratio;
-                sell |= Ao[i].Value > 0 && Ao[i].Value < Ao[i - 1].Value * Ratio && Ao[i - 1].Color == AoColor.Green && Ao[i].Color == AoColor.Red;
+                if (!sell)
+                {
+                    sell |= Ao[i].Value < 0 && Ao[i - 2].Color == AoColor.Red && Ao[i - 1].Color == AoColor.Green && Ao[i].Color == AoColor.Red && fastSmaProvider.Sma[si] < fastSmaProvider.Sma[si - 1] * Ratio;
+                }
+                if (!sell)
+                {
+                    sell |= Ao[i].Value > 0 && fastSmaProvider.Sma[si] < fastSmaProvider.Sma[si - 1] * Ratio && Ao[i - 1].Color == AoColor.Green && Ao[i].Color == AoColor.Red;
+                }
                 return sell;
             }
             return false;
@@ -104,7 +125,10 @@ namespace AutoTrader.GraphProviders
 
                 if (fastMa > -1 && slowMa > -1)
                 {
-                    Ao.Add(CreateAo(ma));
+                    var aoValue = CreateAo(ma, fastSmaProvider.Sma.Count - 1);
+                    Ao.Add(aoValue);
+                    aoValue.Buy = IsBuy(AoIndex, aoValue.SmaIndex);
+                    aoValue.Sell = IsSell(AoIndex, aoValue.SmaIndex);
                 }
                 HasChanged = true;
             }
@@ -116,9 +140,9 @@ namespace AutoTrader.GraphProviders
             Refresh();
         }
 
-        private AoValue CreateAo(double ma)
+        private AoValue CreateAo(double ma, int smaIndex)
         {
-            return new AoValue { Value = ma, Color = previousMa > ma ? AoColor.Red : AoColor.Green, Buy = IsBuy(), Sell = IsSell() };
+            return new AoValue { Value = ma, Color = previousMa > ma ? AoColor.Red : AoColor.Green, SmaIndex = smaIndex };
         }
     }
 }
