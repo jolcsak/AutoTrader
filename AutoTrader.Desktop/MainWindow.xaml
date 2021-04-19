@@ -48,7 +48,7 @@
                     <Label Content="Currencies" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="86" DockPanel.Dock="Top" FontWeight="SemiBold"/>
                     <DataGrid x:Name="currencies" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" SelectedCellsChanged="currencies_SelectedCellsChanged" ScrollViewer.IsDeferredScrollingEnabled="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Binding="{Binding Name}" Header="Date" />
+                            <DataGridTextColumn Binding="{Binding Name}" Header="Name" SortDirection="Ascending"/>
                             <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N10}}" Header="Price" />
                             <DataGridTextColumn Binding="{Binding Amount}" Header="Amount" />
                             <DataGridTextColumn Binding="{Binding Change}" Header="Change" FontWeight="ExtraBold"/>
