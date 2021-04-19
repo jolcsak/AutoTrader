@@ -24,8 +24,14 @@ namespace AutoTrader.Desktop
         private bool showPoints;
 
         private SolidColorBrush lineBrush;
-        private SolidColorBrush pointOutlineBrush = new SolidColorBrush { Color = Colors.Black };
-        private SolidColorBrush pointFillBrush = new SolidColorBrush { Color = Colors.Orange };
+        private static SolidColorBrush pointOutlineBrush = new SolidColorBrush { Color = Colors.Black };
+        private static SolidColorBrush pointFillBrush = new SolidColorBrush { Color = Colors.Orange };
+
+        static Graph()
+        {
+            pointOutlineBrush.Freeze();
+            pointFillBrush.Freeze();
+        }
 
         public Graph(Canvas graph, string graphName, IList<double> values, Color lineColor, bool showPoints)
         {
@@ -36,8 +42,6 @@ namespace AutoTrader.Desktop
 
             lineBrush = new SolidColorBrush { Color = lineColor };
             lineBrush.Freeze();
-            pointOutlineBrush.Freeze();
-            pointFillBrush.Freeze();
         }
 
         public void Draw(int skip)

@@ -149,9 +149,9 @@ namespace AutoTrader.Desktop
 
             GraphCollection graphCollection = trader.GraphCollection;
             graphCollection.Refresh();
+            new BarGraph(graph, "Awesome Oscillator", graphCollection.Ao, Colors.Yellow, Colors.Blue).Draw();
             new Graph(graph, "BTC Price ratio", graphCollection.PastPrices, Colors.DarkGray, showPoints: false).Draw(graphCollection.PricesSkip);
             new Graph(graph, "Simple Moving Average", graphCollection.Sma, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
-            new BarGraph(graph, "Awesome Oscillator", graphCollection.Ao, Colors.Yellow, Colors.Blue).Draw();
         }
 
         private void RefreshCurrencyList()

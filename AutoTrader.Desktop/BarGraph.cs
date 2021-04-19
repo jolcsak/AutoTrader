@@ -21,9 +21,15 @@ namespace AutoTrader.Desktop
 
         SolidColorBrush buyFillColor;
         SolidColorBrush sellFillColor;
-        SolidColorBrush pointFillRedBrush = new SolidColorBrush { Color = Colors.Red };
-        SolidColorBrush pointFillGreenBrush = new SolidColorBrush { Color = Colors.Green };
-        protected Dispatcher Dispatcher => Application.Current != null ? Application.Current.Dispatcher : null;
+        private static SolidColorBrush pointFillRedBrush = new SolidColorBrush { Color = Colors.Red };
+        private static SolidColorBrush pointFillGreenBrush = new SolidColorBrush { Color = Colors.Green };
+        protected Dispatcher Dispatcher => Application.Current?.Dispatcher;
+
+        static BarGraph()
+        {
+            pointFillRedBrush.Freeze();
+            pointFillGreenBrush.Freeze();
+        }
 
         public BarGraph(Canvas graph, string graphName, IList<AoValue> values, Color buyColor, Color sellColor)
         {
@@ -36,8 +42,6 @@ namespace AutoTrader.Desktop
 
             buyFillColor.Freeze();
             sellFillColor.Freeze();
-            pointFillRedBrush.Freeze();
-            pointFillGreenBrush.Freeze();
         }
 
         public void Draw(double xOffset = 0)
