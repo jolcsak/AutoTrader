@@ -18,11 +18,11 @@ namespace AutoTrader
         private const int APP_TRADER_DELAY_TIME = 10;
         private ITradeLogger Logger = TradeLogManager.GetLogger("AutoTrader");
 
-        private static List<ITrader> traders = new List<ITrader>();
+        public static List<ITrader> Traders { get; } = new List<ITrader>();
 
         public ITrader GetTrader(string targetCurrency)
         {
-            return traders.FirstOrDefault(t => t.TargetCurrency == targetCurrency);
+            return Traders.FirstOrDefault(t => t.TargetCurrency == targetCurrency);
         }
 
         public Thread GetTraderThread(string appName = null)
@@ -61,7 +61,7 @@ namespace AutoTrader
 
             do
             {
-                foreach (ITrader trader in traders)
+                foreach (ITrader trader in Traders)
                 {
                     try
                     {
@@ -90,7 +90,7 @@ namespace AutoTrader
 
             do
             {
-                foreach (ITrader trader in traders)
+                foreach (ITrader trader in Traders)
                 {
                     try
                     {
@@ -110,15 +110,15 @@ namespace AutoTrader
 
         private static void CreateTraders(NiceHashApi niceHashApi)
         {
-            traders.Clear();
+            Traders.Clear();
 
             Symbols symbols = niceHashApi.GetExchangeSettings();
 
             foreach (Symbol symbol in symbols.symbols.Where(s => s.baseAsset != BtcTrader.BTC))
             {
-                if (!traders.Any(t => t.TargetCurrency == symbol.baseAsset))
+                if (!Traders.Any(t => t.TargetCurrency == symbol.baseAsset))
                 {
-                    traders.Add(new BtcTrader(symbol.baseAsset));
+                    Traders.Add(new BtcTrader(symbol.baseAsset));
                 }
             }
         }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace AutoTrader.GraphProviders
 {
@@ -10,7 +9,7 @@ namespace AutoTrader.GraphProviders
 
         public ObservableCollection<double> Sma { get; } = new ObservableCollection<double>();
 
-        public double Current => Sma.Any() ? Sma.Last() : -1;
+        public double Current { get; private set; } = -1;
 
         public SmaProvider(int period = 8)
         {
@@ -43,13 +42,19 @@ namespace AutoTrader.GraphProviders
             Sma.Clear();
             for (int i = 0; i < data.Count; i++)
             {
-                Sma.Add(GetMa(i));
+                Add(GetMa(i));
             }
         }
 
         public void Refresh()
         {
-            Sma.Add(GetMa(data.Count - 1));            
+            Add(GetMa(data.Count - 1));
+        }
+
+        private void Add(double ma)
+        {
+            Current = ma;
+            Sma.Add(ma);
         }
 
         private void DataChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

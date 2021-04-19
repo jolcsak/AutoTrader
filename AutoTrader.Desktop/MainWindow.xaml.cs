@@ -99,7 +99,9 @@ namespace AutoTrader.Desktop
             AoProvider.Ratio = e.NewValue;
             if (CurrentTrader != null)
             {
-                CurrentTrader.GraphCollection.AoProvider.RefreshAll();
+                foreach (ITrader trader in TraderThread.Traders) {
+                    trader.GraphCollection.AoProvider.RefreshAll();
+                }
                 currencies_SelectedCellsChanged(sender, null);
             }
         }
