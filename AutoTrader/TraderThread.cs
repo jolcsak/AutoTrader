@@ -61,7 +61,7 @@ namespace AutoTrader
 
             do
             {
-                foreach (ITrader trader in Traders)
+                foreach (ITrader trader in Traders.OrderByDescending(t => t.Order).ToList())
                 {
                     try
                     {

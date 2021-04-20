@@ -33,6 +33,58 @@ namespace AutoTrader.GraphProviders
 
         public AoValue Current => Ao.Any() ? Ao.Last() : null;
 
+        public double Frequency
+        {
+            get
+            {
+                int frequency = 0;
+                int i = 0;
+                foreach (var ao in Ao)
+                {
+                    if (i > 0 && Math.Sign(Ao[i].Value * Ao[i - 1].Value) < 0)
+                    {
+                        frequency++;
+                    }
+                    i++;
+                }
+                return frequency > 0 ? (double)frequency / Ao.Count : 0;
+            }
+        }
+
+        public double Amplitude 
+        { 
+            get
+            {
+                if (Ao.Count > 0)
+                {
+                    int i = 0;
+                    double max = Math.Abs(Ao.Select(ao => ao.Value).Max());
+                    double min = Math.Abs(Ao.Select(ao => ao.Value).Min());
+                    List<double> amplitudes = new List<double>();
+                    foreach (var ao in Ao)
+                    {
+                        if (i > 0)
+                        {
+                            if (Ao[i].Color != Ao[i - 1].Color)
+                            {
+                                if (Ao[i].Value >= 0)
+                                {
+                                    amplitudes.Add(Ao[i].Value / max);
+                                }
+                                else
+                                {
+                                    amplitudes.Add(Math.Abs(Ao[i].Value) / min);
+                                }
+                            }
+                        }
+                        i++;
+                    }
+                    return amplitudes.Average();
+                }
+                return 0;
+            }
+        }
+
         public AoProvider(int slowPeriod = 34, int fastPeriod = 5)
         {
             this.slowPeriod = slowPeriod;
@@ -136,7 +188,7 @@ namespace AutoTrader.GraphProviders
         {
             int oi = i;
             i--;
-            while (i > 0 && Math.Sign(Ao[i].Value * Ao[i -1].Value) >= 0)
+            while (i > 0 && (Math.Sign(Ao[i].Value * Ao[i -1].Value) >= 0 || Ao[i].Color == color))
             {
                 i--;
             }

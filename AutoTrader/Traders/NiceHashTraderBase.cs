@@ -23,6 +23,10 @@ namespace AutoTrader.Traders
         public virtual IList<TradeOrder> AllTradeOrders => Store.OrderBooks.GetAllOrders(this);
 
         public GraphCollection GraphCollection { get; }
+        public double Frequency => GraphCollection.AoProvider.Frequency;
+        public double Amplitude => GraphCollection.AoProvider.Amplitude;
+
+        public double Order => GraphCollection.AoProvider.Frequency * GraphCollection.AoProvider.Amplitude;
 
         public NiceHashTraderBase()
         {

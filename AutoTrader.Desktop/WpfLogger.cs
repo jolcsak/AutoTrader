@@ -124,13 +124,13 @@ namespace AutoTrader.Desktop
             var currencyInst = currencyList.FirstOrDefault(c => c.Name == currency);
             if (currencyInst == null)
             {
-                currencyInst = new Currency { Name = currency, Price = price, Amount = amount };
+                currencyInst = new Currency { Name = currency, Price = price, Amount = amount, Frequency = trader.Frequency, Amplitude = trader.Amplitude, Order = trader.Order };
                 currencyList.Add(currencyInst);
                 RefreshCurrencyList();
             }
             else
             {
-                if (currencyInst.Refresh(price, amount, trader.GraphCollection.MinPeriodPrice, trader.GraphCollection.MaxPeriodPrice))
+                if (currencyInst.Refresh(price, amount, trader.GraphCollection.MinPeriodPrice, trader.GraphCollection.MaxPeriodPrice, trader.Frequency, trader.Amplitude, trader.Order))
                 {
                     RefreshCurrencyList();
                 }

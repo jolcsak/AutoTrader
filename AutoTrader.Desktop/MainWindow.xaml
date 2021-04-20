@@ -54,6 +54,9 @@
                             <DataGridTextColumn Binding="{Binding Change}" Header="Change" FontWeight="ExtraBold"/>
                             <DataGridTextColumn Binding="{Binding MinPeriodPrice, StringFormat={}{0:N10}}" Header="Min Period Price" />
                             <DataGridTextColumn Binding="{Binding MaxPeriodPrice, StringFormat={}{0:N10}}" Header="Max Period Price" />
+                            <DataGridTextColumn Binding="{Binding Frequency, StringFormat={}{0:N6}}" Header="Frequency" />
+                            <DataGridTextColumn Binding="{Binding Amplitude, StringFormat={}{0:N4}}" Header="Amplitude" />
+                            <DataGridTextColumn Binding="{Binding Order, StringFormat={}{0:N4}}" Header="Order" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>

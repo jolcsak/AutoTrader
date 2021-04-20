@@ -9,6 +9,12 @@ namespace AutoTrader.Traders
 
         string TargetCurrency { get; }
 
+        double Frequency { get; }
+
+        double Amplitude { get; }
+
+        double Order { get; }
+
         public IList<TradeOrder> TradeOrders { get; }
 
         public IList<TradeOrder> AllTradeOrders { get; }

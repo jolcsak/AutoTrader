@@ -10,6 +10,12 @@
         public double MinPeriodPrice { get; set; }
         public double MaxPeriodPrice { get; set; }
 
+        public double Frequency { get; set; }
+
+        public double Amplitude { get; set; }
+
+        public double Order { get; set; }
+
         public string Change
         {
             get
@@ -22,9 +28,9 @@
             }
         }
 
-        public bool Refresh(double price, double amount, double minPeriodPrice, double maxPeriodPrice)
+        public bool Refresh(double price, double amount, double minPeriodPrice, double maxPeriodPrice, double frequency, double amplitude, double order)
         {
-            bool hasChanged = price != Price || amount != Amount || previousPrice != Price || minPeriodPrice != MinPeriodPrice || maxPeriodPrice != MaxPeriodPrice;
+            bool hasChanged = price != Price || amount != Amount || previousPrice != Price || minPeriodPrice != MinPeriodPrice || maxPeriodPrice != MaxPeriodPrice || frequency != Frequency || amplitude != Amplitude || Order != order;
             if (hasChanged)
             {
                 previousPrice = Price;
@@ -32,6 +38,10 @@
                 Amount = amount;
                 MinPeriodPrice = minPeriodPrice;
                 MaxPeriodPrice = maxPeriodPrice;
+                Frequency = frequency;
+                Amplitude = amplitude;
+                Order = order;
+                                
             }
             return hasChanged;
         }
