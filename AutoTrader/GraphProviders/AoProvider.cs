@@ -242,6 +242,7 @@ namespace AutoTrader.GraphProviders
                     Ao.Add(aoValue);
                     Trade(Ao.Count - 1, aoValue);
                 }
+                previousMa = ma;
                 HasChanged = true;
             }
 
