@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using MathNet.Numerics.IntegralTransforms;
+using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -12,7 +14,7 @@ namespace AutoTrader.Desktop
     {
         private Canvas graph;
 
-        private int pointSize = 6;
+        private int pointSize = 2;
         private int lineWeight = 2;
         private string toolTipFormat = "N10";
 
@@ -82,10 +84,11 @@ namespace AutoTrader.Desktop
                 if (showPoints)
                 {
                     currentX = 0;
+                    int i = 0;
                     foreach (double value in drawValues)
                     {
                         double y = (value - minValue) * cHeight;
-                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = pointFillBrush, Width = pointSize, Height = pointSize, ToolTip = value.ToString(toolTipFormat) };
+                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = pointFillBrush, Width = pointSize, Height = pointSize, ToolTip = value.ToString(toolTipFormat)  + "    "  + i++};
                         Canvas.SetLeft(rect, currentX - halfPointSize);
                         Canvas.SetBottom(rect, y - halfPointSize);
                         graph.Children.Add(rect);

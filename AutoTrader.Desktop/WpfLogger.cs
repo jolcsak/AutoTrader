@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using AutoTrader.Db.Entities;
+using AutoTrader.GraphProviders;
 using AutoTrader.Log;
 using AutoTrader.Traders;
+using MathNet.Filtering;
+using MathNet.Filtering.FIR;
+using MathNet.Numerics.IntegralTransforms;
 
 namespace AutoTrader.Desktop
 {
@@ -150,7 +155,17 @@ namespace AutoTrader.Desktop
             GraphCollection graphCollection = trader.GraphCollection;
             graphCollection.Refresh();
             new BarGraph(graph, "Awesome Oscillator", graphCollection.Ao, Colors.Yellow, Colors.Blue).Draw();
-            new Graph(graph, "BTC Price ratio", graphCollection.PastPrices, Colors.DarkGray, showPoints: false).Draw(graphCollection.PricesSkip);
+
+            //Complex[] signal = graphCollection.PastPrices.Select(val => new Complex(val, 0)).ToArray();
+            //Fourier.Inverse(signal, FourierOptions.Matlab);
+            //var result = signal.Select(x => new AoValue { Value = x.Magnitude, Color = AoColor.Green }).Take(signal.Length / 2).Skip(3).ToArray();
+            //new BarGraph(graph, "FFT", result, Colors.LightBlue, Colors.Orange).Draw();
+
+            var filter = OnlineFirFilter.CreateLowpass(ImpulseResponse.Finite, 50, trader.Amplitude);
+            var result2 = filter.ProcessSamples(graphCollection.PastPrices.ToArray());
+            new Graph(graph, "Price low-pass", result2, Colors.Orange, showPoints: false).Draw(85);
+
+            new Graph(graph, "BTC Price ratio", graphCollection.PastPrices, Colors.DarkGray, showPoints: true).Draw(graphCollection.PricesSkip);
             new Graph(graph, "Simple Moving Average", graphCollection.Sma, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
         }
 

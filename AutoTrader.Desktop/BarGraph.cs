@@ -72,7 +72,7 @@ namespace AutoTrader.Desktop
                 double cHeight = Math.Abs(minValue) > Math.Abs(maxValue) ? zeroY / Math.Abs(minValue) : zeroY / Math.Abs(maxValue);
                 double rectWidth = cWidth < 1 ? 1 : cWidth;
                 double currentX = 0;
-
+                    
                 foreach (AoValue value in values)
                 {
                     SetAttributes(buyFillColor, sellFillColor, pointFillRedBrush, pointFillGreenBrush, value, out var fill, out var toolTip);
