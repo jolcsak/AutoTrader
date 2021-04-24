@@ -33,7 +33,7 @@
                         Buy
                     </CheckBox>
                     <Label Content="Ao Ratio:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="3" Height="26" VerticalAlignment="Center"/>
-                    <Slider x:Name="aoRatio" VerticalAlignment="Center" Grid.Column="4" Minimum="1" Maximum="1.2" Grid.ColumnSpan="2" Height="18" Margin="0,0,3,0" ValueChanged="aoRatio_ValueChanged" Value="0.1" AutoToolTipPlacement="BottomRight" TickPlacement="BottomRight" LargeChange="0.1" SmallChange="0.01" TickFrequency="0.01" AutoToolTipPrecision="3"/>
+                    <Slider x:Name="aoRatio" VerticalAlignment="Center" Grid.Column="4" Minimum="0" Maximum="2" Grid.ColumnSpan="2" Height="18" Margin="0,0,3,0" ValueChanged="aoRatio_ValueChanged" Value="0.1" AutoToolTipPlacement="BottomRight" TickPlacement="BottomRight" LargeChange="0.1" SmallChange="0.01" TickFrequency="0.01" AutoToolTipPrecision="3"/>
                     <Label Content="Minimum Yield:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="7"/>
                     <TextBox x:Name="minYield" TextWrapping="Wrap" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" TextChanged="MinYield_TextChanged" Grid.Column="8" Height="18"/>
                 </Grid>

@@ -3,6 +3,7 @@ using System.Linq;
 using AutoTrader.Api;
 using AutoTrader.Db.Entities;
 using AutoTrader.Log;
+using AutoTrader.Traders.Agents;
 
 namespace AutoTrader.Traders
 {
@@ -19,9 +20,10 @@ namespace AutoTrader.Traders
         protected static double minBtcTradeAmount = 0.0001;
         protected static double btcBalance = 0.001;
 
-        public BtcTrader(string targetCurrency)
+        public BtcTrader(string targetCurrency) : base()
         {
             TargetCurrency = targetCurrency;
+            AoAgent = new AoAgent(GraphCollection);
         }
 
         protected override ITradeLogger Logger => TradeLogManager.GetLogger(BTC + "->" + TargetCurrency);
@@ -72,7 +74,7 @@ namespace AutoTrader.Traders
             actualAmount = lastPrice.Amount;
             lastPriceDate = lastPrice.Date;
 
-            GraphCollection.Refresh(actualPrice);
+            AoAgent.Refresh(actualPrice);
 
             if (previousPrice == double.MaxValue)
             {
@@ -90,14 +92,7 @@ namespace AutoTrader.Traders
             hasChanged |= Sell(actualPrice);
             previousPrice = actualPrice;
 
-            foreach (TradeOrder tradeOrder in TradeOrders.Where(to => to.ActualPrice != actualPrice))
-            {
-                if (actualPrice != tradeOrder.ActualPrice)
-                {
-                    tradeOrder.ActualPrice = actualPrice;
-                    Store.OrderBooks.SaveOrUpdate(tradeOrder);
-                }
-            }
+            RefreshOrderBooksPrices();
 
             if (hasChanged)
             {
@@ -110,7 +105,7 @@ namespace AutoTrader.Traders
 
         private bool Buy(double btc, double actualPrice, double actualAmount)
         {
-            if (GraphCollection.Ao.LastOrDefault()?.Buy == true)
+            if (AoAgent.IsBuy())
             {
                 Logger.Info($"Time to buy at price {actualPrice}, amount: {btc}");
                 StoreTradeOrder(actualPrice, btc, actualPrice * 0.005, TargetCurrency);
@@ -121,7 +116,7 @@ namespace AutoTrader.Traders
 
         private bool Sell(double actualPrice)
         {
-            if (GraphCollection.Ao.LastOrDefault()?.Sell == true)
+            if (AoAgent.IsSell())
             {
                 Logger.Info($"Time to sell at price {actualPrice}");
                 foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))
@@ -145,6 +140,18 @@ namespace AutoTrader.Traders
             //IDictionary<string, double> myBalances = NiceHashApi.GetBalances();
             //return myBalances.ContainsKey(BTC) ? myBalances[BTC] : 0;
             return btcBalance;
+        }
+
+        private void RefreshOrderBooksPrices()
+        {
+            foreach (TradeOrder tradeOrder in TradeOrders.Where(to => to.ActualPrice != actualPrice))
+            {
+                if (actualPrice != tradeOrder.ActualPrice)
+                {
+                    tradeOrder.ActualPrice = actualPrice;
+                    Store.OrderBooks.SaveOrUpdate(tradeOrder);
+                }
+            }
         }
     }
 }

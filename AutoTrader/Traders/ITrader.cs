@@ -1,4 +1,5 @@
 ﻿using AutoTrader.Db.Entities;
+using AutoTrader.Traders.Agents;
 using System.Collections.Generic;
 
 namespace AutoTrader.Traders
@@ -20,6 +21,8 @@ namespace AutoTrader.Traders
         public IList<TradeOrder> AllTradeOrders { get; }
 
         public GraphCollection GraphCollection { get; }
+
+        public IAgent AoAgent { get; set; }
 
         public void Trade();
 

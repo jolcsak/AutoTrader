@@ -3,6 +3,7 @@ using AutoTrader.Api;
 using AutoTrader.Db;
 using AutoTrader.Db.Entities;
 using AutoTrader.Log;
+using AutoTrader.Traders.Agents;
 
 namespace AutoTrader.Traders
 {
@@ -27,6 +28,8 @@ namespace AutoTrader.Traders
         public double Amplitude => GraphCollection.AoProvider.Amplitude;
 
         public double Order => GraphCollection.AoProvider.Frequency * GraphCollection.AoProvider.Amplitude;
+
+        public IAgent AoAgent { get; set; }
 
         public NiceHashTraderBase()
         {

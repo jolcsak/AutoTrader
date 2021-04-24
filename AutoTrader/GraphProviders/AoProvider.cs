@@ -7,29 +7,21 @@ namespace AutoTrader.GraphProviders
 {
     public class AoProvider
     {
-        public static double Ratio { get; set; } = 1;
-        public static int TrendNumber { get; set; } = 4;
-
-        public static int MinTradePeriod { get; set; } = 10;
-
-
+        private static int lastAmps = 10;
         private int slowPeriod;
         private int fastPeriod;
-        private ObservableCollection<double> data;
 
-        private int lastTradeIndex = 0;
+        private ObservableCollection<double> data;
 
         double previousMa = -1;
 
-        private SmaProvider slowSmaProvider;
-        private SmaProvider fastSmaProvider;
+        public SmaProvider SlowSmaProvider { get; set; }
+        public SmaProvider FastSmaProvider { get; set; }
 
         public IList<AoValue> Ao { get; } = new List<AoValue>();
 
-        private int AoIndex => Ao.Count - 1;
+        public int AoIndex => Ao.Count - 1;
         private int DataIndex => data.Count - 1;
-
-        public bool HasChanged { get; private set; } = false;
 
         public AoValue Current => Ao.Any() ? Ao.Last() : null;
 
@@ -51,8 +43,8 @@ namespace AutoTrader.GraphProviders
             }
         }
 
-        public double Amplitude 
-        { 
+        public double Amplitude
+        {
             get
             {
                 if (Ao.Count > 0)
@@ -63,23 +55,13 @@ namespace AutoTrader.GraphProviders
                     List<double> amplitudes = new List<double>();
                     foreach (var ao in Ao)
                     {
-                        if (i > 0)
+                        if (i > 0 && Ao[i].Color != Ao[i - 1].Color)
                         {
-                            if (Ao[i].Color != Ao[i - 1].Color)
-                            {
-                                if (Ao[i].Value >= 0)
-                                {
-                                    amplitudes.Add(Ao[i].Value / max);
-                                }
-                                else
-                                {
-                                    amplitudes.Add(Math.Abs(Ao[i].Value) / min);
-                                }
-                            }
+                            amplitudes.Add(Ao[i].Value >= 0 ? Ao[i].Value / max : Math.Abs(Ao[i].Value) / min);
                         }
                         i++;
                     }
-                    return amplitudes.Average();
+                    return amplitudes.Skip(amplitudes.Count > lastAmps ? amplitudes.Count - lastAmps : 0).Average();
                 }
                 return 0;
             }
@@ -94,158 +76,49 @@ namespace AutoTrader.GraphProviders
         public void SetData(ObservableCollection<double> data)
         {
             this.data = data;
-            slowSmaProvider = new SmaProvider(slowPeriod);
-            fastSmaProvider = new SmaProvider(fastPeriod);
-            slowSmaProvider.SetData(data);
-            fastSmaProvider.SetData(data);
+            SlowSmaProvider = new SmaProvider(slowPeriod);
+            FastSmaProvider = new SmaProvider(fastPeriod);
+            SlowSmaProvider.SetData(data);
+            FastSmaProvider.SetData(data);
 
-            slowSmaProvider.Sma.CollectionChanged += SmaChanged;
-            fastSmaProvider.Sma.CollectionChanged += SmaChanged;
+            SlowSmaProvider.Sma.CollectionChanged += SmaChanged;
+            FastSmaProvider.Sma.CollectionChanged += SmaChanged;
 
             Ao.Clear();
 
             Calculate();
         }
 
-        public void RefreshAll()
-        {
-            lastTradeIndex = 0;
-            int i = 0;
-            foreach (var ao in Ao)
-            {
-                Trade(i, ao);
-                i++;
-            }
-        }
-
         public void Calculate()
         {
-            lastTradeIndex = 0;
-            int aoIndex = 0;
-            for (int i = 0; i < slowSmaProvider.Sma.Count; i++)
+            for (int i = 0; i < SlowSmaProvider.Sma.Count; i++)
             {
-                double slowMa = slowSmaProvider.Sma[i];
-                double fastMa = fastSmaProvider.Sma[i];
+                double slowMa = SlowSmaProvider.Sma[i];
+                double fastMa = FastSmaProvider.Sma[i];
                 var ma = fastMa - slowMa;
+
                 if (fastMa > -1 && slowMa > -1)
                 {
-                    var aoValue = CreateAo(ma, i);
-                    Ao.Add(aoValue);
-                    Trade(aoIndex, aoValue);
-                    aoIndex++;
+                    Ao.Add(CreateAo(ma, i));
                 }
                 previousMa = ma;
             }
         }
 
-        private void Trade(int i, AoValue aoValue)
+         public void Refresh()
         {
-            if (i - lastTradeIndex >= MinTradePeriod)
+            if (DataIndex >= 2 && SlowSmaProvider.Sma.Count == FastSmaProvider.Sma.Count)
             {
-                aoValue.Buy = IsBuy(i, aoValue.SmaIndex);
-                aoValue.Sell = IsSell(i, aoValue.SmaIndex);
-                if (aoValue.Buy || aoValue.Sell)
-                {
-                    lastTradeIndex = i;
-                }
-            }
-            else
-            {
-                aoValue.Buy = false;
-                aoValue.Sell = false;
-            }
-        }
-
-        public bool IsBuy(int i, int si)
-        {
-            if (i >= 2)
-            {
-                bool buy = Ao[i - 1].Value < 0 && Ao[i].Value > 0;
-                if (!buy)
-                {
-                    buy |= Ao[i].Value < 0 && Ao[i - 1].Color == AoColor.Red && Ao[i].Color == AoColor.Green && ValueOf(AoColor.Green, i) > Ratio;
-                }
-                return buy;
-            }
-            return false;
-        }
-
-        public bool IsSell(int i, int si)
-        {
-            if (i >= 2)
-            {
-                bool sell = Ao[i - 1]?.Value > 0 && Ao[i].Value < 0;
-                if (!sell)
-                {
-                    sell |= Ao[i].Value > 0 && Ao[i - 1].Color == AoColor.Green && Ao[i].Color == AoColor.Red && ValueOf(AoColor.Green, i) > Ratio;
-                }
-                return sell;
-            }
-            return false;
-        }
-
-        private double ValueOf(AoColor color, int i)
-        {
-            int oi = i;
-            i--;
-            while (i > 0 && (Math.Sign(Ao[i].Value * Ao[i -1].Value) >= 0 || Ao[i].Color == color))
-            {
-                i--;
-            }
-
-            double oiSma = slowSmaProvider.Sma[Ao[i].SmaIndex];
-            double iSma = slowSmaProvider.Sma[Ao[oi].SmaIndex];
-
-            return oiSma > iSma ? oiSma / iSma : iSma / oiSma;
-        }
-
-        private bool IsInflexionPoint(int i)
-        {
-            if (i > 0)
-            {
-                var smaCurrent = slowSmaProvider.Sma[Ao[i].SmaIndex];
-                var smaPrevious = slowSmaProvider.Sma[Ao[i - 1].SmaIndex];
-                if (Ao[i].Value >= 0)
-                {
-                    return smaPrevious <= smaCurrent;
-                }
-                return smaCurrent >= smaPrevious;
-            }
-            return false;
-        }
-
-        private double NumberOf(AoColor color, int i)
-        {
-            i--;
-            int c = 0;
-
-            while (i > 0 && Ao[i].Color == color)
-            {
-                i--;
-                c++;
-            }
-            return c;
-        }
-
-        public void Refresh()
-        {
-            int i = DataIndex;
-            if (i >= 2 && slowSmaProvider.Sma.Count == fastSmaProvider.Sma.Count)
-            {
-                double slowMa = slowSmaProvider.Current;
-                double fastMa = fastSmaProvider.Current;
+                double slowMa = SlowSmaProvider.Current;
+                double fastMa = FastSmaProvider.Current;
                 var ma = fastMa - slowMa;
 
                 if (fastMa > -1 && slowMa > -1)
                 {
-                    var aoValue = CreateAo(ma, fastSmaProvider.Sma.Count - 1);
-                    Ao.Add(aoValue);
-                    Trade(Ao.Count - 1, aoValue);
+                    Ao.Add(CreateAo(ma, FastSmaProvider.Sma.Count - 1));
                 }
                 previousMa = ma;
-                HasChanged = true;
             }
-
         }
 
         private void SmaChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

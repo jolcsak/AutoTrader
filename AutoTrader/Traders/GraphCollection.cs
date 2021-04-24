@@ -1,9 +1,9 @@
-﻿using AutoTrader.Db;
-using AutoTrader.GraphProviders;
-using AutoTrader.Log;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using AutoTrader.Db;
+using AutoTrader.GraphProviders;
+using AutoTrader.Log;
 
 namespace AutoTrader.Traders
 {

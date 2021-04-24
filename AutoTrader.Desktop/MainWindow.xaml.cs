@@ -2,6 +2,7 @@
 using AutoTrader.GraphProviders;
 using AutoTrader.Log;
 using AutoTrader.Traders;
+using AutoTrader.Traders.Agents;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
@@ -96,11 +97,11 @@ namespace AutoTrader.Desktop
 
         private void aoRatio_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            AoProvider.Ratio = e.NewValue;
+            AoAgent.Ratio = e.NewValue;
             if (CurrentTrader != null)
             {
                 foreach (ITrader trader in TraderThread.Traders) {
-                    trader.GraphCollection.AoProvider.RefreshAll();
+                    trader.AoAgent.RefreshAll();
                 }
                 currencies_SelectedCellsChanged(sender, null);
             }
