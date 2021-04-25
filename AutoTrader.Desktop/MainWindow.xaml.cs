@@ -4,6 +4,7 @@ using AutoTrader.Log;
 using AutoTrader.Traders;
 using AutoTrader.Traders.Agents;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -24,7 +25,7 @@ namespace AutoTrader.Desktop
             get
             {
                 var selectedCurrency = currencies?.SelectedItem as Currency;
-                return selectedCurrency != null ? traderThread.GetTrader(selectedCurrency.Name) : null;
+                return selectedCurrency != null ? traderThread.GetTrader(selectedCurrency.Name) : TraderThread.Traders.FirstOrDefault();
             }
         }
 
@@ -110,6 +111,16 @@ namespace AutoTrader.Desktop
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             currencies_SelectedCellsChanged(sender, null);
+        }
+
+        private void SellAll_Click(object sender, RoutedEventArgs e)
+        {
+            CurrentTrader?.SellAll(false);
+        }
+
+        private void SellAllProfitable_Click(object sender, RoutedEventArgs e)
+        {
+            CurrentTrader?.SellAll(true);
         }
     }
 }

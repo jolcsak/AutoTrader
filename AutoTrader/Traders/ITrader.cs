@@ -27,5 +27,9 @@ namespace AutoTrader.Traders
         public void Trade();
 
         ActualPrice GetAndStoreCurrentOrders();
+
+        void Sell(double actualPrice, TradeOrder tradeOrder);
+
+        public void SellAll(bool onlyProfitable);
     }
 }

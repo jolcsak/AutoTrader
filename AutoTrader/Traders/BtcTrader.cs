@@ -11,7 +11,7 @@ namespace AutoTrader.Traders
     {
         public const string BTC = "BTC";
 
-        protected static double minBtcTradeAmount = 0.0001; 
+        protected static double minBtcTradeAmount = 0.0002; 
 
         protected DateTime lastPriceDate = DateTime.MinValue;
         protected double actualPrice;
@@ -56,8 +56,7 @@ namespace AutoTrader.Traders
             double btcBalance = GetBTCBalance();
 
             //var r = NiceHashApi.GetOrder("ENJBTC", "1a1365e3-891a-4ba9-9ca6-67f3150f2d16");
-
-            OrderTrade orderResponseSell = NiceHashApi.Order("ENJBTC", isBuy: false, r.qty - r.fee);
+            //OrderTrade orderResponseSell = NiceHashApi.Order("ENJBTC", isBuy: false, r.qty - r.fee);
 
             if (btcBalance == 0)
             {
@@ -145,15 +144,7 @@ namespace AutoTrader.Traders
                 {
                     if (actualPrice >= (tradeOrder.Price * TradeSettings.MinSellYield) + tradeOrder.Fee)
                     {
-                        Logger.Info($"Time to sell at price {actualPrice}, amount: {tradeOrder.TargetAmount}, buy price: {tradeOrder.Price}, sell price: {actualPrice}, yield: {actualPrice / tradeOrder.Price * 100}%");
-                        OrderTrade orderResponse = NiceHashApi.Order(TargetCurrency + "BTC", isBuy: false, tradeOrder.TargetAmount - tradeOrder.Fee);
-                        if (orderResponse.state == "FULL")
-                        {
-                            tradeOrder.Type = TradeOrderType.CLOSED;
-                            tradeOrder.SellPrice = actualPrice;
-                            tradeOrder.SellDate = DateTime.Now;
-                            Store.OrderBooks.SaveOrUpdate(tradeOrder);
-                        }
+                        Sell(actualPrice, tradeOrder);
                     }
                 }
             }

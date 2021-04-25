@@ -54,8 +54,8 @@
                             <DataGridTextColumn Binding="{Binding Change}" Header="Change" FontWeight="ExtraBold"/>
                             <DataGridTextColumn Binding="{Binding MinPeriodPrice, StringFormat={}{0:N10}}" Header="Min Period Price" />
                             <DataGridTextColumn Binding="{Binding MaxPeriodPrice, StringFormat={}{0:N10}}" Header="Max Period Price" />
-                            <DataGridTextColumn Binding="{Binding Frequency, StringFormat={}{0:N6}}" Header="Frequency" />
-                            <DataGridTextColumn Binding="{Binding Amplitude, StringFormat={}{0:N4}}" Header="Amplitude" />
+                            <DataGridTextColumn Binding="{Binding Frequency, StringFormat={}{0:N6}}" Header="Freq" />
+                            <DataGridTextColumn Binding="{Binding Amplitude, StringFormat={}{0:N4}}" Header="Ampl" />
                             <DataGridTextColumn Binding="{Binding Order, StringFormat={}{0:N4}}" Header="Order" />
                         </DataGrid.Columns>
                     </DataGrid>
@@ -67,16 +67,25 @@
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <DockPanel Grid.Column="0" Grid.Row="0" LastChildFill="True">
-                            <Label Content="Opened Orders" DockPanel.Dock="Top" FontWeight="SemiBold"/>
+                            <Grid DockPanel.Dock="Top">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Opened Orders" FontWeight="SemiBold" Grid.Column="0"/>
+                                <Button Content="Sell All" FontWeight="SemiBold" Grid.Column="1" Margin="50,4,50,4" Click="SellAll_Click"/>
+                                <Button Content="Sell All Profitable" FontWeight="SemiBold" Grid.Column="2" Margin="50,4,50,4" Click="SellAllProfitable_Click"/>
+                            </Grid>
                             <DataGrid x:Name="openedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" ScrollViewer.IsDeferredScrollingEnabled="True">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Binding="{Binding BuyDate}" Header="BuyDate" />
                                     <DataGridTextColumn Binding="{Binding Currency}" Header="Currency" />
                                     <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N10}}" Header="Price" />
-                                    <DataGridTextColumn Binding="{Binding Amount}" Header="Amount" />
+                                    <DataGridTextColumn Binding="{Binding Amount}" Header="BTC Amount" />
                                     <DataGridTextColumn Binding="{Binding TargetAmount}" Header="Target Amount" />
                                     <DataGridTextColumn Binding="{Binding Fee, StringFormat={}{0:N10}}" Header="Fee" />
                                     <DataGridTextColumn Binding="{Binding ActualPrice, StringFormat={}{0:N10}}" Header="Actual Price" />

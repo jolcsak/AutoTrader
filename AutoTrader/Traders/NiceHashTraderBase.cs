@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AutoTrader.Api;
 using AutoTrader.Db;
 using AutoTrader.Db.Entities;
@@ -48,6 +49,30 @@ namespace AutoTrader.Traders
         public void StoreTradeOrder(string orderId, double price, double amount, double targetAmount, double fee, string currency)
         {
             Store.OrderBooks.Save(new TradeOrder(orderId, price, amount, targetAmount, currency, fee, TraderId));
+        }
+
+        public void Sell(double actualPrice, TradeOrder tradeOrder)
+        {
+            Logger.Info($"Time to sell at price {actualPrice}, amount: {tradeOrder.TargetAmount}, buy price: {tradeOrder.Price}, sell price: {actualPrice}, yield: {actualPrice / tradeOrder.Price * 100}%");
+            OrderTrade orderResponse = NiceHashApi.Order(TargetCurrency + "BTC", isBuy: false, tradeOrder.TargetAmount - tradeOrder.Fee);
+            if (orderResponse.state == "FULL")
+            {
+                tradeOrder.Type = TradeOrderType.CLOSED;
+                tradeOrder.SellPrice = actualPrice;
+                tradeOrder.SellDate = DateTime.Now;
+                Store.OrderBooks.SaveOrUpdate(tradeOrder);
+            }
+        }
+
+        public void SellAll(bool onlyProfitable)
+        {
+            foreach (TradeOrder tradeOrder in AllTradeOrders)
+            {
+                if (!onlyProfitable || tradeOrder.ActualYield > 1)
+                {
+                    Sell(tradeOrder.ActualPrice, tradeOrder);
+                }
+            }
         }
     }
 }

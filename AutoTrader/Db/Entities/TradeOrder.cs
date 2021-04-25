@@ -33,7 +33,7 @@ namespace AutoTrader.Db.Entities
             BuyDate = DateTime.Now;
             Price = price;
             Amount = amount;
-            TargetAmount = amount;
+            TargetAmount = targetAmount;
             Currency = currency;
             Fee = fee;
             Trader = trader;
