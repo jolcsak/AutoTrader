@@ -68,7 +68,7 @@ namespace AutoTrader.Traders
         {
             foreach (TradeOrder tradeOrder in AllTradeOrders)
             {
-                if (!onlyProfitable || tradeOrder.ActualYield > 1)
+                if (!onlyProfitable || tradeOrder.ActualYield > 0)
                 {
                     Sell(tradeOrder.ActualPrice, tradeOrder);
                 }
