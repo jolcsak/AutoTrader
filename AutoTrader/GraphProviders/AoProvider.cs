@@ -39,7 +39,7 @@ namespace AutoTrader.GraphProviders
                     }
                     i++;
                 }
-                return frequency > 0 ? (double)frequency / Ao.Count : 0;
+                return frequency > 0 ?  (double)frequency / Ao.Count : 0;
             }
         }
 

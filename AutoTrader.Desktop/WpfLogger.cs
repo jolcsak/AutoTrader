@@ -167,6 +167,8 @@ namespace AutoTrader.Desktop
 
             new Graph(graph, "BTC Price ratio", graphCollection.PastPrices, Colors.DarkGray, showPoints: true).Draw(graphCollection.PricesSkip);
             new Graph(graph, "Simple Moving Average", graphCollection.Sma, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
+
+            new DateGraph(graph, graphCollection.Dates).Draw(graphCollection.PricesSkip);
         }
 
         private void RefreshCurrencyList()

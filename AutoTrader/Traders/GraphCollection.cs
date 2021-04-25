@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using AutoTrader.Db;
@@ -21,6 +22,8 @@ namespace AutoTrader.Traders
         public ObservableCollection<double> PastPrices { get; set; }
         public IList<double> Sma => smaProvider.Sma;
         public IList<AoValue> Ao => AoProvider.Ao;
+
+        public IList<DateTime> Dates { get; set; }
         public int PricesSkip { get; set; }
         public int SmaSkip { get; set; } = 0;
         public double MaxPeriodPrice => PastPrices.Any() ? PastPrices.Max() : 0;
@@ -35,7 +38,9 @@ namespace AutoTrader.Traders
         {
             if (PastPrices == null)
             {
-                PastPrices = new ObservableCollection<double>(Store.Prices.GetPricesForTrader(trader).Select(p => p.Value));
+                IList<Db.Entities.Price> prices = Store.Prices.GetPricesForTrader(trader);
+                PastPrices = new ObservableCollection<double>(prices.Select(p => p.Value));
+                Dates = new List<DateTime>(prices.Select(p => p.Time));
                 smaProvider.SetData(PastPrices);
                 AoProvider.SetData(PastPrices);
                 SmaSkip = smaProvider.Sma.Count - Ao.Count;

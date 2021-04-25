@@ -65,6 +65,7 @@ namespace AutoTrader.Traders
 
             var lastPrice = Store.LastPrices.GetLastPriceForTrader(this);
 
+
             if (lastPrice == null || lastPrice.Date == lastPriceDate)
             {
                 return;

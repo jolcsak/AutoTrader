@@ -51,7 +51,7 @@ namespace AutoTrader.Traders.Agents
                 bool sell = Ao[i - 1]?.Value > 0 && Ao[i].Value < 0;
                 if (!sell)
                 {
-                    sell |= Ao[i].Value > 0 && Ao[i].Color == AoColor.Red  && ColorCountBefore(i, AoColor.Green) > cc && ValueOf(AoColor.Green, i) > Ratio;
+                    sell |= Ao[i].Value > 0 && Ao[i].Color == AoColor.Red && ColorCountBefore(i, AoColor.Green) > cc && ValueOf(AoColor.Green, i) > Ratio;
                 }
                 return sell;
             }
