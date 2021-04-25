@@ -8,13 +8,7 @@ namespace AutoTrader.Desktop.Graphs
 {
     public class OutlinedText : FrameworkElement, IAddChild
     {
-        #region Private Fields
-
         private Geometry _textGeometry;
-
-        #endregion
-
-        #region Private Methods
 
         /// <summary>
         /// Invoked when a dependency property has changed. Generate a new FormattedText object to display.
@@ -25,11 +19,6 @@ namespace AutoTrader.Desktop.Graphs
         {
             ((OutlinedText)d).CreateText();
         }
-
-        #endregion
-
-
-        #region FrameworkElement Overrides
 
         /// <summary>
         /// OnRender override draws the geometry of the text and optional highlight.
@@ -51,11 +40,11 @@ namespace AutoTrader.Desktop.Graphs
             FontStyle fontStyle = FontStyles.Normal;
             FontWeight fontWeight = FontWeights.Medium;
 
-            if (Bold == true) fontWeight = FontWeights.Bold;
-            if (Italic == true) fontStyle = FontStyles.Italic;
+            if (Bold) fontWeight = FontWeights.Bold;
+            if (Italic) fontStyle = FontStyles.Italic;
 
             // Create the formatted text based on the properties set.
-            FormattedText formattedText = new FormattedText(
+            FormattedText formattedText = new(
                 Text,
                 CultureInfo.GetCultureInfo("en-us"),
                 FlowDirection.LeftToRight,
@@ -67,33 +56,19 @@ namespace AutoTrader.Desktop.Graphs
             // Build the geometry object that represents the text.
             _textGeometry = formattedText.BuildGeometry(new Point(0, 0));
 
-
-
-
             //set the size of the custome control based on the size of the text
-            this.MinWidth = formattedText.Width;
-            this.MinHeight = formattedText.Height;
+            MinWidth = formattedText.Width;
+            MinHeight = formattedText.Height;
 
         }
-
-        #endregion
-
-        #region DependencyProperties
 
         /// <summary>
         /// Specifies whether the font should display Bold font weight.
         /// </summary>
         public bool Bold
         {
-            get
-            {
-                return (bool)GetValue(BoldProperty);
-            }
-
-            set
-            {
-                SetValue(BoldProperty, value);
-            }
+            get => (bool)GetValue(BoldProperty);
+            set => SetValue(BoldProperty, value);
         }
 
         /// <summary>
@@ -116,10 +91,7 @@ namespace AutoTrader.Desktop.Graphs
         /// </summary>
         public Brush Fill
         {
-            get
-            {
-                return (Brush)GetValue(FillProperty);
-            }
+            get => (Brush)GetValue(FillProperty);
 
             set
             {
@@ -146,16 +118,9 @@ namespace AutoTrader.Desktop.Graphs
         /// The font to use for the displayed formatted text.
         /// </summary>
         public FontFamily Font
-        {
-            get
-            {
-                return (FontFamily)GetValue(FontProperty);
-            }
-
-            set
-            {
-                SetValue(FontProperty, value);
-            }
+       {
+            get => (FontFamily)GetValue(FontProperty);
+            set => SetValue(FontProperty, value);
         }
 
         /// <summary>
@@ -178,15 +143,8 @@ namespace AutoTrader.Desktop.Graphs
         /// </summary>
         public double FontSize
         {
-            get
-            {
-                return (double)GetValue(FontSizeProperty);
-            }
-
-            set
-            {
-                SetValue(FontSizeProperty, value);
-            }
+            get => (double)GetValue(FontSizeProperty);
+            set => SetValue(FontSizeProperty, value);
         }
 
         /// <summary>
@@ -204,21 +162,13 @@ namespace AutoTrader.Desktop.Graphs
                  )
             );
 
-
         /// <summary>
         /// Specifies whether the font should display Italic font style.
         /// </summary>
         public bool Italic
         {
-            get
-            {
-                return (bool)GetValue(ItalicProperty);
-            }
-
-            set
-            {
-                SetValue(ItalicProperty, value);
-            }
+            get => (bool)GetValue(ItalicProperty);
+            set => SetValue(ItalicProperty, value);
         }
 
         /// <summary>
@@ -241,15 +191,8 @@ namespace AutoTrader.Desktop.Graphs
         /// </summary>
         public Brush Stroke
         {
-            get
-            {
-                return (Brush)GetValue(StrokeProperty);
-            }
-
-            set
-            {
-                SetValue(StrokeProperty, value);
-            }
+            get => (Brush)GetValue(StrokeProperty);
+            set => SetValue(StrokeProperty, value);
         }
 
         /// <summary>
@@ -272,15 +215,8 @@ namespace AutoTrader.Desktop.Graphs
         /// </summary>
         public ushort StrokeThickness
         {
-            get
-            {
-                return (ushort)GetValue(StrokeThicknessProperty);
-            }
-
-            set
-            {
-                SetValue(StrokeThicknessProperty, value);
-            }
+            get => (ushort)GetValue(StrokeThicknessProperty);
+            set => SetValue(StrokeThicknessProperty, value);
         }
 
         /// <summary>
@@ -303,15 +239,8 @@ namespace AutoTrader.Desktop.Graphs
         /// </summary>
         public string Text
         {
-            get
-            {
-                return (string)GetValue(TextProperty);
-            }
-
-            set
-            {
-                SetValue(TextProperty, value);
-            }
+            get => (string)GetValue(TextProperty);
+            set => SetValue(TextProperty, value);
         }
 
         /// <summary>
@@ -331,14 +260,11 @@ namespace AutoTrader.Desktop.Graphs
 
         public void AddChild(Object value)
         {
-
         }
 
         public void AddText(string value)
         {
             Text = value;
         }
-
-        #endregion
     }
 }

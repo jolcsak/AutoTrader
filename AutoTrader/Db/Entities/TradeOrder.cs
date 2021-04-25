@@ -5,7 +5,9 @@ namespace AutoTrader.Db.Entities
 {
     public class TradeOrder : Document<Guid>
     {
+        public string OrderId { get; set; }
         public double Amount { get; set; }
+        public double TargetAmount { get; set; }
         public double Price { get; set; }
         public string Currency { get; set; }
         public double Fee { get; set; }
@@ -25,18 +27,20 @@ namespace AutoTrader.Db.Entities
         {
         }
 
-        public TradeOrder(double price, double amount, string currency, double fee, string trader, TradeOrderType orderType) : base()
+        public TradeOrder(string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader, TradeOrderType orderType) : base()
         {
+            OrderId = orderId;
             BuyDate = DateTime.Now;
             Price = price;
             Amount = amount;
+            TargetAmount = amount;
             Currency = currency;
             Fee = fee;
             Trader = trader;
             Type = orderType;
         }
 
-        public TradeOrder(double price, double amount, string currency, double fee, string trader) : this(price, amount, currency, fee, trader, TradeOrderType.OPEN)
+        public TradeOrder(string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader) : this(orderId, price, amount, targetAmount, currency, fee, trader, TradeOrderType.OPEN)
         {
         }
     }

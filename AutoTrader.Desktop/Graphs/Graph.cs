@@ -15,7 +15,6 @@ namespace AutoTrader.Desktop
         private int pointSize = 2;
         private int lineWeight = 2;
         private string toolTipFormat = "N10";
-
         protected Dispatcher Dispatcher => Application.Current != null ? Application.Current.Dispatcher : null;
         
         protected IList<double> values;

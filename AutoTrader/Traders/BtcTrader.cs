@@ -10,15 +10,14 @@ namespace AutoTrader.Traders
     public class BtcTrader : NiceHashTraderBase
     {
         public const string BTC = "BTC";
-        protected const double MIN_BTC_SELL_AMOUNT = 0.000001;
+
+        protected static double minBtcTradeAmount = 0.0001; 
 
         protected DateTime lastPriceDate = DateTime.MinValue;
         protected double actualPrice;
         protected double actualAmount;
         protected double previousPrice = double.MaxValue;
         protected double changeRatio;
-        protected static double minBtcTradeAmount = 0.0001;
-        protected static double btcBalance = 0.001;
 
         public BtcTrader(string targetCurrency) : base()
         {
@@ -55,6 +54,10 @@ namespace AutoTrader.Traders
         public override void Trade()
         {
             double btcBalance = GetBTCBalance();
+
+            //var r = NiceHashApi.GetOrder("ENJBTC", "1a1365e3-891a-4ba9-9ca6-67f3150f2d16");
+
+            OrderTrade orderResponseSell = NiceHashApi.Order("ENJBTC", isBuy: false, r.qty - r.fee);
 
             if (btcBalance == 0)
             {
@@ -104,13 +107,31 @@ namespace AutoTrader.Traders
             Logger.LogCurrency(this, actualPrice, actualAmount);
         }
 
-        private bool Buy(double btc, double actualPrice, double actualAmount)
+        private bool Buy(double amount, double actualPrice, double actualAmount)
         {
             if (AoAgent.IsBuy())
             {
-                Logger.Info($"Time to buy at price {actualPrice}, amount: {btc}");
-                StoreTradeOrder(actualPrice, btc, actualPrice * 0.005, TargetCurrency);
-                btcBalance -= btc + (actualPrice * 0.005);
+                Logger.Info($"Time to buy at price {actualPrice}, amount: {amount}");
+
+                if (actualAmount > amount)
+                {
+                    var orderResponse = NiceHashApi.Order(TargetCurrency + "BTC", isBuy: true, amount);
+                    if (orderResponse.state == "FULL")
+                    {
+                        var r = NiceHashApi.GetOrder(TargetCurrency + "BTC", orderResponse.orderId);
+                        if (r != null)
+                        {
+                            StoreTradeOrder(orderResponse.orderId, actualPrice, amount, r.qty, r.fee, TargetCurrency);
+                        } else
+                        {
+                            Logger.Err($"BUY: Can't query order with market: {TargetCurrency}, id: {orderResponse.orderId}");
+                        }
+                    }
+                }   
+                else
+                {
+                    Logger.Warn($"Buy cancelled because actualAmount: {actualAmount} < amount: {amount}!");
+                }
             }
             return true;
         }
@@ -124,12 +145,15 @@ namespace AutoTrader.Traders
                 {
                     if (actualPrice >= (tradeOrder.Price * TradeSettings.MinSellYield) + tradeOrder.Fee)
                     {
-                        Logger.Info($"Time to sell at price {actualPrice}, amount: {tradeOrder.Amount}, buy price: {tradeOrder.Price}, yield: {actualPrice / tradeOrder.Price * 100}%");
-                        tradeOrder.Type = TradeOrderType.CLOSED;
-                        tradeOrder.SellPrice = actualPrice;
-                        tradeOrder.SellDate = DateTime.Now;
-                        btcBalance += actualPrice;
-                        Store.OrderBooks.SaveOrUpdate(tradeOrder);
+                        Logger.Info($"Time to sell at price {actualPrice}, amount: {tradeOrder.TargetAmount}, buy price: {tradeOrder.Price}, sell price: {actualPrice}, yield: {actualPrice / tradeOrder.Price * 100}%");
+                        OrderTrade orderResponse = NiceHashApi.Order(TargetCurrency + "BTC", isBuy: false, tradeOrder.TargetAmount - tradeOrder.Fee);
+                        if (orderResponse.state == "FULL")
+                        {
+                            tradeOrder.Type = TradeOrderType.CLOSED;
+                            tradeOrder.SellPrice = actualPrice;
+                            tradeOrder.SellDate = DateTime.Now;
+                            Store.OrderBooks.SaveOrUpdate(tradeOrder);
+                        }
                     }
                 }
             }
@@ -138,9 +162,8 @@ namespace AutoTrader.Traders
 
         protected double GetBTCBalance()
         {
-            //IDictionary<string, double> myBalances = NiceHashApi.GetBalances();
-            //return myBalances.ContainsKey(BTC) ? myBalances[BTC] : 0;
-            return btcBalance;
+            var myBalances = NiceHashApi.GetBalances();
+            return myBalances.ContainsKey(BTC) ? myBalances[BTC] : 0;
         }
 
         private void RefreshOrderBooksPrices()

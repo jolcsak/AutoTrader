@@ -45,9 +45,9 @@ namespace AutoTrader.Traders
             return null;
         }
 
-        public void StoreTradeOrder(double price, double amount, double fee, string currency)
+        public void StoreTradeOrder(string orderId, double price, double amount, double targetAmount, double fee, string currency)
         {
-            Store.OrderBooks.Save(new TradeOrder(price, amount, currency, fee, TraderId));
+            Store.OrderBooks.Save(new TradeOrder(orderId, price, amount, targetAmount, currency, fee, TraderId));
         }
     }
 }
