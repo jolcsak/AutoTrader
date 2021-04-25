@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AutoTrader.Api;
 using AutoTrader.Db;
 using AutoTrader.Db.Entities;
@@ -54,7 +55,7 @@ namespace AutoTrader.Traders
         public void Sell(double actualPrice, TradeOrder tradeOrder)
         {
             Logger.Info($"Time to sell at price {actualPrice}, amount: {tradeOrder.TargetAmount}, buy price: {tradeOrder.Price}, sell price: {actualPrice}, yield: {actualPrice / tradeOrder.Price * 100}%");
-            OrderTrade orderResponse = NiceHashApi.Order(TargetCurrency + "BTC", isBuy: false, tradeOrder.TargetAmount - tradeOrder.Fee);
+            OrderTrade orderResponse = NiceHashApi.Order(tradeOrder.Currency + "BTC", isBuy: false, tradeOrder.TargetAmount - tradeOrder.Fee, tradeOrder.Amount);
             if (orderResponse.state == "FULL")
             {
                 tradeOrder.Type = TradeOrderType.CLOSED;
@@ -66,7 +67,7 @@ namespace AutoTrader.Traders
 
         public void SellAll(bool onlyProfitable)
         {
-            foreach (TradeOrder tradeOrder in AllTradeOrders)
+            foreach (TradeOrder tradeOrder in AllTradeOrders.Where(to => to.Type == TradeOrderType.OPEN))
             {
                 if (!onlyProfitable || tradeOrder.ActualYield > 0)
                 {

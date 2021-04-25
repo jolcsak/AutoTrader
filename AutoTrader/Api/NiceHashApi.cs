@@ -52,11 +52,20 @@ namespace AutoTrader.Api
             return Get<OrderBooks>("/exchange/api/v2/orderbook?market=" + currencyBuy + currencySell + "&limit=100", true, ServerTime);
         }
 
-        public OrderTrade Order(string market, bool isBuy, double amount)
+        public OrderTrade Order(string market, bool isBuy, double amount, double minSecQuantity = 0)
         {
             string side = isBuy ? "buy" : "sell";
-            string amountStr = amount.ToString(CultureInfo.InvariantCulture);
-            string url = $"/exchange/api/v2/order?market={market}&side={side}&type=market&quantity={amountStr}&secQuantity={amountStr}";
+            string amountStr = amount.ToString("N8", CultureInfo.InvariantCulture);
+            string url = $"/exchange/api/v2/order?market={market}&side={side}&type=market&quantity={amountStr}";
+            if (isBuy)
+            {
+                url += $"&secQuantity={amountStr}";
+            }
+            //else
+            //{
+            //    string minSecQuantityStr = minSecQuantity.ToString("N8", CultureInfo.InvariantCulture);
+            //    url += $"&minSecQuantity={minSecQuantityStr}";
+            //}
             return Post<OrderTrade>(url);
         }
 
