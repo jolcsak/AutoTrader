@@ -7,7 +7,7 @@ namespace AutoTrader.GraphProviders
 {
     public class AoProvider
     {
-        private static int lastAmps = 10;
+        private static int lastAmps = 5;
         private int slowPeriod;
         private int fastPeriod;
 
@@ -30,8 +30,7 @@ namespace AutoTrader.GraphProviders
             get
             {
                 int frequency = 0;
-                int i = 0;
-                foreach (var ao in Ao)
+                for (int i = 1; i < Ao.Count; i++)
                 {
                     if (i > 0 && Math.Sign(Ao[i].Value * Ao[i - 1].Value) < 0)
                     {
@@ -49,11 +48,10 @@ namespace AutoTrader.GraphProviders
             {
                 if (Ao.Count > 0)
                 {
-                    int i = 0;
                     double max = Math.Abs(Ao.Select(ao => ao.Value).Max());
                     double min = Math.Abs(Ao.Select(ao => ao.Value).Min());
                     List<double> amplitudes = new List<double>();
-                    foreach (var ao in Ao)
+                    for(int i = 1; i < Ao.Count; i++)
                     {
                         if (i > 0 && Ao[i].Color != Ao[i - 1].Color)
                         {
@@ -61,7 +59,11 @@ namespace AutoTrader.GraphProviders
                         }
                         i++;
                     }
-                    return amplitudes.Skip(amplitudes.Count > lastAmps ? amplitudes.Count - lastAmps : 0).Average();
+                    var amp = amplitudes.Skip(amplitudes.Count > lastAmps ? amplitudes.Count - lastAmps : 0);
+                    if (amp.Any())
+                    {
+                        return amp.Average();
+                    }
                 }
                 return 0;
             }

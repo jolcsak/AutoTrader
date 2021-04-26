@@ -1,5 +1,4 @@
 ﻿using AutoTrader.Db.Entities;
-using AutoTrader.GraphProviders;
 using AutoTrader.Log;
 using AutoTrader.Traders;
 using AutoTrader.Traders.Agents;
@@ -7,6 +6,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace AutoTrader.Desktop
@@ -92,6 +93,7 @@ namespace AutoTrader.Desktop
             var currentTrader = CurrentTrader;
             if (currentTrader != null)
             {
+                Logger.SelectedCurrency = currentTrader.TargetCurrency;
                 Logger.RefreshGraph(currentTrader);
             }
         }
@@ -129,6 +131,16 @@ namespace AutoTrader.Desktop
             var trader = selectedTradeOrder != null ? traderThread.GetTrader(selectedTradeOrder.Currency) : TraderThread.Traders.FirstOrDefault();
             if (trader != null)
             {
+                var selectedItem = currencies?.Items.OfType<Currency>().FirstOrDefault(i => i.Name == trader.TargetCurrency);
+                if (selectedItem != null)
+                {
+                    currencies.SelectedItem = selectedItem;
+                    currencies.ScrollIntoView(selectedItem);
+                    var row = (DataGridRow)currencies.ItemContainerGenerator.ContainerFromIndex(currencies.SelectedIndex);
+                    row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+
+                    Logger.SelectedCurrency = trader.TargetCurrency;
+                }
                 Logger.RefreshGraph(trader);
             }
         }

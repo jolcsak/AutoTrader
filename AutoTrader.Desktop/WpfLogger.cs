@@ -27,11 +27,20 @@ namespace AutoTrader.Desktop
         private static Label balanceText;
         private static DataGrid currencies;
         private static Canvas graph;
+
+        private static string selectedCurrency = string.Empty;
         private static Label selectedCurrencyLabel;
 
         private static IList<Currency> currencyList = new List<Currency>();
-
-        private static string selectedCurrency;
+        public string SelectedCurrency
+        {
+            get => selectedCurrency;
+            set
+            {
+                selectedCurrency = value;
+                selectedCurrencyLabel.Content = value;
+            }
+        }
 
         protected string Name { get; private set; }
 
@@ -138,7 +147,7 @@ namespace AutoTrader.Desktop
                 }
             }
 
-            if (selectedCurrency != currency)
+            if (!SelectedCurrency.Equals(currency))
             {
                 return;
             }
@@ -157,15 +166,22 @@ namespace AutoTrader.Desktop
             //Fourier.Inverse(signal, FourierOptions.Matlab);
             //var result = signal.Select(x => new AoValue { Value = x.Magnitude, Color = AoColor.Green }).Take(signal.Length / 2).Skip(3).ToArray();
             //new BarGraph(graph, "FFT", result, Colors.LightBlue, Colors.Orange).Draw();
-
-            var filter = OnlineFirFilter.CreateLowpass(ImpulseResponse.Finite, 50, trader.Amplitude);
-            var result2 = filter.ProcessSamples(graphCollection.PastPrices.ToArray());
-            new Graph(graph, "Price low-pass", result2, Colors.Orange, showPoints: false).Draw(85);
+            double amplitude = trader.Amplitude;
+            if (!double.IsNaN(amplitude))
+            {
+                DrawTendencies(graphCollection, amplitude);
+            }
 
             new Graph(graph, "BTC Price ratio", graphCollection.PastPrices, Colors.DarkGray, showPoints: true).Draw(graphCollection.PricesSkip);
             new Graph(graph, "Simple Moving Average", graphCollection.Sma, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
-
             new DateGraph(graph, graphCollection.Dates).Draw(graphCollection.PricesSkip);
+        }
+
+        private static void DrawTendencies(GraphCollection graphCollection, double amplitude)
+        {
+            var filter = OnlineFirFilter.CreateLowpass(ImpulseResponse.Finite, 50, amplitude);
+            var result2 = filter.ProcessSamples(graphCollection.PastPrices.ToArray());
+            new Graph(graph, "Price low-pass", result2, Colors.Orange, showPoints: false).Draw(85);
         }
 
         private void RefreshCurrencyList()
