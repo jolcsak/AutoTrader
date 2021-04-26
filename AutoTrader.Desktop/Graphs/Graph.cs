@@ -45,20 +45,26 @@ namespace AutoTrader.Desktop
 
         public void Draw(int skip)
         {
-            if (!values.Any())
+            if (!values.Any() || values.Any(v => double.IsNaN(v)))
             {
                 return;
             }
+
+            var drawValues = values.Skip(skip);
+            if (!drawValues.Any())
+            {
+                return;
+            }
+
+            double maxValue = drawValues.Max();
+            double minValue = drawValues.Min();
+            if (maxValue == minValue)
+            {
+                return;
+            }
+
             Dispatcher?.BeginInvoke(() =>
             {
-                var drawValues = values.Skip(skip);
-
-                double maxValue = drawValues.Max();
-                double minValue = drawValues.Min();
-                if (maxValue == minValue)
-                {
-                    return;
-                }
 
                 int halfPointSize = pointSize / 2;
                 double priceHeight = maxValue - minValue;

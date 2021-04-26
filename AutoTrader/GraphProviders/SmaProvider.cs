@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace AutoTrader.GraphProviders
 {
@@ -14,6 +16,12 @@ namespace AutoTrader.GraphProviders
         public SmaProvider(int period = 8)
         {
             this.period = period;
+        }
+
+        public SmaProvider(ObservableCollection<double> data, NotifyCollectionChangedEventHandler eventHandler, int period = 8) : this(period)
+        {
+            SetData(data);
+            Sma.CollectionChanged += eventHandler;
         }
 
         public void SetData(ObservableCollection<double> data)

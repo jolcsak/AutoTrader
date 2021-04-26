@@ -112,8 +112,11 @@ namespace AutoTrader.Traders.Agents
         private void RefreshLast()
         {
             int lastIndex = graphCollection.AoProvider.AoIndex;
-            Ao[lastIndex].Buy = IsBuy(lastIndex);
-            Ao[lastIndex].Sell = IsSell(lastIndex);
+            if (lastIndex >= 0)
+            {
+                Ao[lastIndex].Buy = IsBuy(lastIndex);
+                Ao[lastIndex].Sell = IsSell(lastIndex);
+            }
         }
 
         public void RefreshAll()
