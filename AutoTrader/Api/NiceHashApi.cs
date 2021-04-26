@@ -39,7 +39,7 @@ namespace AutoTrader.Api
         public IDictionary<string, double> GetBalances()
         {
             var currenciesObj = Get<Currencies>("/main/api/v2/accounting/accounts2", true, ServerTime);
-            return currenciesObj != null ? currenciesObj.currencies.Where(c => c.available != 0).ToDictionary(c => c.currency, c => c.available) : new Dictionary<string, double>();
+            return currenciesObj?.currencies != null ? currenciesObj.currencies.Where(c => c.available != 0).ToDictionary(c => c.currency, c => c.available) : new Dictionary<string, double>();
         }
 
         public Symbols GetExchangeSettings()
