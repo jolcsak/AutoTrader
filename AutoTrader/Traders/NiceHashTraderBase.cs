@@ -9,7 +9,7 @@ using AutoTrader.Traders.Agents;
 
 namespace AutoTrader.Traders
 {
-    public class NiceHashTraderBase : ITrader
+    public abstract class NiceHashTraderBase : ITrader
     {
         protected static NiceHashApi NiceHashApi => NiceHashApi.Instance;
 
@@ -74,9 +74,16 @@ namespace AutoTrader.Traders
                     Sell(tradeOrder.ActualPrice, tradeOrder);
                 }
             }
-
+            RefreshBalance();
             Logger.LogTradeOrders(AllTradeOrders);
             Logger.Warn($"All orders are sold.");
+        }
+
+        protected abstract double GetBalance();
+
+        protected double RefreshBalance()
+        {
+            return GetBalance();
         }
     }
 }

@@ -53,17 +53,14 @@ namespace AutoTrader.Traders
 
         public override void Trade()
         {
-            double btcBalance = GetBTCBalance();
+            double btcBalance = RefreshBalance();
 
             if (btcBalance == 0)
             {
                 return;
             }
 
-            Logger.LogBalance(BTC, btcBalance);
-
             var lastPrice = Store.LastPrices.GetLastPriceForTrader(this);
-
 
             if (lastPrice == null || lastPrice.Date == lastPriceDate)
             {
@@ -96,7 +93,7 @@ namespace AutoTrader.Traders
 
             if (hasChanged)
             {
-                Logger.LogTradeOrders(AllTradeOrders, TargetCurrency, actualPrice);
+                Logger.LogTradeOrders(AllTradeOrders);
                 Logger.Info($"Change: {changeRatio}, Cur: {actualPrice} x {actualAmount}");
             }
 
@@ -148,10 +145,15 @@ namespace AutoTrader.Traders
             return true;
         }
 
-        protected double GetBTCBalance()
+        protected override double GetBalance()
         {
             var myBalances = NiceHashApi.GetBalances();
-            return myBalances.ContainsKey(BTC) ? myBalances[BTC] : 0;
+            var balance = myBalances.ContainsKey(BTC) ? myBalances[BTC] : 0;
+            if (balance > 0)
+            {
+                Logger.LogBalance(BTC, balance);
+            }
+            return balance;
         }
 
         private void RefreshOrderBooksPrices()
