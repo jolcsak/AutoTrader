@@ -12,9 +12,11 @@ namespace AutoTrader
 {
     public class TraderThread
     {
-        private const int COLLECTOR_WAIT = 5 * 60 * 1000;
+        private const string VERSION = "0.2";
+
+        private const int COLLECTOR_WAIT = 3 * 60 * 1000;
         private const int TRADE_WAIT = 2 * 60 * 1000;
-        private const int COLLECTOR_TRADER_DELAY_TIME = 333;
+        private const int COLLECTOR_TRADER_DELAY_TIME = 1000;
         private const int APP_TRADER_DELAY_TIME = 10;
         private const int BUYER_NUMBER = 12;
 
@@ -48,7 +50,7 @@ namespace AutoTrader
         public void Trade()
         {
             NiceHashApi niceHashApi = GetNiceHashApi();
-            Logger.Info("NiceHash AutoTrader 0.1");
+            Logger.Info("NiceHash AutoTrader " + VERSION);
 
             niceHashApi.QueryServerTime();
             Logger.Info("Server time:" + niceHashApi.ServerTime);
@@ -85,7 +87,7 @@ namespace AutoTrader
         public void Collect()
         {
             NiceHashApi niceHashApi = GetNiceHashApi();
-            Logger.Info("NiceHash AutoTrader Collector 0.1");
+            Logger.Info("NiceHash AutoTrader Collector " + VERSION);
 
             niceHashApi.QueryServerTime();
             Logger.Info("Server time:" + niceHashApi.ServerTime);
