@@ -94,10 +94,10 @@ namespace AutoTrader.Traders.Agents
             return false;
         }
 
-        public void Refresh(double? actualPrice)
+        public void Refresh(double? actualPrice, DateTime? date)
         {
             bool empty = graphCollection.PastPrices == null;
-            graphCollection.Refresh();
+            graphCollection.Refresh(actualPrice, date);
 
             if (empty)
             {

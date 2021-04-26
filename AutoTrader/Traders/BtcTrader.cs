@@ -51,7 +51,7 @@ namespace AutoTrader.Traders
             return actualOrder;
         }
 
-        public override void Trade()
+        public override void Trade(bool canBuy)
         {
             double btcBalance = RefreshBalance();
 
@@ -71,7 +71,7 @@ namespace AutoTrader.Traders
             actualAmount = lastPrice.Amount;
             lastPriceDate = lastPrice.Date;
 
-            AoAgent.Refresh(actualPrice);
+            AoAgent.Refresh(actualPrice, lastPriceDate);
 
             if (previousPrice == double.MaxValue)
             {
@@ -81,7 +81,7 @@ namespace AutoTrader.Traders
             changeRatio = actualPrice / previousPrice;
 
             bool hasChanged = false;
-            if (TradeSettings.CanBuy && btcBalance >= minBtcTradeAmount)
+            if (TradeSettings.CanBuy && canBuy && btcBalance >= minBtcTradeAmount)
             {
                 hasChanged |= Buy(minBtcTradeAmount, actualPrice, actualAmount);
             }

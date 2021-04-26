@@ -38,7 +38,7 @@ namespace AutoTrader.Traders
             GraphCollection = new GraphCollection(this);
         }
 
-        public virtual void Trade()
+        public virtual void Trade(bool canBuy)
         {
         }
 

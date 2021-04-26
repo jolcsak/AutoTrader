@@ -16,6 +16,8 @@ namespace AutoTrader
         private const int TRADE_WAIT = 2 * 60 * 1000;
         private const int COLLECTOR_TRADER_DELAY_TIME = 333;
         private const int APP_TRADER_DELAY_TIME = 10;
+        private const int BUYER_NUMBER = 12;
+
         private ITradeLogger Logger = TradeLogManager.GetLogger("AutoTrader");
 
         public static List<ITrader> Traders { get; } = new List<ITrader>();
@@ -61,11 +63,13 @@ namespace AutoTrader
 
             do
             {
+                int i = 0;
                 foreach (ITrader trader in Traders.OrderByDescending(t => t.Order).ToList())
                 {
                     try
                     {
-                        trader.Trade();
+                        trader.Trade(i < BUYER_NUMBER);
+                        i++;
                         Thread.Sleep(APP_TRADER_DELAY_TIME);
                     }
                     catch (Exception ex)

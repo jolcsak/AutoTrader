@@ -34,7 +34,7 @@ namespace AutoTrader.Traders
             this.trader = trader;
         }
 
-        public void Refresh(double? actualPrice = null)
+        public void Refresh(double? actualPrice = null, DateTime? date = null)
         {
             if (PastPrices == null)
             {
@@ -49,6 +49,10 @@ namespace AutoTrader.Traders
             else if (actualPrice.HasValue)
             {
                 PastPrices.Add(actualPrice.Value);
+                if (date.HasValue)
+                {
+                    Dates.Add(date.Value);
+                }
             }
         }
     }

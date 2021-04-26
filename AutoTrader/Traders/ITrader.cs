@@ -24,7 +24,7 @@ namespace AutoTrader.Traders
 
         public IAgent AoAgent { get; set; }
 
-        public void Trade();
+        public void Trade(bool canBuy);
 
         ActualPrice GetAndStoreCurrentOrders();
 

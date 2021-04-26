@@ -122,5 +122,15 @@ namespace AutoTrader.Desktop
         {
             CurrentTrader?.SellAll(true);
         }
+
+        private void openedOrders_SelectedCellsChanged(object sender, System.Windows.Controls.SelectedCellsChangedEventArgs e)
+        {
+            var selectedTradeOrder = openedOrders?.SelectedItem as TradeOrder;
+            var trader = selectedTradeOrder != null ? traderThread.GetTrader(selectedTradeOrder.Currency) : TraderThread.Traders.FirstOrDefault();
+            if (trader != null)
+            {
+                Logger.RefreshGraph(trader);
+            }
+        }
     }
 }
