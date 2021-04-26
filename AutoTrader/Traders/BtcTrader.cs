@@ -13,7 +13,6 @@ namespace AutoTrader.Traders
 
         protected static double minBtcTradeAmount = 0.00025; 
 
-        protected DateTime lastPriceDate = DateTime.MinValue;
         protected double actualPrice;
         protected double actualAmount;
         protected double previousPrice = double.MaxValue;
@@ -62,16 +61,16 @@ namespace AutoTrader.Traders
 
             var lastPrice = Store.LastPrices.GetLastPriceForTrader(this);
 
-            if (lastPrice == null || lastPrice.Date == lastPriceDate)
+            if (lastPrice == null || lastPrice.Date == LastPriceDate)
             {
                 return;
             }
 
             actualPrice = lastPrice.Price;
             actualAmount = lastPrice.Amount;
-            lastPriceDate = lastPrice.Date;
+            LastPriceDate = lastPrice.Date.AddHours(2);
 
-            AoAgent.Refresh(actualPrice, lastPriceDate);
+            AoAgent.Refresh(actualPrice, LastPriceDate);
 
             if (previousPrice == double.MaxValue)
             {

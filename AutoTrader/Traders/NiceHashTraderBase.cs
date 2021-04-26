@@ -28,8 +28,9 @@ namespace AutoTrader.Traders
         public GraphCollection GraphCollection { get; }
         public double Frequency => GraphCollection.AoProvider.Frequency;
         public double Amplitude => GraphCollection.AoProvider.Amplitude;
-
         public double Order => GraphCollection.AoProvider.Frequency * GraphCollection.AoProvider.Amplitude;
+        public DateTime LastPriceDate { get; set; } = DateTime.MinValue;
+
 
         public IAgent AoAgent { get; set; }
 

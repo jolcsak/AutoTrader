@@ -1,4 +1,6 @@
-﻿namespace AutoTrader.Db.Entities
+﻿using System;
+
+namespace AutoTrader.Db.Entities
 {
     public class Currency
     {
@@ -9,12 +11,10 @@
         public double Amount { get; set; }
         public double MinPeriodPrice { get; set; }
         public double MaxPeriodPrice { get; set; }
-
         public double Frequency { get; set; }
-
         public double Amplitude { get; set; }
-
         public double Order { get; set; }
+        public DateTime LastUpdate { get; set; }
 
         public string Change
         {
@@ -28,9 +28,9 @@
             }
         }
 
-        public bool Refresh(double price, double amount, double minPeriodPrice, double maxPeriodPrice, double frequency, double amplitude, double order)
+        public bool Refresh(double price, double amount, double minPeriodPrice, double maxPeriodPrice, double frequency, double amplitude, double order, DateTime lastUpdate)
         {
-            bool hasChanged = price != Price || amount != Amount || previousPrice != Price || minPeriodPrice != MinPeriodPrice || maxPeriodPrice != MaxPeriodPrice || frequency != Frequency || amplitude != Amplitude || Order != order;
+            bool hasChanged = price != Price || amount != Amount || previousPrice != Price || minPeriodPrice != MinPeriodPrice || maxPeriodPrice != MaxPeriodPrice || frequency != Frequency || amplitude != Amplitude || Order != order || LastUpdate != lastUpdate;
             if (hasChanged)
             {
                 previousPrice = Price;
@@ -41,6 +41,7 @@
                 Frequency = frequency;
                 Amplitude = amplitude;
                 Order = order;
+                LastUpdate = LastUpdate;
                                 
             }
             return hasChanged;

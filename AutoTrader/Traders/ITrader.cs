@@ -1,5 +1,6 @@
 ﻿using AutoTrader.Db.Entities;
 using AutoTrader.Traders.Agents;
+using System;
 using System.Collections.Generic;
 
 namespace AutoTrader.Traders
@@ -15,6 +16,7 @@ namespace AutoTrader.Traders
         double Amplitude { get; }
 
         double Order { get; }
+        DateTime LastPriceDate { get; }
 
         public IList<TradeOrder> TradeOrders { get; }
 
