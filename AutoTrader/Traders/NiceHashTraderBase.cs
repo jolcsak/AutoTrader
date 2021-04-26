@@ -74,6 +74,9 @@ namespace AutoTrader.Traders
                     Sell(tradeOrder.ActualPrice, tradeOrder);
                 }
             }
+
+            Logger.LogTradeOrders(AllTradeOrders);
+            Logger.Warn($"All orders are sold.");
         }
     }
 }

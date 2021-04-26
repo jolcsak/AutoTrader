@@ -55,9 +55,6 @@ namespace AutoTrader.Traders
         {
             double btcBalance = GetBTCBalance();
 
-            //var r = NiceHashApi.GetOrder("ENJBTC", "1a1365e3-891a-4ba9-9ca6-67f3150f2d16");
-            //OrderTrade orderResponseSell = NiceHashApi.Order("ENJBTC", isBuy: false, r.qty - r.fee);
-
             if (btcBalance == 0)
             {
                 return;

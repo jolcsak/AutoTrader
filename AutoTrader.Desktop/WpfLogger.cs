@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using AutoTrader.Db.Entities;
-using AutoTrader.GraphProviders;
 using AutoTrader.Log;
 using AutoTrader.Traders;
 using MathNet.Filtering;
 using MathNet.Filtering.FIR;
-using MathNet.Numerics.IntegralTransforms;
 
 namespace AutoTrader.Desktop
 {
@@ -104,7 +101,7 @@ namespace AutoTrader.Desktop
             });
         }
 
-        public void LogTradeOrders(IList<TradeOrder> traderOrders, string currency, double actualPrice)
+        public void LogTradeOrders(IList<TradeOrder> traderOrders)
         {
             Dispatcher?.BeginInvoke(() => {
                 openedOrders.ItemsSource = traderOrders.Where(o => o.Type == TradeOrderType.OPEN).OrderByDescending(o => o.ActualYield);
