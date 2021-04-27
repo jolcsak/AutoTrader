@@ -12,10 +12,10 @@ namespace AutoTrader
 {
     public class TraderThread
     {
-        private const string VERSION = "0.2";
+        private const string VERSION = "0.21";
 
         private const int COLLECTOR_WAIT = 3 * 60 * 1000;
-        private const int TRADE_WAIT = 2 * 60 * 1000;
+        private const int TRADE_WAIT = 1 * 60 * 1000;
         private const int COLLECTOR_TRADER_DELAY_TIME = 1000;
         private const int APP_TRADER_DELAY_TIME = 10;
         private const int BUYER_NUMBER = 12;
@@ -98,10 +98,12 @@ namespace AutoTrader
             {
                 foreach (ITrader trader in Traders)
                 {
+                    int delayTime = COLLECTOR_TRADER_DELAY_TIME;
                     try
                     {
                         trader.GetAndStoreCurrentOrders();
-                        Thread.Sleep(COLLECTOR_TRADER_DELAY_TIME);
+                        Thread.Sleep(delayTime);
+                        delayTime += COLLECTOR_TRADER_DELAY_TIME;
                     }
                     catch (Exception ex)
                     {

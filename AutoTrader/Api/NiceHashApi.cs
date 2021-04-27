@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -12,7 +13,7 @@ namespace AutoTrader.Api
         private static string TEST_URL_ROOT = "https://api-test.nicehash.com";
         private static string PROD_URL_ROOT = "https://api2.nicehash.com";
 
-        private const int RETRY_PERIOD = 1000;
+        private const int RETRY_PERIOD = 10;
         private string URL_ROOT;
         private NiceHashConnectApi api;
 
@@ -49,7 +50,7 @@ namespace AutoTrader.Api
 
         public OrderBooks GetOrderBook(string currencyBuy, string currencySell)
         {
-            return Get<OrderBooks>("/exchange/api/v2/orderbook?market=" + currencyBuy + currencySell + "&limit=100", true, ServerTime);
+            return Get<OrderBooks>($"/exchange/api/v2/orderbook?market={currencyBuy}{currencySell}&limit=1", true, ServerTime);
         }
 
         public OrderTrade Order(string market, bool isBuy, double amount, double minSecQuantity = 0)
@@ -61,11 +62,7 @@ namespace AutoTrader.Api
             {
                 url += $"&secQuantity={amountStr}";
             }
-            //else
-            //{
-            //    string minSecQuantityStr = minSecQuantity.ToString("N8", CultureInfo.InvariantCulture);
-            //    url += $"&minSecQuantity={minSecQuantityStr}";
-            //}
+
             return Post<OrderTrade>(url);
         }
 
@@ -85,7 +82,13 @@ namespace AutoTrader.Api
                 Thread.Sleep(RETRY_PERIOD);
                 response = api.get(url, true, ServerTime);
             }
-            return JsonConvert.DeserializeObject<T>(response);
+
+            var r = JsonConvert.DeserializeObject<T>(response);
+            if (r == null)
+            {
+                Console.WriteLine();
+            }
+            return r;
         }
 
         private T Post<T>(string url)

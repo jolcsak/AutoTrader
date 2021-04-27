@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AutoTrader.Log;
+using RestSharp;
 
 namespace AutoTrader.Api
 {
@@ -11,6 +13,8 @@ namespace AutoTrader.Api
         private string orgId;
         private string apiKey;
         private string apiSecret;
+
+        protected virtual ITradeLogger Logger => TradeLogManager.GetLogger(GetType());
 
         public NiceHashConnectApi(string urlRoot, string orgId, string apiKey, string apiSecret)
         {
@@ -101,8 +105,8 @@ namespace AutoTrader.Api
 
         public string get(string url, bool auth, string time)
         {
-            var client = new RestSharp.RestClient(this.urlRoot);
-            var request = new RestSharp.RestRequest(url);
+            var client = new RestClient(this.urlRoot);
+            var request = new RestRequest(url);
 
             if (auth)
             {
@@ -116,14 +120,13 @@ namespace AutoTrader.Api
             }
 
             var response = client.Execute(request, RestSharp.Method.GET);
-            var content = response.Content;
-            return content;
+            return GetContent(response);
         }
 
         public string post(string url, string payload, string time, bool requestId)
         {
-            var client = new RestSharp.RestClient(this.urlRoot);
-            var request = new RestSharp.RestRequest(url);
+            var client = new RestClient(this.urlRoot);
+            var request = new RestRequest(url);
             request.AddHeader("Accept", "application/json");
             request.AddHeader("Content-type", "application/json");
 
@@ -146,14 +149,13 @@ namespace AutoTrader.Api
             }
 
             var response = client.Execute(request, RestSharp.Method.POST);
-            var content = response.Content;
-            return content;
+            return GetContent(response);
         }
 
         public string delete(string url, string time, bool requestId)
         {
-            var client = new RestSharp.RestClient(this.urlRoot);
-            var request = new RestSharp.RestRequest(url);
+            var client = new RestClient(this.urlRoot);
+            var request = new RestRequest(url);
 
             string nonce = Guid.NewGuid().ToString();
             string digest = HashBySegments(this.apiSecret, this.apiKey, time, nonce, this.orgId, "DELETE", getPath(url), getQuery(url), null);
@@ -169,8 +171,21 @@ namespace AutoTrader.Api
             }
 
             var response = client.Execute(request, RestSharp.Method.DELETE);
-            var content = response.Content;
-            return content;
+            return GetContent(response);
+        }
+
+        private string GetContent(IRestResponse restResponse)
+        {
+            if (restResponse == null)
+            {
+                Logger.Err("No response from the server!");
+                return string.Empty;
+            }
+            if (!restResponse.IsSuccessful)
+            {
+                Logger.Err($"Request failed: Status={restResponse.StatusCode}, URL={restResponse.ResponseUri}, RespStatus={restResponse.ResponseStatus}, Error={restResponse.ErrorMessage}, Desc={restResponse.StatusDescription}, Content={restResponse.Content}");
+            }
+            return restResponse.Content;
         }
     }
 }

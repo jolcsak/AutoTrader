@@ -54,11 +54,11 @@
                             <DataGridTextColumn Binding="{Binding Name}" Header="Name" SortDirection="Ascending"/>
                             <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N10}}" Header="Price" />
                             <DataGridTextColumn Binding="{Binding Amount}" Header="Amount" />
-                            <DataGridTextColumn Binding="{Binding LastUpdate}" Header="Last Update" FontStyle="Italic"/>
                             <DataGridTextColumn Binding="{Binding Change}" Header="Change" FontWeight="ExtraBold"/>
                             <DataGridTextColumn Binding="{Binding Frequency, StringFormat={}{0:N6}}" Header="Freq" />
                             <DataGridTextColumn Binding="{Binding Amplitude, StringFormat={}{0:N4}}" Header="Ampl" />
                             <DataGridTextColumn Binding="{Binding Order, StringFormat={}{0:N4}}" Header="Order" />
+                            <DataGridTextColumn Binding="{Binding LastUpdate}" Header="Last Update" FontStyle="Italic"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
