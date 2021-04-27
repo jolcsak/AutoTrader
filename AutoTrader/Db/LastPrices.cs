@@ -13,10 +13,15 @@ namespace AutoTrader.Db
 
         public LastPrice GetLastPriceForTrader(ITrader trader)
         {
-            var lastPrice = Table.
+            var lastPrices = Table.
                 Filter(doc => R.Or(doc["Currency"].Eq(trader.TargetCurrency))).Limit(1)
                 .RunResult<IList<LastPrice>>(conn);
-            return lastPrice.FirstOrDefault();
+            var lastPrice = lastPrices.FirstOrDefault();
+            if (lastPrice != null)
+            {
+                lastPrice.Date = lastPrice.Date.AddHours(2);
+            }
+            return lastPrice;
         }
     }
 }

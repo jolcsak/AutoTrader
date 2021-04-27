@@ -46,9 +46,12 @@ namespace AutoTrader.Traders
                 SmaSkip = smaProvider.Sma.Count - Ao.Count;
                 PricesSkip = PastPrices.Count - Ao.Count;
             }
-            else if (actualPrice.HasValue)
+            else 
             {
-                PastPrices.Add(actualPrice.Value);
+                if (actualPrice.HasValue)
+                {
+                    PastPrices.Add(actualPrice.Value);
+                }
                 if (date.HasValue)
                 {
                     Dates.Add(date.Value);

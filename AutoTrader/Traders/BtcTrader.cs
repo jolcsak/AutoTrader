@@ -82,7 +82,7 @@ namespace AutoTrader.Traders
 
             actualPrice = lastPrice.Price;
             actualAmount = lastPrice.Amount;
-            LastPriceDate = lastPrice.Date.AddHours(2);
+            LastPriceDate = lastPrice.Date;
 
             AoAgent.Refresh(actualPrice, LastPriceDate);
 
@@ -93,23 +93,18 @@ namespace AutoTrader.Traders
 
             changeRatio = actualPrice / previousPrice;
 
-            bool hasChanged = false;
             if (TradeSettings.CanBuy && canBuy && btcBalance >= minBtcTradeAmount)
             {
-                hasChanged |= Buy(minBtcTradeAmount, actualPrice, actualAmount);
+                Buy(minBtcTradeAmount, actualPrice, actualAmount);
             }
 
-            hasChanged |= Sell(actualPrice);
+            Sell(actualPrice);
             previousPrice = actualPrice;
 
             RefreshOrderBooksPrices();
 
-            if (hasChanged)
-            {
-                Logger.LogTradeOrders(AllTradeOrders);
-                Logger.Info($"Change: {changeRatio}, Cur: {actualPrice} x {actualAmount}");
-            }
-
+            Logger.Info($"Change: {changeRatio}, Cur: {actualPrice} x {actualAmount}");
+            Logger.LogTradeOrders(AllTradeOrders);
             Logger.LogCurrency(this, actualPrice, actualAmount);
         }
 

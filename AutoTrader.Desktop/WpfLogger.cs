@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using AutoTrader.Db.Entities;
 using AutoTrader.Log;
 using AutoTrader.Traders;
 using MathNet.Filtering;
-using MathNet.Filtering.FIR;
 
 namespace AutoTrader.Desktop
 {
@@ -31,12 +30,16 @@ namespace AutoTrader.Desktop
         private static string selectedCurrency = string.Empty;
         private static Label selectedCurrencyLabel;
 
-        private static IList<Currency> currencyList = new List<Currency>();
+        private static readonly ObservableCollection<Currency> currencyList = new ObservableCollection<Currency>();
+        private static readonly ObservableCollection<TradeOrder> openedOrdersData = new ObservableCollection<TradeOrder>();
+        private static readonly ObservableCollection<TradeOrder> closedOrdersData = new ObservableCollection<TradeOrder>();
+
         public string SelectedCurrency
         {
             get => selectedCurrency;
             set
             {
+                currencies.SelectedItem = currencyList.FirstOrDefault(c => c.Name.Equals(value));
                 selectedCurrency = value;
                 selectedCurrencyLabel.Content = value;
             }
@@ -57,6 +60,10 @@ namespace AutoTrader.Desktop
             currencies = currenciesInstance;
             graph = graphInstance;
             selectedCurrencyLabel = selectedCurrencyInst;
+
+            currencies.ItemsSource = currencyList;
+            openedOrders.ItemsSource = openedOrdersData;
+            closedOrders.ItemsSource = closedOrdersData;
         }
 
         protected WpfLogger(string name)
@@ -112,10 +119,19 @@ namespace AutoTrader.Desktop
 
         public void LogTradeOrders(IList<TradeOrder> traderOrders)
         {
-            Dispatcher?.BeginInvoke(() => {
-                openedOrders.ItemsSource = traderOrders.Where(o => o.Type == TradeOrderType.OPEN).OrderByDescending(o => o.ActualYield);
-                closedOrders.ItemsSource = traderOrders.Where(o => o.Type == TradeOrderType.CLOSED).OrderByDescending(o => o.SellDate);
-            });
+
+            Dispatcher?.BeginInvoke(() =>
+               {
+                   foreach (var newOpenedOrder in traderOrders.Where(o => o.Type == TradeOrderType.OPEN && !openedOrdersData.Any(i => i.Id.Equals(o.Id))))
+                   {
+                       openedOrdersData.Add(newOpenedOrder);
+                   }
+
+                   foreach (var newClosedOrder in traderOrders.Where(o => o.Type == TradeOrderType.CLOSED && !closedOrdersData.Any(i => i.Id.Equals(o.Id))))
+                   {
+                       closedOrdersData.Add(newClosedOrder);
+                   }
+               });
         }
 
         public void LogBalance(string currency, double balance)
@@ -125,79 +141,56 @@ namespace AutoTrader.Desktop
 
         public void LogCurrency(ITrader trader, double price, double amount)
         {
-            if (currencies.ItemsSource == null)
-            {
-                Dispatcher?.BeginInvoke(() => currencies.ItemsSource = currencyList);
-            }
-
             string currency = trader.TargetCurrency;
 
             var currencyInst = currencyList.FirstOrDefault(c => c.Name == currency);
-            if (currencyInst == null)
-            {
-                currencyInst = new Currency { Name = currency, Price = price, Amount = amount, Frequency = trader.Frequency, Amplitude = trader.Amplitude, Order = trader.Order, LastUpdate = trader.LastPriceDate };
-                currencyList.Add(currencyInst);
-                RefreshCurrencyList();
-            }
-            else
-            {
-                if (currencyInst.Refresh(price, amount, trader.GraphCollection.MinPeriodPrice, trader.GraphCollection.MaxPeriodPrice, trader.Frequency, trader.Amplitude, trader.Order, trader.LastPriceDate))
-                {
-                    RefreshCurrencyList();
-                }
-            }
+            Dispatcher?.BeginInvoke(() =>
+               {
+                   if (currencyInst == null)
+                   {
+                       currencyInst = new Currency { Name = currency, Price = price, Amount = amount, Frequency = trader.Frequency, Amplitude = trader.Amplitude, Order = trader.Order, LastUpdate = trader.LastPriceDate };
+                       currencyList.Add(currencyInst);
+                   }
+                   else
+                   {
+                       currencyInst.Refresh(price, amount, trader.GraphCollection.MinPeriodPrice, trader.GraphCollection.MaxPeriodPrice, trader.Frequency, trader.Amplitude, trader.Order, trader.LastPriceDate);
+                   }
+               });
 
-            if (!SelectedCurrency.Equals(currency))
-            {
-                return;
-            }
             RefreshGraph(trader);
         }
 
         public void RefreshGraph(ITrader trader)
         {
-            Dispatcher?.Invoke(() => graph.Children.Clear());
+            if (SelectedCurrency.Equals(trader.TargetCurrency))
+            {
+                Dispatcher?.Invoke(() => graph.Children.Clear());
 
-            GraphCollection graphCollection = trader.GraphCollection;
-            graphCollection.Refresh();
-            new BarGraph(graph, "Awesome Oscillator", graphCollection.Ao, Colors.Yellow, Colors.Blue).Draw();
+                GraphCollection graphCollection = trader.GraphCollection;
+                graphCollection.Refresh();
+                new BarGraph(graph, "Awesome Oscillator", graphCollection.Ao, Colors.Yellow, Colors.Blue).Draw();
 
-            //Complex[] signal = graphCollection.PastPrices.Select(val => new Complex(val, 0)).ToArray();
-            //Fourier.Inverse(signal, FourierOptions.Matlab);
-            //var result = signal.Select(x => new AoValue { Value = x.Magnitude, Color = AoColor.Green }).Take(signal.Length / 2).Skip(3).ToArray();
-            //new BarGraph(graph, "FFT", result, Colors.LightBlue, Colors.Orange).Draw();
+                //Complex[] signal = graphCollection.PastPrices.Select(val => new Complex(val, 0)).ToArray();
+                //Fourier.Inverse(signal, FourierOptions.Matlab);
+                //var result = signal.Select(x => new AoValue { Value = x.Magnitude, Color = AoColor.Green }).Take(signal.Length / 2).Skip(3).ToArray();
+                //new BarGraph(graph, "FFT", result, Colors.LightBlue, Colors.Orange).Draw();
+
+                DrawTendencies(graphCollection, trader);
+                new Graph(graph, "BTC Price ratio", graphCollection.PastPrices, Colors.DarkGray, showPoints: true).Draw(graphCollection.PricesSkip);
+                new Graph(graph, "Simple Moving Average", graphCollection.Sma, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
+                new DateGraph(graph, graphCollection.Dates).Draw(graphCollection.PricesSkip);
+            }
+        }
+
+        private static void DrawTendencies(GraphCollection graphCollection, ITrader trader)
+        {
             double amplitude = trader.Amplitude;
             if (!double.IsNaN(amplitude))
             {
-                DrawTendencies(graphCollection, amplitude);
+                var filter = OnlineFilter.CreateLowpass(ImpulseResponse.Finite, 50, amplitude);
+                var result2 = filter.ProcessSamples(graphCollection.PastPrices.ToArray());
+                new Graph(graph, "Price low-pass", result2, Colors.Orange, showPoints: false).Draw(85);
             }
-
-            new Graph(graph, "BTC Price ratio", graphCollection.PastPrices, Colors.DarkGray, showPoints: true).Draw(graphCollection.PricesSkip);
-            new Graph(graph, "Simple Moving Average", graphCollection.Sma, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
-            new DateGraph(graph, graphCollection.Dates).Draw(graphCollection.PricesSkip);
-        }
-
-        private static void DrawTendencies(GraphCollection graphCollection, double amplitude)
-        {
-            var filter = OnlineFirFilter.CreateLowpass(ImpulseResponse.Finite, 50, amplitude);
-            var result2 = filter.ProcessSamples(graphCollection.PastPrices.ToArray());
-            new Graph(graph, "Price low-pass", result2, Colors.Orange, showPoints: false).Draw(85);
-        }
-
-        private void RefreshCurrencyList()
-        {
-            Dispatcher?.BeginInvoke(() =>
-            {
-                var selectedItem = currencies.SelectedItem;
-                currencies.Items.Refresh();
-                if (selectedItem != null)
-                {
-                    currencies.SelectedItem = selectedItem;
-                    currencies.ScrollIntoView(selectedItem);
-                    var row = (DataGridRow)currencies.ItemContainerGenerator.ContainerFromIndex(currencies.SelectedIndex);
-                    row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
-                }
-            });
         }
     }
 }

@@ -20,31 +20,23 @@ namespace AutoTrader.Db.Entities
         {
             get
             {
-                if (previousPrice.HasValue)
-                {
-                    return previousPrice == Price ? string.Empty : (((previousPrice / Price) * 100) - 100).Value.ToString("N3") + "%";
-                }
-                return string.Empty;
+                return previousPrice.HasValue
+                    ? previousPrice == Price ? string.Empty : (((previousPrice / Price) * 100) - 100).Value.ToString("N3") + "%"
+                    : string.Empty;
             }
         }
 
-        public bool Refresh(double price, double amount, double minPeriodPrice, double maxPeriodPrice, double frequency, double amplitude, double order, DateTime lastUpdate)
+        public void Refresh(double price, double amount, double minPeriodPrice, double maxPeriodPrice, double frequency, double amplitude, double order, DateTime lastUpdate)
         {
-            bool hasChanged = price != Price || amount != Amount || previousPrice != Price || minPeriodPrice != MinPeriodPrice || maxPeriodPrice != MaxPeriodPrice || frequency != Frequency || amplitude != Amplitude || Order != order || LastUpdate != lastUpdate;
-            if (hasChanged)
-            {
-                previousPrice = Price;
-                Price = price;
-                Amount = amount;
-                MinPeriodPrice = minPeriodPrice;
-                MaxPeriodPrice = maxPeriodPrice;
-                Frequency = frequency;
-                Amplitude = amplitude;
-                Order = order;
-                LastUpdate = LastUpdate;
-                                
-            }
-            return hasChanged;
+            previousPrice = Price;
+            Price = price;
+            Amount = amount;
+            MinPeriodPrice = minPeriodPrice;
+            MaxPeriodPrice = maxPeriodPrice;
+            Frequency = frequency;
+            Amplitude = amplitude;
+            Order = order;
+            LastUpdate = LastUpdate;                                
         }
     }
 }
