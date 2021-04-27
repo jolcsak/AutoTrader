@@ -68,9 +68,10 @@ namespace AutoTrader.Traders
 
         public void SellAll(bool onlyProfitable)
         {
+            double yield = (TradeSettings.MinSellYield - 1) * 100;
             foreach (TradeOrder tradeOrder in AllTradeOrders.Where(to => to.Type == TradeOrderType.OPEN))
             {
-                if (!onlyProfitable || tradeOrder.ActualYield > TradeSettings.MinSellYield)
+                if (!onlyProfitable || tradeOrder.ActualYield > yield)
                 {
                     Sell(tradeOrder.ActualPrice, tradeOrder);
                 }

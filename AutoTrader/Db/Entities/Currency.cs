@@ -1,8 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace AutoTrader.Db.Entities
 {
-    public class Currency
+    public class Currency : INotifyPropertyChanged
     {
         private double? previousPrice;
         public string Name { get; set; }
@@ -28,14 +29,57 @@ namespace AutoTrader.Db.Entities
         public void Refresh(double price, double amount, double minPeriodPrice, double maxPeriodPrice, double frequency, double amplitude, double order, DateTime lastUpdate)
         {
             previousPrice = Price;
-            Price = price;
-            Amount = amount;
-            MinPeriodPrice = minPeriodPrice;
-            MaxPeriodPrice = maxPeriodPrice;
-            Frequency = frequency;
-            Amplitude = amplitude;
-            Order = order;
-            LastUpdate = lastUpdate;                                
+            if (price != Price)
+            {
+                Price = price;
+                NotifyPropertyChanged(nameof(Price));
+                NotifyPropertyChanged(nameof(Change));
+            }
+            if (amount != Amount)
+            {
+                Amount = amount;
+                NotifyPropertyChanged(nameof(Amount));
+            }
+            if (minPeriodPrice != MinPeriodPrice)
+            {
+                MinPeriodPrice = minPeriodPrice;
+                NotifyPropertyChanged(nameof(MinPeriodPrice));
+            }
+            if (maxPeriodPrice != MaxPeriodPrice)
+            {
+                MaxPeriodPrice = maxPeriodPrice;
+                NotifyPropertyChanged(nameof(MaxPeriodPrice));
+            }
+            if (frequency != Frequency)
+            {
+                Frequency = frequency;
+                NotifyPropertyChanged(nameof(Frequency));
+            }
+            if (amplitude != Amplitude)
+            {
+                Amplitude = amplitude;
+                NotifyPropertyChanged(nameof(Amplitude));
+            }
+            if (order != Order)
+            {
+                Order = order;
+                NotifyPropertyChanged(nameof(Order));
+            }
+            if (lastUpdate != LastUpdate)
+            {
+                LastUpdate = lastUpdate;
+                NotifyPropertyChanged(nameof(LastUpdate));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void NotifyPropertyChanged(string propName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
         }
     }
 }

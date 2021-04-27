@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -39,7 +40,7 @@ namespace AutoTrader.Desktop
             get => selectedCurrency;
             set
             {
-                currencies.SelectedItem = currencyList.FirstOrDefault(c => c.Name.Equals(value));
+                currencies.SelectedItem = currencyList.FirstOrDefault(c => ((dynamic)c).Name.Equals(value));
                 selectedCurrency = value;
                 selectedCurrencyLabel.Content = value;
             }
@@ -122,7 +123,7 @@ namespace AutoTrader.Desktop
 
             Dispatcher?.BeginInvoke(() =>
                {
-                   foreach (var newOpenedOrder in traderOrders.Where(o => o.Type == TradeOrderType.OPEN && !openedOrdersData.Any(i => i.Id.Equals(o.Id))))
+                   foreach (var newOpenedOrder in traderOrders.Where(o => o.Type == TradeOrderType.OPEN))
                    {
                        var existingOrder = openedOrdersData.FirstOrDefault(i => i.Id.Equals(newOpenedOrder.Id));
                        if (existingOrder == null)

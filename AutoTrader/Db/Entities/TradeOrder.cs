@@ -1,9 +1,10 @@
 ﻿using RethinkDb.Driver.Extras.Dao;
 using System;
+using System.ComponentModel;
 
 namespace AutoTrader.Db.Entities
 {
-    public class TradeOrder : Document<Guid>
+    public class TradeOrder : Document<Guid>, INotifyPropertyChanged
     {
         public string OrderId { get; set; }
         public double Amount { get; set; }
@@ -45,10 +46,24 @@ namespace AutoTrader.Db.Entities
         {
         }
 
-
         public void RefreshFrom(TradeOrder tradeOrder)
         {
-            ActualPrice = tradeOrder.ActualPrice;
+            if (tradeOrder.ActualPrice != ActualPrice)
+            {
+                ActualPrice = tradeOrder.ActualPrice;
+                NotifyPropertyChanged(nameof(ActualPrice));
+                NotifyPropertyChanged(nameof(ActualYield));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void NotifyPropertyChanged(string propName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
         }
     }
 

@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoTrader.Desktop", "AutoTrader.Desktop\AutoTrader.Desktop.csproj", "{60379B16-7820-4901-B19E-B7451DCC1E89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoTrader.PriceCollector", "AutoTrader.PriceCollector\AutoTrader.PriceCollector.csproj", "{10964453-63BA-4C2D-BF72-73E90DA7D7A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoTrader.PriceCollector", "AutoTrader.PriceCollector\AutoTrader.PriceCollector.csproj", "{10964453-63BA-4C2D-BF72-73E90DA7D7A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

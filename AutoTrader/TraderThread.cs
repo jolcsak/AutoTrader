@@ -15,7 +15,7 @@ namespace AutoTrader
         private const string VERSION = "0.22";
 
         private const int COLLECTOR_WAIT = 1 * 60 * 1000;
-        private const int TRADE_WAIT = 1 * 60 * 1000;
+        private const int TRADE_WAIT = 20 * 1000;
         private const int BUYER_NUMBER = 12;
 
         private ITradeLogger Logger = TradeLogManager.GetLogger("AutoTrader");

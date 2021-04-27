@@ -152,13 +152,10 @@ namespace AutoTrader.Traders
 
         private void SaveOrderBooksPrices()
         {
-            foreach (TradeOrder tradeOrder in TradeOrders.Where(to => to.ActualPrice != actualPrice))
+            foreach (TradeOrder tradeOrder in TradeOrders.Where(to => to.Type == TradeOrderType.OPEN && to.ActualPrice != actualPrice))
             {
-                if (actualPrice != tradeOrder.ActualPrice)
-                {
-                    tradeOrder.ActualPrice = actualPrice;
-                    Store.OrderBooks.SaveOrUpdate(tradeOrder);
-                }
+                tradeOrder.ActualPrice = actualPrice;
+                Store.OrderBooks.SaveOrUpdate(tradeOrder);
             }
         }
     }
