@@ -105,7 +105,7 @@ namespace AutoTrader.Desktop
 
         private string GetFormattedString(string level, string message)
         {
-            return DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss.fff") + $" - {level} - {Name} : {message}" + Environment.NewLine;
+            return $"{DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss.fff")} - {level} - {Name} : {message}{Environment.NewLine}";
         }
 
         private void ScrollToEnd()

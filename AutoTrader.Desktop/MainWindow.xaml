@@ -46,7 +46,10 @@
                 </Grid.ColumnDefinitions>
                 <DockPanel Grid.Column="0" DockPanel.Dock="Left" LastChildFill="True" Margin="5,5,5,5">
                     <Label Content="Currencies" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="86" DockPanel.Dock="Top" FontWeight="SemiBold"/>
-                    <DataGrid x:Name="currencies" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" SelectedCellsChanged="currencies_SelectedCellsChanged" ScrollViewer.IsDeferredScrollingEnabled="True">
+                    <DataGrid x:Name="currencies" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" SelectedCellsChanged="currencies_SelectedCellsChanged" ScrollViewer.IsDeferredScrollingEnabled="True" CanUserDeleteRows="False">
+                        <DataGrid.Resources>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkGray"/>
+                        </DataGrid.Resources>
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding Name}" Header="Name" SortDirection="Ascending"/>
                             <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N10}}" Header="Price" />
@@ -79,7 +82,10 @@
                                 <Button Content="Sell All" FontWeight="SemiBold" Grid.Column="1" Margin="50,4,50,4" Click="SellAll_Click"/>
                                 <Button Content="Sell All Profitable" FontWeight="SemiBold" Grid.Column="2" Margin="50,4,50,4" Click="SellAllProfitable_Click"/>
                             </Grid>
-                            <DataGrid x:Name="openedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" ScrollViewer.IsDeferredScrollingEnabled="True" SelectedCellsChanged="openedOrders_SelectedCellsChanged">
+                            <DataGrid x:Name="openedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" ScrollViewer.IsDeferredScrollingEnabled="True" SelectedCellsChanged="openedOrders_SelectedCellsChanged" CanUserDeleteRows="False">
+                                <DataGrid.Resources>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkGray"/>
+                                </DataGrid.Resources>
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Binding="{Binding BuyDate}" Header="BuyDate" />
                                     <DataGridTextColumn Binding="{Binding Currency}" Header="Currency" />
@@ -94,7 +100,10 @@
                         </DockPanel>
                         <DockPanel Grid.Column="0" Grid.Row="1" LastChildFill="True" >
                             <Label Content="Closed Orders" DockPanel.Dock="Top" FontWeight="SemiBold"/>
-                            <DataGrid x:Name="closedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" ScrollViewer.IsDeferredScrollingEnabled="True">
+                            <DataGrid x:Name="closedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" ScrollViewer.IsDeferredScrollingEnabled="True" CanUserDeleteRows="False">
+                                <DataGrid.Resources>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkGray"/>
+                                </DataGrid.Resources>
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Binding="{Binding BuyDate}" Header="Buy Date" />
                                     <DataGridTextColumn Binding="{Binding SellDate}" Header="Sell Date" />
