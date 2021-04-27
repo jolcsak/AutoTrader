@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
 using AutoTrader.Api;
 using AutoTrader.Db.Entities;
 using AutoTrader.Log;
@@ -10,9 +9,6 @@ namespace AutoTrader.Traders
 {
     public class BtcTrader : NiceHashTraderBase
     {
-        private const int RETRY_COUNT = 3;
-        private const int RETRY_TIME = 1000;
-
         public const string BTC = "BTC";
 
         protected static double minBtcTradeAmount = 0.00025; 
@@ -32,20 +28,10 @@ namespace AutoTrader.Traders
 
         public override ActualPrice GetAndStoreCurrentOrders()
         {
-            OrderBooks orderBooks = null;
-            int i = 1;
-            do
-            {
-                orderBooks = NiceHashApi.GetOrderBook(TargetCurrency, BTC);
-                if (orderBooks == null)
-                {
-                    Logger.Err($"#{i}: No orderbook returned!");
-                    Thread.Sleep(RETRY_TIME);
-                }
-            } while (orderBooks == null && i++ < RETRY_COUNT);
-
+            OrderBooks orderBooks = NiceHashApi.GetOrderBook(TargetCurrency, BTC);
             if (orderBooks == null)
             {
+                Logger.Err("No orderbook returned!");
                 return null;
             }
 
@@ -144,7 +130,7 @@ namespace AutoTrader.Traders
                 Logger.Info($"Time to sell at price {actualPrice}");
                 foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))
                 {
-                    if (actualPrice >= (tradeOrder.Price * TradeSettings.MinSellYield) + tradeOrder.Fee * 2)
+                    if (actualPrice >= (tradeOrder.Price * TradeSettings.MinSellYield))
                     {
                         Sell(actualPrice, tradeOrder);
                     }

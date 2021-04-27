@@ -83,12 +83,7 @@ namespace AutoTrader.Api
                 response = api.get(url, true, ServerTime);
             }
 
-            var r = JsonConvert.DeserializeObject<T>(response);
-            if (r == null)
-            {
-                Console.WriteLine();
-            }
-            return r;
+            return JsonConvert.DeserializeObject<T>(response);
         }
 
         private T Post<T>(string url)

@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Security.Cryptography;
+using System.Net;
 using AutoTrader.Log;
 using RestSharp;
 
@@ -9,6 +12,9 @@ namespace AutoTrader.Api
 {
     class NiceHashConnectApi
     {
+        private const int DEFAULT_RETRY_TIME = 30 * 1000;
+        private const int SESSION_RETRY_PERIOD = 10;
+
         private string urlRoot;
         private string orgId;
         private string apiKey;
@@ -26,18 +32,10 @@ namespace AutoTrader.Api
 
         private static string HashBySegments(string key, string apiKey, string time, string nonce, string orgId, string method, string encodedPath, string query, string bodyStr)
         {
-            List<string> segments = new List<string>();
-            segments.Add(apiKey);
-            segments.Add(time);
-            segments.Add(nonce);
-            segments.Add(null);
-            segments.Add(orgId);
-            segments.Add(null);
-            segments.Add(method);
-            segments.Add(encodedPath == null ? null : encodedPath);
-            segments.Add(query == null ? null : query);
+            List<string> segments = 
+                new List<string> { apiKey, time, nonce, null, orgId, null, method, encodedPath, query };
 
-            if (bodyStr != null && bodyStr.Length > 0)
+            if (bodyStr?.Length > 0)
             {
                 segments.Add(bodyStr);
             }
@@ -45,21 +43,12 @@ namespace AutoTrader.Api
         }
         private static string getPath(string url)
         {
-            var arrSplit = url.Split('?');
-            return arrSplit[0];
+            return url.Split('?')[0];
         }
         private static string getQuery(string url)
         {
             var arrSplit = url.Split('?');
-
-            if (arrSplit.Length == 1)
-            {
-                return null;
-            }
-            else
-            {
-                return arrSplit[1];
-            }
+            return arrSplit.Length == 1 ? null : arrSplit[1];
         }
 
         private static string JoinSegments(List<string> segments)
@@ -87,15 +76,10 @@ namespace AutoTrader.Api
 
         private static string CalcHMACSHA256Hash(string plaintext, string salt)
         {
-            string result = "";
-            var enc = Encoding.Default;
-            byte[]
-            baText2BeHashed = enc.GetBytes(plaintext),
-            baSalt = enc.GetBytes(salt);
-            System.Security.Cryptography.HMACSHA256 hasher = new System.Security.Cryptography.HMACSHA256(baSalt);
-            byte[] baHashedText = hasher.ComputeHash(baText2BeHashed);
-            result = string.Join("", baHashedText.ToList().Select(b => b.ToString("x2")).ToArray());
-            return result;
+            byte[] baText2BeHashed = Encoding.Default.GetBytes(plaintext),
+            baSalt = Encoding.Default.GetBytes(salt);
+            byte[] baHashedText = new HMACSHA256(baSalt).ComputeHash(baText2BeHashed);
+            return string.Join("", baHashedText.ToList().Select(b => b.ToString("x2")).ToArray());
         }
 
         public string get(string url)
@@ -105,87 +89,116 @@ namespace AutoTrader.Api
 
         public string get(string url, bool auth, string time)
         {
-            var client = new RestClient(this.urlRoot);
             var request = new RestRequest(url);
-
             if (auth)
             {
-                string nonce = Guid.NewGuid().ToString();
-                string digest = HashBySegments(this.apiSecret, this.apiKey, time, nonce, this.orgId, "GET", getPath(url), getQuery(url), null);
-
-                request.AddHeader("X-Time", time);
-                request.AddHeader("X-Nonce", nonce);
-                request.AddHeader("X-Auth", this.apiKey + ":" + digest);
-                request.AddHeader("X-Organization-Id", this.orgId);
+                AddHeaders(time, request, "GET", url);
             }
 
-            var response = client.Execute(request, RestSharp.Method.GET);
-            return GetContent(response);
+            return GetContent(request, Method.GET);
         }
 
         public string post(string url, string payload, string time, bool requestId)
         {
-            var client = new RestClient(this.urlRoot);
             var request = new RestRequest(url);
             request.AddHeader("Accept", "application/json");
             request.AddHeader("Content-type", "application/json");
-
-            string nonce = Guid.NewGuid().ToString();
-            string digest = HashBySegments(this.apiSecret, this.apiKey, time, nonce, this.orgId, "POST", getPath(url), getQuery(url), payload);
-
+            
             if (payload != null)
             {
                 request.AddJsonBody(payload);
             }
 
-            request.AddHeader("X-Time", time);
-            request.AddHeader("X-Nonce", nonce);
-            request.AddHeader("X-Auth", this.apiKey + ":" + digest);
-            request.AddHeader("X-Organization-Id", this.orgId);
+            AddHeaders(time, request, "POST", url, payload);
 
             if (requestId)
             {
                 request.AddHeader("X-Request-Id", Guid.NewGuid().ToString());
             }
 
-            var response = client.Execute(request, RestSharp.Method.POST);
-            return GetContent(response);
+            return GetContent(request, Method.POST);
         }
 
         public string delete(string url, string time, bool requestId)
         {
-            var client = new RestClient(this.urlRoot);
-            var request = new RestRequest(url);
-
-            string nonce = Guid.NewGuid().ToString();
-            string digest = HashBySegments(this.apiSecret, this.apiKey, time, nonce, this.orgId, "DELETE", getPath(url), getQuery(url), null);
-
-            request.AddHeader("X-Time", time);
-            request.AddHeader("X-Nonce", nonce);
-            request.AddHeader("X-Auth", this.apiKey + ":" + digest);
-            request.AddHeader("X-Organization-Id", this.orgId);
+            var request = new RestRequest(url);            
+            AddHeaders(time, request, "DELETE", url);
 
             if (requestId)
             {
                 request.AddHeader("X-Request-Id", Guid.NewGuid().ToString());
             }
 
-            var response = client.Execute(request, RestSharp.Method.DELETE);
-            return GetContent(response);
+            return GetContent(request, Method.DELETE);
         }
 
-        private string GetContent(IRestResponse restResponse)
+        private string GetContent(RestRequest request, Method method)
         {
-            if (restResponse == null)
+            IRestResponse response;
+            bool hasValidResponse;
+
+            do
             {
-                Logger.Err("No response from the server!");
-                return string.Empty;
-            }
-            if (!restResponse.IsSuccessful)
+                hasValidResponse = true;
+                response = new RestClient(this.urlRoot).Execute(request, method);
+
+                if (response == null)
+                {
+                    Logger.Err("No response from the server!");
+                    return string.Empty;
+                }
+                
+                if (!response.IsSuccessful)
+                {
+                    Logger.Err($"Request failed: Status={response.StatusCode}, URL={response.ResponseUri}, RespStatus={response.ResponseStatus}, Error={response.ErrorMessage}, Desc={response.StatusDescription}, Content={response.Content}");
+                    if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    {
+                        hasValidResponse = HandleTooManyRequests(response);
+                    }
+                }
+            } while (!hasValidResponse);
+
+            return response.Content;
+        }
+
+        private bool HandleTooManyRequests(IRestResponse response)
+        {
+            string timeWindow =
+                response.Headers.FirstOrDefault(p => p.Name.Equals("retry-after", StringComparison.OrdinalIgnoreCase))?.Value as string;
+
+            if (timeWindow != null)
             {
-                Logger.Err($"Request failed: Status={restResponse.StatusCode}, URL={restResponse.ResponseUri}, RespStatus={restResponse.ResponseStatus}, Error={restResponse.ErrorMessage}, Desc={restResponse.StatusDescription}, Content={restResponse.Content}");
+                if (int.TryParse(timeWindow, out var time))
+                {
+                    Logger.Info($"Waiting {time} seconds before retry...");
+                    time *= 1000;
+                    Thread.Sleep(time);
+                }
+                else
+                {
+                    Logger.Err($"retry_after ({timeWindow}) in header not a valid number!");
+                    Logger.Info($"Waiting the default {DEFAULT_RETRY_TIME} seconds before retry...");
+                    Thread.Sleep(DEFAULT_RETRY_TIME);
+                }
             }
-            return restResponse.Content;
+            else
+            {
+                Logger.Err($"retry_after not found in header!");
+                Logger.Info($"Waiting the default {DEFAULT_RETRY_TIME} seconds before retry...");
+                Thread.Sleep(DEFAULT_RETRY_TIME);
+            }
+
+            return false;
+        }
+
+        private void AddHeaders(string time, RestRequest request, string method, string url, string payload = null)
+        {
+            string nonce = Guid.NewGuid().ToString();
+            string digest = HashBySegments(this.apiSecret, this.apiKey, time, nonce, this.orgId, method, getPath(url), getQuery(url), payload);
+            request.AddHeader("X-Time", time);
+            request.AddHeader("X-Nonce", nonce);
+            request.AddHeader("X-Auth", $"{this.apiKey}:{digest}");
+            request.AddHeader("X-Organization-Id", this.orgId);
         }
     }
 }
