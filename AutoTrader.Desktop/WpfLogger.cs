@@ -192,11 +192,11 @@ namespace AutoTrader.Desktop
                 if (graphCollection.Balances.Count > 0)
                 {
                     new Graph(graph, "Total balance", graphCollection.Balances, Colors.DarkOrange, showPoints: true, "N1").Draw(0);
-                    totalBalanceText.Content = graphCollection.Balances.Last().ToString("N1") + " HUF";
+                    Dispatcher?.Invoke(() => totalBalanceText.Content = graphCollection.Balances.Last().ToString("N1") + " HUF");
                 }
                 else
                 {
-                    totalBalanceText.Content = "N/A";
+                    Dispatcher?.Invoke(() => totalBalanceText.Content = "N/A");
                 }
             }
         }
