@@ -8,7 +8,7 @@ namespace AutoTrader.Traders.Agents
     {
         public static double Ratio { get; set; } = 0;
 
-        private static int cc = 6;
+        private static int cc = 3;
 
         protected GraphCollection graphCollection;
         protected IList<AoValue> Ao => graphCollection.Ao;

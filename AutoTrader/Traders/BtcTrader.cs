@@ -149,7 +149,7 @@ namespace AutoTrader.Traders
                 Logger.Info($"Time to sell at price {actualPrice}");
                 foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))
                 {
-                    if (actualPrice >= (tradeOrder.Price * TradeSettings.MinSellYield) + tradeOrder.Fee)
+                    if (actualPrice >= (tradeOrder.Price * TradeSettings.MinSellYield) + tradeOrder.Fee * 2)
                     {
                         Sell(actualPrice, tradeOrder);
                     }
