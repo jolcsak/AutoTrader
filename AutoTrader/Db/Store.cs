@@ -17,6 +17,8 @@ namespace AutoTrader.Db
 
         public OrderBooks OrderBooks { get; private set; }
 
+        public TotalBalances TotalBalances { get; private set; }
+
         private Store()
         {
             Con = R.Connection()
@@ -30,6 +32,7 @@ namespace AutoTrader.Db
             Prices = new Prices();
             OrderBooks = new OrderBooks();
             LastPrices = new LastPrices();
+            TotalBalances = new TotalBalances();
         }
 
         public static Store Connect()

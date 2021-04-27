@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using AutoTrader.Api.Objects;
 using AutoTrader.Config;
 using Newtonsoft.Json;
 
@@ -37,15 +38,20 @@ namespace AutoTrader.Api
             ServerTime = Get<ServerTime>("/api/v2/time").serverTime;
         }
         
-        public IDictionary<string, double> GetBalances()
+        public double GetBalance(string currency)
         {
-            var currenciesObj = Get<Currencies>("/main/api/v2/accounting/accounts2", true, ServerTime);
-            return currenciesObj?.currencies != null ? currenciesObj.currencies.Where(c => c.available != 0).ToDictionary(c => c.currency, c => c.available) : new Dictionary<string, double>();
+            var balance = Get<Balance>($"/main/api/v2/accounting/account2/{currency}", true, ServerTime);
+            return balance.available;
         }
 
         public Symbols GetExchangeSettings()
         {
             return Get<Symbols>("/exchange/api/v2/info/status");
+        }
+            
+        public TotalBalance GetTotalBalance(string fiat = "EUR")
+        {
+            return Get<TotalBalance>($"/main/api/v2/accounting/accounts2?fiat={fiat}", true, ServerTime);
         }
 
         public OrderBooks GetOrderBook(string currencyBuy, string currencySell)

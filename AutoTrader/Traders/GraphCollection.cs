@@ -24,6 +24,8 @@ namespace AutoTrader.Traders
         public IList<AoValue> Ao => AoProvider.Ao;
 
         public IList<DateTime> Dates { get; set; }
+
+        public IList<double> Balances { get; set; }
         public int PricesSkip { get; set; }
         public int SmaSkip { get; set; } = 0;
         public double MaxPeriodPrice => PastPrices.Any() ? PastPrices.Max() : 0;
@@ -57,6 +59,8 @@ namespace AutoTrader.Traders
                     Dates.Add(date.Value);
                 }
             }
+
+            Balances = Store.TotalBalances.GetTotalBalances(trader).Select(b => b.Balance).ToList();
         }
     }
 }

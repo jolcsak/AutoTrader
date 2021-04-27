@@ -11,6 +11,8 @@ namespace AutoTrader.Traders
 {
     public abstract class NiceHashTraderBase : ITrader
     {
+        private const string FIAT = "HUF";
+
         protected static NiceHashApi NiceHashApi => NiceHashApi.Instance;
 
         protected static Store Store => Store.Instance;
@@ -30,7 +32,6 @@ namespace AutoTrader.Traders
         public double Amplitude => GraphCollection.AoProvider.Amplitude;
         public double Order => GraphCollection.AoProvider.Frequency * GraphCollection.AoProvider.Amplitude;
         public DateTime LastPriceDate { get; set; } = DateTime.MinValue;
-
 
         public IAgent AoAgent { get; set; }
 
@@ -85,7 +86,9 @@ namespace AutoTrader.Traders
 
         protected double RefreshBalance()
         {
-            return GetBalance();
+            var balance = GetBalance();
+            Logger.LogBalance(balance);
+            return balance;
         }
     }
 }

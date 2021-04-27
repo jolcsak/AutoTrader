@@ -1,8 +1,8 @@
-﻿using AutoTrader.Db.Entities;
-using AutoTrader.Traders;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoTrader.Db.Entities;
+using AutoTrader.Traders;
 
 namespace AutoTrader.Db
 {
@@ -24,7 +24,7 @@ namespace AutoTrader.Db
         public IList<Price> GetPricesForTrader(ITrader trader)
         {
             var prices = Table.
-                Filter(doc => R.And(doc["Currency"].Eq(trader.TargetCurrency))).OrderBy(R.Desc("Time")).Limit(500)
+                Filter(doc => R.And(doc["Currency"].Eq(trader.TargetCurrency))).OrderBy(R.Desc("Time")).Limit(RECORD_LIMIT)
                 .RunResult<IList<Price>>(conn);
             return prices.Reverse().ToList();
         }

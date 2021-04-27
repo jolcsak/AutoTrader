@@ -32,12 +32,13 @@ namespace AutoTrader.Desktop
             pointFillBrush.Freeze();
         }
 
-        public Graph(Canvas graph, string graphName, IList<double> values, Color lineColor, bool showPoints)
+        public Graph(Canvas graph, string graphName, IList<double> values, Color lineColor, bool showPoints, string toolTipFormat = "N10")
         {
             this.graph = graph;
             this.values = values;
             this.graphName = graphName;
             this.showPoints = showPoints;
+            this.toolTipFormat = toolTipFormat;
 
             lineBrush = new SolidColorBrush { Color = lineColor };
             lineBrush.Freeze();

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -30,6 +29,7 @@ namespace AutoTrader.Desktop
 
         private static string selectedCurrency = string.Empty;
         private static Label selectedCurrencyLabel;
+        private static Label totalBalanceText;
 
         private static readonly ObservableCollection<Currency> currencyList = new ObservableCollection<Currency>();
         private static readonly ObservableCollection<TradeOrder> openedOrdersData = new ObservableCollection<TradeOrder>();
@@ -50,7 +50,7 @@ namespace AutoTrader.Desktop
 
         protected Dispatcher Dispatcher => Application.Current != null ? Application.Current.Dispatcher : null;
 
-        public static void Init(TextBox consoleInstance, ScrollViewer consoleScrollInstance, DataGrid openedOrdersInstance, DataGrid closedOrdersInstance, Label balanceInstance, DataGrid currenciesInstance, Canvas graphInstance, Label selectedCurrencyInst)
+        public static void Init(TextBox consoleInstance, ScrollViewer consoleScrollInstance, DataGrid openedOrdersInstance, DataGrid closedOrdersInstance, Label balanceInstance, DataGrid currenciesInstance, Canvas graphInstance, Label selectedCurrencyInst, Label totalBalanceInstance)
         {
             TradeLogManager.Init(new WpfLogger(string.Empty));
             console = consoleInstance;
@@ -61,6 +61,7 @@ namespace AutoTrader.Desktop
             currencies = currenciesInstance;
             graph = graphInstance;
             selectedCurrencyLabel = selectedCurrencyInst;
+            totalBalanceText = totalBalanceInstance;
 
             currencies.ItemsSource = currencyList;
             openedOrders.ItemsSource = openedOrdersData;
@@ -143,9 +144,9 @@ namespace AutoTrader.Desktop
                });
         }
 
-        public void LogBalance(string currency, double balance)
+        public void LogBalance( double balance)
         {
-            Dispatcher?.BeginInvoke(() => balanceText.Content = $"{balance:N10} {currency}");
+            Dispatcher?.BeginInvoke(() => balanceText.Content = $"{balance:N8}");
         }
 
         public void LogCurrency(ITrader trader, double price, double amount)
@@ -188,6 +189,15 @@ namespace AutoTrader.Desktop
                 new Graph(graph, "BTC Price ratio", graphCollection.PastPrices, Colors.DarkGray, showPoints: true).Draw(graphCollection.PricesSkip);
                 new Graph(graph, "Simple Moving Average", graphCollection.Sma, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
                 new DateGraph(graph, graphCollection.Dates).Draw(graphCollection.PricesSkip);
+                if (graphCollection.Balances.Count > 0)
+                {
+                    new Graph(graph, "Total balance", graphCollection.Balances, Colors.DarkOrange, showPoints: true, "N1").Draw(0);
+                    totalBalanceText.Content = graphCollection.Balances.Last().ToString("N1") + " HUF";
+                }
+                else
+                {
+                    totalBalanceText.Content = "N/A";
+                }
             }
         }
 

@@ -38,14 +38,18 @@ namespace AutoTrader.Traders
             var actualOrder = new ActualPrice { Currency = TargetCurrency, Price = orderBooks.sell[0][0], Amount = orderBooks.sell[0][1] };
 
             LastPrice lastPrice = Store.LastPrices.GetLastPriceForTrader(this) ?? new LastPrice { Currency = TargetCurrency };
-            lastPrice.Price = actualOrder.Price;
-            lastPrice.Amount = actualOrder.Amount;
-            lastPrice.Date = DateTime.Now;
+            bool isChanged = lastPrice.Price != actualOrder.Price || lastPrice.Amount != actualOrder.Amount;
+            if (isChanged)
+            {
+                lastPrice.Price = actualOrder.Price;
+                lastPrice.Amount = actualOrder.Amount;
+                lastPrice.Date = DateTime.Now;
 
-            Store.Prices.Save(new Price(DateTime.Now, TargetCurrency, actualOrder.Price));
-            Store.LastPrices.SaveOrUpdate(lastPrice);
+                Store.Prices.Save(new Price(DateTime.Now, TargetCurrency, actualOrder.Price));
+                Store.LastPrices.SaveOrUpdate(lastPrice);
+            }
 
-            Logger.Info($"{TargetCurrency} price: {actualOrder.Price}, amount: {actualOrder.Amount}");
+            Logger.Info($"{TargetCurrency} price: {actualOrder.Price}, amount: {actualOrder.Amount}" + (isChanged ? " - CHANGED" : ""));
 
             return actualOrder;
         }
@@ -141,13 +145,7 @@ namespace AutoTrader.Traders
 
         protected override double GetBalance()
         {
-            var myBalances = NiceHashApi.GetBalances();
-            var balance = myBalances.ContainsKey(BTC) ? myBalances[BTC] : 0;
-            if (balance > 0)
-            {
-                Logger.LogBalance(BTC, balance);
-            }
-            return balance;
+            return NiceHashApi.GetBalance(BTC);
         }
 
         private void SaveOrderBooksPrices()

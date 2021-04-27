@@ -1,5 +1,4 @@
-﻿using RethinkDb.Driver;
-using RethinkDb.Driver.Ast;
+﻿using RethinkDb.Driver.Ast;
 using RethinkDb.Driver.Extras.Dao;
 using System;
 
@@ -10,6 +9,7 @@ namespace AutoTrader.Db
         where TD : RethinkDao<T, Guid>
     {
         public const string DatabaseName = "AutoTraderStore";
+        protected const int RECORD_LIMIT = 500;
 
         protected static Store DbStore => Store.Instance;
 

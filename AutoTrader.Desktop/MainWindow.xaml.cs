@@ -40,7 +40,7 @@ namespace AutoTrader.Desktop
 
         protected override void OnInitialized(EventArgs e)
         {
-            WpfLogger.Init(null, null, openedOrders, closedOrders, balance, currencies, graph, selectedCurrency);
+            WpfLogger.Init(null, null, openedOrders, closedOrders, balance, currencies, graph, selectedCurrency, totalBalance);
 
             SetRatios();
 
