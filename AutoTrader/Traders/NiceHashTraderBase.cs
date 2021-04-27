@@ -70,7 +70,7 @@ namespace AutoTrader.Traders
         {
             foreach (TradeOrder tradeOrder in AllTradeOrders.Where(to => to.Type == TradeOrderType.OPEN))
             {
-                if (!onlyProfitable || tradeOrder.ActualYield > 0)
+                if (!onlyProfitable || tradeOrder.ActualYield > TradeSettings.MinSellYield)
                 {
                     Sell(tradeOrder.ActualPrice, tradeOrder);
                 }

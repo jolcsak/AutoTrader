@@ -38,10 +38,17 @@ namespace AutoTrader.Db.Entities
             Fee = fee;
             Trader = trader;
             Type = orderType;
+            ActualPrice = price;
         }
 
         public TradeOrder(string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader) : this(orderId, price, amount, targetAmount, currency, fee, trader, TradeOrderType.OPEN)
         {
+        }
+
+
+        public void RefreshFrom(TradeOrder tradeOrder)
+        {
+            ActualPrice = tradeOrder.ActualPrice;
         }
     }
 

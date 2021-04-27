@@ -124,7 +124,15 @@ namespace AutoTrader.Desktop
                {
                    foreach (var newOpenedOrder in traderOrders.Where(o => o.Type == TradeOrderType.OPEN && !openedOrdersData.Any(i => i.Id.Equals(o.Id))))
                    {
-                       openedOrdersData.Add(newOpenedOrder);
+                       var existingOrder = openedOrdersData.FirstOrDefault(i => i.Id.Equals(newOpenedOrder.Id));
+                       if (existingOrder == null)
+                       {
+                           openedOrdersData.Add(newOpenedOrder);
+                       }
+                       else
+                       {
+                           existingOrder.RefreshFrom(newOpenedOrder);
+                       }
                    }
 
                    foreach (var newClosedOrder in traderOrders.Where(o => o.Type == TradeOrderType.CLOSED && !closedOrdersData.Any(i => i.Id.Equals(o.Id))))

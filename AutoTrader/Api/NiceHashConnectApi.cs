@@ -13,7 +13,6 @@ namespace AutoTrader.Api
     class NiceHashConnectApi
     {
         private const int DEFAULT_RETRY_TIME = 30 * 1000;
-        private const int SESSION_RETRY_PERIOD = 10;
 
         private string urlRoot;
         private string orgId;
