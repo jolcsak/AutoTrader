@@ -5,7 +5,6 @@ namespace AutoTrader.Db.Entities
     public class Currency
     {
         private double? previousPrice;
-
         public string Name { get; set; }
         public double Price { get; set; }
         public double Amount { get; set; }
@@ -36,7 +35,7 @@ namespace AutoTrader.Db.Entities
             Frequency = frequency;
             Amplitude = amplitude;
             Order = order;
-            LastUpdate = LastUpdate;                                
+            LastUpdate = lastUpdate;                                
         }
     }
 }

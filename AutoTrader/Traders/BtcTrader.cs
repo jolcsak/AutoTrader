@@ -101,7 +101,7 @@ namespace AutoTrader.Traders
             Sell(actualPrice);
             previousPrice = actualPrice;
 
-            RefreshOrderBooksPrices();
+            SaveOrderBooksPrices();
 
             Logger.Info($"Change: {changeRatio}, Cur: {actualPrice} x {actualAmount}");
             Logger.LogTradeOrders(AllTradeOrders);
@@ -164,7 +164,7 @@ namespace AutoTrader.Traders
             return balance;
         }
 
-        private void RefreshOrderBooksPrices()
+        private void SaveOrderBooksPrices()
         {
             foreach (TradeOrder tradeOrder in TradeOrders.Where(to => to.ActualPrice != actualPrice))
             {
