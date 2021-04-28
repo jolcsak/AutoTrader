@@ -15,6 +15,7 @@ namespace AutoTrader.Desktop
         public LogWindow(MainWindow mainWindow)
         {
             InitializeComponent();
+            mainWindow.IsLogWindowClosed = false;
             this.mainWindow = mainWindow;
         }
 

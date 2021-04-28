@@ -141,6 +141,7 @@ namespace AutoTrader.Desktop
                 WpfLogger.SetConsole(logWindow.console);
             }
             logWindow.Show();
+            logWindow.Focus();
         }
     }
 }

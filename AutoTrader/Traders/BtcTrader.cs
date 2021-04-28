@@ -11,7 +11,7 @@ namespace AutoTrader.Traders
     {
         public const string BTC = "BTC";
 
-        protected static double minBtcTradeAmount = 0.00025; 
+        protected static double minBtcTradeAmount = 0.00025;
 
         protected double actualPrice;
         protected double actualAmount;

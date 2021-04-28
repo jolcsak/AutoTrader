@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using AutoTrader.Api;
 using AutoTrader.Db;
 using AutoTrader.GraphProviders;
 using AutoTrader.Log;
+using AutoTraderML.Model;
 
 namespace AutoTrader.Traders
 {
@@ -19,7 +21,11 @@ namespace AutoTrader.Traders
         protected virtual ITradeLogger Logger => TradeLogManager.GetLogger(GetType());
         protected static Store Store => Store.Instance;
 
+        protected static NiceHashApi NiceHashApi => NiceHashApi.Instance;
+
         public ObservableCollection<double> PastPrices { get; set; }
+
+        public IList<double> MlPrices { get; set; }
         public IList<double> Sma => smaProvider.Sma;
         public IList<AoValue> Ao => AoProvider.Ao;
 
@@ -41,6 +47,8 @@ namespace AutoTrader.Traders
             if (PastPrices == null)
             {
                 IList<Db.Entities.Price> prices = Store.Prices.GetPricesForTrader(trader);
+
+                MlPrices = prices.Select(p => p.Value).ToList();
                 PastPrices = new ObservableCollection<double>(prices.Select(p => p.Value));
                 Dates = new List<DateTime>(prices.Select(p => p.Time));
                 smaProvider.SetData(PastPrices);
@@ -53,6 +61,18 @@ namespace AutoTrader.Traders
                 if (actualPrice.HasValue)
                 {
                     PastPrices.Add(actualPrice.Value);
+                    var input = new ModelInput { Col0 = DateTime.Now.Ticks };
+
+                    // Load model and predict output of sample data
+                    if (trader.TargetCurrency == "PPT")
+                    {
+                        ModelOutput result = ConsumeModel.Predict(input);
+                        MlPrices.Add(result.Score);
+                    }
+                    else
+                    {
+                        MlPrices.Add(actualPrice.Value);
+                    }
                 }
                 if (date.HasValue)
                 {

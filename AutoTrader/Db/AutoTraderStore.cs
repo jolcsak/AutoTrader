@@ -9,7 +9,7 @@ namespace AutoTrader.Db
         where TD : RethinkDao<T, Guid>
     {
         public const string DatabaseName = "AutoTraderStore";
-        protected const int RECORD_LIMIT = 500;
+        protected const int RECORD_LIMIT = 1000;
 
         protected static Store DbStore => Store.Instance;
 

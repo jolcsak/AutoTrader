@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Threading;
 using AutoTrader.Api.Objects;
 using AutoTrader.Config;
@@ -54,6 +55,18 @@ namespace AutoTrader.Api
         public OrderBooks GetOrderBook(string currencyBuy, string currencySell)
         {
             return Get<OrderBooks>($"/exchange/api/v2/orderbook?market={currencyBuy}{currencySell}&limit=1", true, ServerTime);
+        }
+
+        public HistoricPrice[] GetLastPrices(string market, int limit)
+        {
+            return Get<HistoricPrice[]>($"/exchange/api/v2/info/trades?market={market}&limit={limit}");
+        }
+
+        public CandleStick[] GetCandleSticks(string market, DateTime from, DateTime to)
+        {
+            long fromSec = new DateTimeOffset(from).ToUnixTimeSeconds();
+            long toSec = new DateTimeOffset(to).ToUnixTimeSeconds();
+            return Get<CandleStick[]>($"/exchange/api/v2/info/candlesticks?market={market}&from={fromSec}&to={toSec}&resolution=1");
         }
 
         public OrderTrade Order(string market, bool isBuy, double amount, double minSecQuantity = 0)

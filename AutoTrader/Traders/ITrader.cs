@@ -30,6 +30,8 @@ namespace AutoTrader.Traders
 
         ActualPrice GetAndStoreCurrentOrders();
 
+        IList<Price> GetAllPastPrices();
+
         void Sell(double actualPrice, TradeOrder tradeOrder);
 
         public void SellAll(bool onlyProfitable);

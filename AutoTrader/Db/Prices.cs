@@ -21,10 +21,10 @@ namespace AutoTrader.Db
             return lastPrice.FirstOrDefault();
         }
 
-        public IList<Price> GetPricesForTrader(ITrader trader)
+        public IList<Price> GetPricesForTrader(ITrader trader, int limit = RECORD_LIMIT)
         {
             var prices = Table.
-                Filter(doc => R.And(doc["Currency"].Eq(trader.TargetCurrency))).OrderBy(R.Desc("Time")).Limit(RECORD_LIMIT)
+                Filter(doc => R.And(doc["Currency"].Eq(trader.TargetCurrency))).OrderBy(R.Desc("Time")).Limit(limit)
                 .RunResult<IList<Price>>(conn);
             return prices.Reverse().ToList();
         }

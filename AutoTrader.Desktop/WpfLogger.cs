@@ -202,9 +202,12 @@ namespace AutoTrader.Desktop
                 //var result = signal.Select(x => new AoValue { Value = x.Magnitude, Color = AoColor.Green }).Take(signal.Length / 2).Skip(3).ToArray();
                 //new BarGraph(graph, "FFT", result, Colors.LightBlue, Colors.Orange).Draw();
 
-                DrawTendencies(graphCollection, trader);
+                //DrawTendencies(graphCollection, trader);
+
+                new Graph(graph, "Predicted BTC Price ratio", graphCollection.MlPrices, Colors.DarkRed, showPoints: true).Draw(graphCollection.PricesSkip);
+
                 new Graph(graph, "BTC Price ratio", graphCollection.PastPrices, Colors.DarkGray, showPoints: true).Draw(graphCollection.PricesSkip);
-                new Graph(graph, "Simple Moving Average", graphCollection.Sma, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
+                //new Graph(graph, "Simple Moving Average", graphCollection.Sma, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
                 new DateGraph(graph, graphCollection.Dates).Draw(graphCollection.PricesSkip);
                 if (graphCollection.Balances.Count > 0)
                 {

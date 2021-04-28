@@ -11,6 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoTrader.Desktop", "AutoT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoTrader.PriceCollector", "AutoTrader.PriceCollector\AutoTrader.PriceCollector.csproj", "{10964453-63BA-4C2D-BF72-73E90DA7D7A2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoTrader.MachineLearning", "AutoTrader.MachineLearning\AutoTrader.MachineLearning.csproj", "{C070FD25-15D9-43DE-8E36-C7D57F238CD5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoTraderML.Model", "AutoTraderML.Model\AutoTraderML.Model.csproj", "{5DD4EB9E-2907-4B9A-A40F-2BE45B21C56B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoTraderML.ConsoleApp", "AutoTraderML.ConsoleApp\AutoTraderML.ConsoleApp.csproj", "{C792B76E-0C20-475F-BDFC-FF1E79132F21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +35,18 @@ Global
 		{10964453-63BA-4C2D-BF72-73E90DA7D7A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10964453-63BA-4C2D-BF72-73E90DA7D7A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10964453-63BA-4C2D-BF72-73E90DA7D7A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C070FD25-15D9-43DE-8E36-C7D57F238CD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C070FD25-15D9-43DE-8E36-C7D57F238CD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C070FD25-15D9-43DE-8E36-C7D57F238CD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C070FD25-15D9-43DE-8E36-C7D57F238CD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DD4EB9E-2907-4B9A-A40F-2BE45B21C56B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DD4EB9E-2907-4B9A-A40F-2BE45B21C56B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DD4EB9E-2907-4B9A-A40F-2BE45B21C56B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DD4EB9E-2907-4B9A-A40F-2BE45B21C56B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C792B76E-0C20-475F-BDFC-FF1E79132F21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C792B76E-0C20-475F-BDFC-FF1E79132F21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C792B76E-0C20-475F-BDFC-FF1E79132F21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C792B76E-0C20-475F-BDFC-FF1E79132F21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

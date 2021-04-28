@@ -82,6 +82,11 @@ namespace AutoTrader.Traders
             Logger.Warn($"All orders are sold.");
         }
 
+        public IList<Price> GetAllPastPrices()
+        {
+            return Store.Prices.GetPricesForTrader(this, int.MaxValue);
+        }
+
         protected abstract double GetBalance();
 
         protected double RefreshBalance()

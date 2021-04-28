@@ -8,6 +8,11 @@ using AutoTrader.Traders;
 using AutoTrader.Api;
 using AutoTrader.Log;
 using AutoTrader.Api.Objects;
+using System.Reflection;
+using System.IO;
+using System.Text;
+using System.Globalization;
+using AutoTrader.Db.Entities;
 
 namespace AutoTrader
 {
@@ -116,9 +121,43 @@ namespace AutoTrader
 
         }
 
+        public void ExportTraindData(string exportPath)
+        {
+            NiceHashApi niceHashApi = GetNiceHashApi();
+            Logger.Info("NiceHash AutoTrader Train data exporter " + VERSION);
+
+            niceHashApi.QueryServerTime();
+            Logger.Info("Server time:" + niceHashApi.ServerTime);
+
+            CreateTraders(niceHashApi);
+            
+            foreach (ITrader trader in Traders)
+            {
+                try
+                {
+                    Logger.Info($"Exporting {trader.TargetCurrency} past prices...");
+                    var r = trader.GetAllPastPrices().OrderBy(p => p.Time);
+                    var stringBuilder = new StringBuilder();
+                    foreach (Price price in r)
+                    {
+                        stringBuilder.Append(price.Time.Ticks).Append(";");
+                        stringBuilder.AppendLine(price.Value.ToString("N8", CultureInfo.InvariantCulture));
+                    }
+
+                    File.WriteAllText(Path.Combine(exportPath, trader.TargetCurrency + ".txt"), stringBuilder.ToString());
+                    Logger.Info($"{r.Count()} prices written to disk.");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
+                }
+            }
+            Logger.Info("Done");
+        }
+
         private static double GetTotalFiatBalance(NiceHashApi niceHashApi)
         {
-            TotalBalance totalBalance = niceHashApi.GetTotalBalance(FIAT);
+            Api.Objects.TotalBalance totalBalance = niceHashApi.GetTotalBalance(FIAT);
             var btcCurrency = totalBalance.currencies.FirstOrDefault(c => c.currency == BtcTrader.BTC);
             return (totalBalance?.total != null && btcCurrency != null)? totalBalance.total.totalBalance * btcCurrency.fiatRate : 0;
         }
