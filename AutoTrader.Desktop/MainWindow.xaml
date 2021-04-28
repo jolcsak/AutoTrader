@@ -27,7 +27,8 @@
                         <ColumnDefinition Width="190"/>
                         <ColumnDefinition Width="0"/>
                         <ColumnDefinition Width="96"/>
-                        <ColumnDefinition Width="125"/>
+                        <ColumnDefinition Width="135"/>
+                        <ColumnDefinition Width="96"/>
                     </Grid.ColumnDefinitions>
                     <Label Content="Total balance:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="0"/>
                     <Label x:Name="totalBalance" FontWeight="ExtraBold" Grid.Column="1"/>
@@ -40,6 +41,7 @@
                     <Slider x:Name="aoRatio" VerticalAlignment="Center" Grid.Column="6" Minimum="0" Maximum="2" Grid.ColumnSpan="2" Height="18" Margin="0,0,3,0" ValueChanged="aoRatio_ValueChanged" Value="0.1" AutoToolTipPlacement="BottomRight" TickPlacement="BottomRight" LargeChange="0.1" SmallChange="0.01" TickFrequency="0.01" AutoToolTipPrecision="3"/>
                     <Label Content="Minimum Yield:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="9"/>
                     <TextBox x:Name="minYield" TextWrapping="Wrap" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" TextChanged="MinYield_TextChanged" Grid.Column="10" Height="18"/>
+                    <Button x:Name="showLog" Content="Show Log" Grid.Column="11" Click="showLog_Click"/>
                 </Grid>
             </DockPanel>
             <Grid Margin="4,4,4,4">

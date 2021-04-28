@@ -44,8 +44,12 @@ namespace AutoTrader.Desktop
                 {
                     selectedCurrency = value;
                     selectedCurrencyLabel.Content = value;
-                    currencies.SelectedItem = currencyList.FirstOrDefault(c => c.Name.Equals(value));
-                    currencies.ScrollIntoView(currencies.SelectedItem);
+                    var selectedItem = currencyList.FirstOrDefault(c => c.Name.Equals(value));
+                    currencies.SelectedItem = selectedItem;
+                    if (selectedItem != null)
+                    {
+                        currencies.ScrollIntoView(currencies.SelectedItem);
+                    }
                 }
             }
         }
@@ -70,6 +74,11 @@ namespace AutoTrader.Desktop
             currencies.ItemsSource = currencyList;
             openedOrders.ItemsSource = openedOrdersData;
             closedOrders.ItemsSource = closedOrdersData;
+        }
+
+        public static void SetConsole(TextBox consoleInstance)
+        {
+            console = consoleInstance;
         }
 
         protected WpfLogger(string name)
@@ -119,7 +128,7 @@ namespace AutoTrader.Desktop
             Dispatcher?.BeginInvoke(() => {
                 console.CaretIndex = console.Text.Length;
                 console.ScrollToEnd();
-                consoleScroll.ScrollToEnd();
+                consoleScroll?.ScrollToEnd();
             });
         }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -17,6 +16,10 @@ namespace AutoTrader.Desktop
     {
         private TraderThread traderThread;
 
+        private LogWindow logWindow = null;
+
+        public bool IsLogWindowClosed { get; set; } = true;
+
         protected ITradeLogger Logger => TradeLogManager.GetLogger(string.Empty);
 
         protected ITrader CurrentTrader
@@ -24,12 +27,13 @@ namespace AutoTrader.Desktop
             get
             {
                 var selectedCurrency = currencies?.SelectedItem as Currency;
-                return selectedCurrency != null ? traderThread.GetTrader(selectedCurrency.Name) : TraderThread.Traders.FirstOrDefault();
+                return selectedCurrency != null ? traderThread.GetTrader(selectedCurrency.Name) : null;
             }
         }
 
         public MainWindow()
         {
+            logWindow = new LogWindow(this);
             InitializeComponent();
         }
 
@@ -40,7 +44,7 @@ namespace AutoTrader.Desktop
 
         protected override void OnInitialized(EventArgs e)
         {
-            WpfLogger.Init(null, null, openedOrders, closedOrders, balance, currencies, graph, selectedCurrency, totalBalance);
+            WpfLogger.Init(logWindow.Console, null, openedOrders, closedOrders, balance, currencies, graph, selectedCurrency, totalBalance);
 
             SetRatios();
 
@@ -127,6 +131,16 @@ namespace AutoTrader.Desktop
         {
             var selectedTradeOrder = openedOrders?.SelectedItem as TradeOrder;
             Logger.SelectedCurrency = selectedTradeOrder?.Currency;
+        }
+
+        private void showLog_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsLogWindowClosed || logWindow == null)
+            {
+                logWindow = new LogWindow(this);
+                WpfLogger.SetConsole(logWindow.console);
+            }
+            logWindow.Show();
         }
     }
 }
