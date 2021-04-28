@@ -40,9 +40,13 @@ namespace AutoTrader.Desktop
             get => selectedCurrency;
             set
             {
-                currencies.SelectedItem = currencyList.FirstOrDefault(c => ((dynamic)c).Name.Equals(value));
-                selectedCurrency = value;
-                selectedCurrencyLabel.Content = value;
+                if (selectedCurrency != value)
+                {
+                    selectedCurrency = value;
+                    selectedCurrencyLabel.Content = value;
+                    currencies.SelectedItem = currencyList.FirstOrDefault(c => c.Name.Equals(value));
+                    currencies.ScrollIntoView(currencies.SelectedItem);
+                }
             }
         }
 
@@ -121,7 +125,6 @@ namespace AutoTrader.Desktop
 
         public void LogTradeOrders(IList<TradeOrder> traderOrders)
         {
-
             Dispatcher?.BeginInvoke(() =>
                {
                    foreach (var newOpenedOrder in traderOrders.Where(o => o.Type == TradeOrderType.OPEN))
@@ -139,6 +142,11 @@ namespace AutoTrader.Desktop
 
                    foreach (var newClosedOrder in traderOrders.Where(o => o.Type == TradeOrderType.CLOSED && !closedOrdersData.Any(i => i.Id.Equals(o.Id))))
                    {
+                       var existingOpenedOrdersData = openedOrdersData.FirstOrDefault(oe => oe.Id == newClosedOrder.Id);
+                       if (existingOpenedOrdersData != null)
+                       {
+                           openedOrdersData.Remove(existingOpenedOrdersData);
+                       }
                        closedOrdersData.Add(newClosedOrder);
                    }
                });
@@ -191,7 +199,7 @@ namespace AutoTrader.Desktop
                 new DateGraph(graph, graphCollection.Dates).Draw(graphCollection.PricesSkip);
                 if (graphCollection.Balances.Count > 0)
                 {
-                    new Graph(graph, "Total balance", graphCollection.Balances, Colors.DarkOrange, showPoints: true, "N1").Draw(0);
+                    new Graph(graph, "Total balance", graphCollection.Balances, Colors.Black, showPoints: true, "N1").Draw(0);
                     Dispatcher?.Invoke(() => totalBalanceText.Content = graphCollection.Balances.Last().ToString("N1") + " HUF");
                 }
                 else

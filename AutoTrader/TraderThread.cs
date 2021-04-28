@@ -13,7 +13,7 @@ namespace AutoTrader
 {
     public class TraderThread
     {
-        private const string VERSION = "0.23";
+        private const string VERSION = "0.24";
 
         private const int COLLECTOR_WAIT = 1 * 60 * 1000;
         private const int TRADE_WAIT = 20 * 1000;
