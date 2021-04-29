@@ -30,6 +30,7 @@ namespace AutoTrader.Desktop
         private static string selectedCurrency = string.Empty;
         private static Label selectedCurrencyLabel;
         private static Label totalBalanceText;
+        private static TradeOrder selectedTradeOrder;
 
         private static readonly ObservableCollection<Currency> currencyList = new ObservableCollection<Currency>();
         private static readonly ObservableCollection<TradeOrder> openedOrdersData = new ObservableCollection<TradeOrder>();
@@ -37,7 +38,11 @@ namespace AutoTrader.Desktop
 
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 
-        public TradeOrder SelectedTradeOrder { get; set; }
+        public TradeOrder SelectedTradeOrder 
+        {
+            get => selectedTradeOrder;
+            set => selectedTradeOrder = value;
+        }
 
         public string SelectedCurrency
         {
