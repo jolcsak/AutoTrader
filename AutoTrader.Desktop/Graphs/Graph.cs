@@ -12,7 +12,6 @@ namespace AutoTrader.Desktop
     {
         private Canvas graph;
 
-        private int pointSize = 2;
         private int lineWeight = 2;
         private string toolTipFormat = "N10";
         protected Dispatcher Dispatcher => Application.Current != null ? Application.Current.Dispatcher : null;
@@ -32,13 +31,14 @@ namespace AutoTrader.Desktop
             pointFillBrush.Freeze();
         }
 
-        public Graph(Canvas graph, string graphName, IList<double> values, Color lineColor, bool showPoints, string toolTipFormat = "N10")
+        public Graph(Canvas graph, string graphName, IList<double> values, Color lineColor, bool showPoints, string toolTipFormat = "N10", int lineWeight = 2)
         {
             this.graph = graph;
             this.values = values;
             this.graphName = graphName;
             this.showPoints = showPoints;
             this.toolTipFormat = toolTipFormat;
+            this.lineWeight = lineWeight;
 
             lineBrush = new SolidColorBrush { Color = lineColor };
             lineBrush.Freeze();
@@ -67,7 +67,7 @@ namespace AutoTrader.Desktop
             Dispatcher?.BeginInvoke(() =>
             {
 
-                int halfPointSize = pointSize / 2;
+                int halfPointSize = lineWeight / 2;
                 double priceHeight = maxValue - minValue;
                 double width = graph.ActualWidth;
                 double height = graph.ActualHeight;
@@ -91,7 +91,7 @@ namespace AutoTrader.Desktop
                     foreach (double value in drawValues)
                     {
                         double y = (value - minValue) * cHeight;
-                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = pointFillBrush, Width = pointSize, Height = pointSize, ToolTip = value.ToString(toolTipFormat)};
+                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = pointFillBrush, Width = lineWeight, Height = lineWeight, ToolTip = value.ToString(toolTipFormat)};
                         Canvas.SetLeft(rect, currentX - halfPointSize);
                         Canvas.SetBottom(rect, y - halfPointSize);
                         graph.Children.Add(rect);

@@ -241,7 +241,7 @@ namespace AutoTrader.Desktop
                 {
                     if (TradeSettings.BalanceGraphVisible)
                     {
-                        new Graph(graph, "Total balance", graphCollection.Balances, Colors.Black, showPoints: true, "N1").Draw(0);
+                        new Graph(graph, "Total balance", graphCollection.Balances, Colors.DarkGray, showPoints: true, "N1", 4).Draw(0);
                     }
                     Dispatcher?.Invoke(() => totalBalanceText.Content = graphCollection.Balances.Last().ToString("N1") + " HUF");
                 }
