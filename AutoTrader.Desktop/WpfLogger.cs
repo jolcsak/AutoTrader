@@ -263,13 +263,8 @@ namespace AutoTrader.Desktop
             if (!double.IsNaN(amplitude))
             {
                 var filter = OnlineFilter.CreateLowpass(ImpulseResponse.Finite, 50, amplitude);
-                var result2 = filter.ProcessSamples(graphCollection.PastPrices.ToArray());
-                for (int i = 0; i < 85; i++)
-                {
-                    result2[i] = result2[85];
-                }
-
-                new Graph(graph, "Price low-pass", result2, Colors.Orange, showPoints: false).Draw(graphCollection.PricesSkip);
+                var lowpassFilterResults = filter.ProcessSamples(graphCollection.PastPrices.ToArray());
+                new Graph(graph, "Price low-pass", lowpassFilterResults, Colors.Orange, showPoints: false).Draw(85);
             }
         }
     }
