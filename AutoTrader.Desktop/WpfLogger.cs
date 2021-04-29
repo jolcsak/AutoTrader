@@ -35,6 +35,8 @@ namespace AutoTrader.Desktop
         private static readonly ObservableCollection<TradeOrder> openedOrdersData = new ObservableCollection<TradeOrder>();
         private static readonly ObservableCollection<TradeOrder> closedOrdersData = new ObservableCollection<TradeOrder>();
 
+        public TradeOrder SelectedTradeOrder { get; set; }
+
         public string SelectedCurrency
         {
             get => selectedCurrency;
@@ -49,6 +51,11 @@ namespace AutoTrader.Desktop
                     if (selectedItem != null)
                     {
                         currencies.ScrollIntoView(currencies.SelectedItem);
+                    }
+                    else
+                    {
+                        selectedCurrency = string.Empty;
+                        selectedCurrencyLabel.Content = "-";
                     }
                 }
             }
@@ -197,17 +204,18 @@ namespace AutoTrader.Desktop
                 graphCollection.Refresh();
                 new BarGraph(graph, "Awesome Oscillator", graphCollection.Ao, Colors.Yellow, Colors.Blue).Draw();
 
+
                 //Complex[] signal = graphCollection.PastPrices.Select(val => new Complex(val, 0)).ToArray();
                 //Fourier.Inverse(signal, FourierOptions.Matlab);
                 //var result = signal.Select(x => new AoValue { Value = x.Magnitude, Color = AoColor.Green }).Take(signal.Length / 2).Skip(3).ToArray();
                 //new BarGraph(graph, "FFT", result, Colors.LightBlue, Colors.Orange).Draw();
 
-                //DrawTendencies(graphCollection, trader);
+                DrawTendencies(graphCollection, trader);
 
                 new Graph(graph, "Predicted BTC Price ratio", graphCollection.MlPrices, Colors.DarkRed, showPoints: true).Draw(graphCollection.PricesSkip);
 
                 new Graph(graph, "BTC Price ratio", graphCollection.PastPrices, Colors.DarkGray, showPoints: true).Draw(graphCollection.PricesSkip);
-                //new Graph(graph, "Simple Moving Average", graphCollection.Sma, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
+                new Graph(graph, "Simple Moving Average", graphCollection.Sma, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
                 new DateGraph(graph, graphCollection.Dates).Draw(graphCollection.PricesSkip);
                 if (graphCollection.Balances.Count > 0)
                 {
@@ -217,6 +225,11 @@ namespace AutoTrader.Desktop
                 else
                 {
                     Dispatcher?.Invoke(() => totalBalanceText.Content = "N/A");
+                }
+
+                if (SelectedTradeOrder != null)
+                {
+                    new PriceLine(graph, "Selected price", graphCollection.PastPrices, SelectedTradeOrder.Price, Colors.LightBlue).Draw(graphCollection.PricesSkip);
                 }
             }
         }
@@ -228,7 +241,12 @@ namespace AutoTrader.Desktop
             {
                 var filter = OnlineFilter.CreateLowpass(ImpulseResponse.Finite, 50, amplitude);
                 var result2 = filter.ProcessSamples(graphCollection.PastPrices.ToArray());
-                new Graph(graph, "Price low-pass", result2, Colors.Orange, showPoints: false).Draw(85);
+                for (int i = 0; i < 85; i++)
+                {
+                    result2[i] = result2[85];
+                }
+
+                new Graph(graph, "Price low-pass", result2, Colors.Orange, showPoints: false).Draw(graphCollection.PricesSkip);
             }
         }
     }

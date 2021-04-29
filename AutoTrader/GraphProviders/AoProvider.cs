@@ -80,6 +80,7 @@ namespace AutoTrader.GraphProviders
             this.data = data;
             SlowSmaProvider = new SmaProvider(data, SmaChanged, slowPeriod);
             FastSmaProvider = new SmaProvider(data, SmaChanged, fastPeriod);
+            previousMa = -1;
             Calculate();
         }
 

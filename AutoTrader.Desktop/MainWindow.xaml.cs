@@ -96,6 +96,7 @@ namespace AutoTrader.Desktop
             if (currentTrader != null)
             {
                 Logger.SelectedCurrency = currentTrader.TargetCurrency;
+                Logger.SelectedTradeOrder = null;
                 Logger.RefreshGraph(currentTrader);
             }
         }
@@ -131,6 +132,15 @@ namespace AutoTrader.Desktop
         {
             var selectedTradeOrder = openedOrders?.SelectedItem as TradeOrder;
             Logger.SelectedCurrency = selectedTradeOrder?.Currency;
+            if (selectedTradeOrder?.Id != Logger.SelectedTradeOrder?.Id)
+            {
+                Logger.SelectedTradeOrder = selectedTradeOrder;
+                var trader = CurrentTrader;
+                if (trader != null)
+                {
+                    Logger.RefreshGraph(trader);
+                }
+            }
         }
 
         private void showLog_Click(object sender, RoutedEventArgs e)
@@ -142,6 +152,11 @@ namespace AutoTrader.Desktop
             }
             logWindow.Show();
             logWindow.Focus();
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Application.Current.Shutdown(0);
         }
     }
 }

@@ -5,20 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AutoTrader.Desktop"
         mc:Ignorable="d"
-        Title="NiceHash AutoTrader v0.1" Height="941" Width="1520" SizeChanged="Window_SizeChanged">
+        Title="NiceHash AutoTrader v0.1" Height="941" Width="1520" SizeChanged="Window_SizeChanged" Closed="Window_Closed">
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="257*"/>
+            <ColumnDefinition Width="1263*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="40"/>
             <RowDefinition Height="300"/>
         </Grid.RowDefinitions>
-        <DockPanel LastChildFill="true" Margin="10,10,10,10" Grid.Row="0">
+        <DockPanel LastChildFill="true" Margin="10,10,10,10" Grid.Row="0" Grid.ColumnSpan="2">
             <DockPanel DockPanel.Dock="Top" LastChildFill="true">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="86"/>
-                        <ColumnDefinition Width="150"/>                        
+                        <ColumnDefinition Width="150"/>
                         <ColumnDefinition Width="124"/>
                         <ColumnDefinition Width="150"/>
                         <ColumnDefinition Width="55"/>
@@ -127,7 +131,7 @@
                 </DockPanel>
             </Grid>
         </DockPanel>
-        <Grid Grid.Row="1">
+        <Grid Grid.ColumnSpan="2" Margin="0,585,0,0" Grid.RowSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="110"/>
                 <ColumnDefinition Width="100"/>
@@ -135,7 +139,7 @@
             <Label Content="Selected Currency:" FontWeight="SemiBold" Grid.Column="0"/>
             <Label x:Name="selectedCurrency" Grid.Column="1" FontWeight="Bold" HorizontalAlignment="Left"/>
         </Grid>
-        <Canvas x:Name="graph" Margin="5,5,5,5" Grid.Row="2" RenderTransformOrigin="0.5,0.5">
+        <Canvas x:Name="graph" Margin="5,5,5,5" Grid.Row="2" RenderTransformOrigin="0.5,0.5" Grid.ColumnSpan="2">
         </Canvas>
     </Grid>
 </Window>

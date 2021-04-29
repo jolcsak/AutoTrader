@@ -10,7 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="LearningData\" />
+    <PackageReference Include="Microsoft.ML" Version="1.5.5" />
+    <PackageReference Include="Microsoft.ML.TimeSeries" Version="1.5.5" />
   </ItemGroup>
 
 </Project>

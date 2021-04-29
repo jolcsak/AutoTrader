@@ -130,28 +130,32 @@ namespace AutoTrader
             Logger.Info("Server time:" + niceHashApi.ServerTime);
 
             CreateTraders(niceHashApi);
-            
+
+            var stringBuilder = new StringBuilder();
             foreach (ITrader trader in Traders)
             {
                 try
                 {
                     Logger.Info($"Exporting {trader.TargetCurrency} past prices...");
                     var r = trader.GetAllPastPrices().OrderBy(p => p.Time);
-                    var stringBuilder = new StringBuilder();
+                    
                     foreach (Price price in r)
                     {
                         stringBuilder.Append(price.Time.Ticks).Append(";");
                         stringBuilder.AppendLine(price.Value.ToString("N8", CultureInfo.InvariantCulture));
                     }
 
-                    File.WriteAllText(Path.Combine(exportPath, trader.TargetCurrency + ".txt"), stringBuilder.ToString());
                     Logger.Info($"{r.Count()} prices written to disk.");
                 }
                 catch (Exception ex)
                 {
                     Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
                 }
+                break;
             }
+
+            File.WriteAllText(Path.Combine(exportPath,"AiData.txt"), stringBuilder.ToString());
+
             Logger.Info("Done");
         }
 

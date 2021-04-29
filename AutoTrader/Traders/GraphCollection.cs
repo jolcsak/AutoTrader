@@ -6,15 +6,16 @@ using AutoTrader.Api;
 using AutoTrader.Db;
 using AutoTrader.GraphProviders;
 using AutoTrader.Log;
-using AutoTraderML.Model;
 
 namespace AutoTrader.Traders
 {
     public class GraphCollection
     {
+        private const int SMA_SMOOTHNESS = 20;
+
         private ITrader trader;
 
-        protected SmaProvider smaProvider = new SmaProvider();
+        protected SmaProvider smaProvider = new SmaProvider(SMA_SMOOTHNESS);
 
         public AoProvider AoProvider { get; } = new AoProvider();
 
@@ -52,7 +53,7 @@ namespace AutoTrader.Traders
                 PastPrices = new ObservableCollection<double>(prices.Select(p => p.Value));
                 Dates = new List<DateTime>(prices.Select(p => p.Time));
                 smaProvider.SetData(PastPrices);
-                AoProvider.SetData(PastPrices);
+                AoProvider.SetData(new ObservableCollection<double>(smaProvider.Sma.Where(sma =>sma > -1)));
                 SmaSkip = smaProvider.Sma.Count - Ao.Count;
                 PricesSkip = PastPrices.Count - Ao.Count;
             }
@@ -61,15 +62,15 @@ namespace AutoTrader.Traders
                 if (actualPrice.HasValue)
                 {
                     PastPrices.Add(actualPrice.Value);
-                    var input = new ModelInput { Col0 = DateTime.Now.Ticks };
+                    //var input = new ModelInput { Col0 = DateTime.Now.Ticks };
 
                     // Load model and predict output of sample data
-                    if (trader.TargetCurrency == "PPT")
-                    {
-                        ModelOutput result = ConsumeModel.Predict(input);
-                        MlPrices.Add(result.Score);
-                    }
-                    else
+                    //if (trader.TargetCurrency == "PPT")
+                    //{
+                    //    ModelOutput result = ConsumeModel.Predict(input);
+                    //    MlPrices.Add(result.Score);
+                    //}
+                    //else
                     {
                         MlPrices.Add(actualPrice.Value);
                     }

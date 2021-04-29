@@ -6,9 +6,9 @@ namespace AutoTrader.Traders.Agents
 {
     public class AoAgent : IAgent
     {
-        public static double Ratio { get; set; } = 0;
+        private const int COLOR_COUNT = 2;
 
-        private static int cc = 3;
+        public static double Ratio { get; set; } = 0;
 
         protected GraphCollection graphCollection;
         protected IList<AoValue> Ao => graphCollection.Ao;
@@ -33,7 +33,9 @@ namespace AutoTrader.Traders.Agents
                 bool buy = Ao[i - 1].Value < 0 && Ao[i].Value > 0;
                 if (!buy)
                 {
-                    buy |= Ao[i].Value < 0 && Ao[i].Color == AoColor.Green && ColorCountBefore(i, AoColor.Red) > cc && ValueOf(AoColor.Red, i) > Ratio;
+                    buy |= Ao[i].Value < 0 && Ao[i].Color == AoColor.Green && 
+                           ColorCountBefore(ref i, AoColor.Green) == COLOR_COUNT &&                            
+                           ColorCountBefore(ref i, AoColor.Red) > COLOR_COUNT;
                 }
                 return buy;
             }
@@ -51,14 +53,16 @@ namespace AutoTrader.Traders.Agents
                 bool sell = Ao[i - 1]?.Value > 0 && Ao[i].Value < 0;
                 if (!sell)
                 {
-                    sell |= Ao[i].Value > 0 && Ao[i].Color == AoColor.Red && ColorCountBefore(i, AoColor.Green) > cc && ValueOf(AoColor.Green, i) > Ratio;
+                    sell |= 
+                        Ao[i].Value > 0 && Ao[i].Color == AoColor.Red && 
+                        ColorCountBefore(ref i, AoColor.Green) > COLOR_COUNT;
                 }
                 return sell;
             }
             return false;
         }
 
-        private int ColorCountBefore(int i, AoColor color)
+        private int ColorCountBefore(ref int i, AoColor color)
         {
             int c = 0;
             do
@@ -72,7 +76,7 @@ namespace AutoTrader.Traders.Agents
         private double ValueOf(AoColor color, int i)
         {
             double a = Ao[i].Value;
-            int c = ColorCountBefore(i, color);
+            int c = ColorCountBefore(ref i, color);
             double valueA = Math.Abs(a);
             double valueB = Math.Abs(Ao[i].Value);
             var r = valueA > valueB ? valueA / valueB : valueB / valueA;

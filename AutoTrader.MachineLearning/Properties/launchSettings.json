@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AutoTrader.MachineLearning": {
+      "commandName": "Project",
+      "commandLineArgs": "Train"
+    }
+  }
+}

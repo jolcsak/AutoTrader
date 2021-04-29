@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AutoTrader.Desktop"
         mc:Ignorable="d"
-        Title="LogWindow" Height="651" Width="662" Closed="Window_Closed">
+        Title="Log" Height="651" Width="662" Closed="Window_Closed">
     <DockPanel LastChildFill="true" Margin="10,10,10,10" Grid.Row="0">
         <TextBox x:Name="console"  TextWrapping="Wrap" IsUndoEnabled="False" VerticalScrollBarVisibility="Visible" DockPanel.Dock="Top" AllowDrop="False" />
     </DockPanel>

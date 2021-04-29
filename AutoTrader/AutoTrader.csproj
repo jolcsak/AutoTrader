@@ -14,8 +14,4 @@
     <PackageReference Include="RethinkDb.Driver" Version="2.3.150" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AutoTraderML.Model\AutoTraderML.Model.csproj" />
-  </ItemGroup>
-
 </Project>
