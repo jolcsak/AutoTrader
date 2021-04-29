@@ -252,7 +252,7 @@ namespace AutoTrader.Desktop
 
                 if (SelectedTradeOrder != null)
                 {
-                    new PriceLine(graph, "Selected price", graphCollection.PastPrices, SelectedTradeOrder.Price, Colors.DarkGray).Draw(graphCollection.PricesSkip);
+                    new PriceLine(graph, "Selected price", graphCollection.PastPrices, SelectedTradeOrder.Price, Colors.Brown).Draw(graphCollection.PricesSkip);
                 }
             }
         }
