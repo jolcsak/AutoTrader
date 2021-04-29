@@ -35,6 +35,8 @@ namespace AutoTrader.Desktop
         private static readonly ObservableCollection<TradeOrder> openedOrdersData = new ObservableCollection<TradeOrder>();
         private static readonly ObservableCollection<TradeOrder> closedOrdersData = new ObservableCollection<TradeOrder>();
 
+        protected TradeSetting TradeSettings => TradeSetting.Instance;
+
         public TradeOrder SelectedTradeOrder { get; set; }
 
         public string SelectedCurrency
@@ -196,13 +198,20 @@ namespace AutoTrader.Desktop
 
         public void RefreshGraph(ITrader trader)
         {
+            if (trader == null)
+            {
+                return;
+            }
             if (SelectedCurrency.Equals(trader.TargetCurrency))
             {
                 Dispatcher?.Invoke(() => graph.Children.Clear());
 
                 GraphCollection graphCollection = trader.GraphCollection;
                 graphCollection.Refresh();
-                new BarGraph(graph, "Awesome Oscillator", graphCollection.Ao, Colors.Yellow, Colors.Blue).Draw();
+                if (TradeSettings.AoGraphVisible)
+                {
+                    new BarGraph(graph, "Awesome Oscillator", graphCollection.Ao, Colors.Yellow, Colors.Blue).Draw();
+                }
 
 
                 //Complex[] signal = graphCollection.PastPrices.Select(val => new Complex(val, 0)).ToArray();
@@ -210,16 +219,30 @@ namespace AutoTrader.Desktop
                 //var result = signal.Select(x => new AoValue { Value = x.Magnitude, Color = AoColor.Green }).Take(signal.Length / 2).Skip(3).ToArray();
                 //new BarGraph(graph, "FFT", result, Colors.LightBlue, Colors.Orange).Draw();
 
-                DrawTendencies(graphCollection, trader);
+                if (TradeSettings.TendencyGraphVisible)
+                {
+                    DrawTendencies(graphCollection, trader);
+                }
 
-                new Graph(graph, "Predicted BTC Price ratio", graphCollection.MlPrices, Colors.DarkRed, showPoints: true).Draw(graphCollection.PricesSkip);
-
-                new Graph(graph, "BTC Price ratio", graphCollection.PastPrices, Colors.DarkGray, showPoints: true).Draw(graphCollection.PricesSkip);
-                new Graph(graph, "Simple Moving Average", graphCollection.Sma, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
+                if (TradeSettings.AiPredicitionVisible)
+                {
+                    new Graph(graph, "Predicted BTC Price ratio", graphCollection.MlPrices, Colors.DarkRed, showPoints: true).Draw(graphCollection.PricesSkip);
+                }
+                if (TradeSettings.PriceGraphVisible)
+                {
+                    new Graph(graph, "BTC Price ratio", graphCollection.PastPrices, Colors.DarkGray, showPoints: true).Draw(graphCollection.PricesSkip);
+                }
+                if (TradeSettings.SmaGraphVisible)
+                {
+                    new Graph(graph, "Simple Moving Average", graphCollection.Sma, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
+                }
                 new DateGraph(graph, graphCollection.Dates).Draw(graphCollection.PricesSkip);
                 if (graphCollection.Balances.Count > 0)
                 {
-                    new Graph(graph, "Total balance", graphCollection.Balances, Colors.Black, showPoints: true, "N1").Draw(0);
+                    if (TradeSettings.BalanceGraphVisible)
+                    {
+                        new Graph(graph, "Total balance", graphCollection.Balances, Colors.Black, showPoints: true, "N1").Draw(0);
+                    }
                     Dispatcher?.Invoke(() => totalBalanceText.Content = graphCollection.Balances.Last().ToString("N1") + " HUF");
                 }
                 else
@@ -229,7 +252,7 @@ namespace AutoTrader.Desktop
 
                 if (SelectedTradeOrder != null)
                 {
-                    new PriceLine(graph, "Selected price", graphCollection.PastPrices, SelectedTradeOrder.Price, Colors.LightBlue).Draw(graphCollection.PricesSkip);
+                    new PriceLine(graph, "Selected price", graphCollection.PastPrices, SelectedTradeOrder.Price, Colors.DarkGray).Draw(graphCollection.PricesSkip);
                 }
             }
         }

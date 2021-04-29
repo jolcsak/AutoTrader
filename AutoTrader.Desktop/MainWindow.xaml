@@ -17,7 +17,7 @@
             <RowDefinition Height="40"/>
             <RowDefinition Height="300"/>
         </Grid.RowDefinitions>
-        <DockPanel LastChildFill="true" Margin="10,10,10,10" Grid.Row="0" Grid.ColumnSpan="2">
+        <DockPanel LastChildFill="true" Margin="10,10,10,0" Grid.Row="0" Grid.ColumnSpan="2">
             <DockPanel DockPanel.Dock="Top" LastChildFill="true">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -42,7 +42,7 @@
                         Buy
                     </CheckBox>
                     <Label Content="Ao Ratio:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="5" Height="26" VerticalAlignment="Center"/>
-                    <Slider x:Name="aoRatio" VerticalAlignment="Center" Grid.Column="6" Minimum="0" Maximum="2" Grid.ColumnSpan="2" Height="18" Margin="0,0,3,0" ValueChanged="aoRatio_ValueChanged" Value="0.1" AutoToolTipPlacement="BottomRight" TickPlacement="BottomRight" LargeChange="0.1" SmallChange="0.01" TickFrequency="0.01" AutoToolTipPrecision="3"/>
+                    <Slider x:Name="aoRatio" VerticalAlignment="Center" Grid.Column="6" Minimum="0" Maximum="2" Grid.ColumnSpan="2" Height="18" Margin="0,0,3,0" ValueChanged="aoRatio_ValueChanged" Value="0.1" AutoToolTipPlacement="BottomRight" TickPlacement="BottomRight" LargeChange="0.1" SmallChange="0.01" TickFrequency="0.01" AutoToolTipPrecision="3" IsEnabled="false"/>
                     <Label Content="Minimum Yield:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="9"/>
                     <TextBox x:Name="minYield" TextWrapping="Wrap" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" TextChanged="MinYield_TextChanged" Grid.Column="10" Height="18"/>
                     <Button x:Name="showLog" Content="Show Log" Grid.Column="11" Click="showLog_Click"/>
@@ -89,8 +89,8 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <Label Content="Opened Orders" FontWeight="SemiBold" Grid.Column="0"/>
-                                <Button Content="Sell All" FontWeight="SemiBold" Grid.Column="1" Margin="50,4,50,4" Click="SellAll_Click"/>
-                                <Button Content="Sell All Profitable" FontWeight="SemiBold" Grid.Column="2" Margin="50,4,50,4" Click="SellAllProfitable_Click"/>
+                                <Button Content="Sell All" FontWeight="SemiBold" Grid.Column="1" Margin="0,2,0,2" Click="SellAll_Click" HorizontalAlignment="Right" Padding="4,0,4,0"/>
+                                <Button Content="Sell All Profitable" FontWeight="SemiBold" Grid.Column="2" Margin="12,2,0,2" Click="SellAllProfitable_Click" HorizontalAlignment="Left" Padding="4,0,4,0"/>
                             </Grid>
                             <DataGrid x:Name="openedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" ScrollViewer.IsDeferredScrollingEnabled="True" SelectedCellsChanged="openedOrders_SelectedCellsChanged" CanUserDeleteRows="False">
                                 <DataGrid.Resources>
@@ -131,13 +131,22 @@
                 </DockPanel>
             </Grid>
         </DockPanel>
-        <Grid Grid.ColumnSpan="2" Margin="0,585,0,0" Grid.RowSpan="2">
+        <Grid Grid.ColumnSpan="2" Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="110"/>
                 <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Label Content="Selected Currency:" FontWeight="SemiBold" Grid.Column="0"/>
             <Label x:Name="selectedCurrency" Grid.Column="1" FontWeight="Bold" HorizontalAlignment="Left"/>
+            <DockPanel Grid.Column="2">
+                <CheckBox Content="Balance" x:Name="balanceVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Checked="Balance_Checked" Unchecked="Balance_Unchecked"/>
+                <CheckBox Content="Price" x:Name="pricesVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Unchecked="Price_Unchecked" Checked="Price_Checked"/>
+                <CheckBox Content="Fast SMA" x:Name="smaVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Sma_Checked" Unchecked="Sma_Unchecked"/>
+                <CheckBox Content="Slow SMA based AO" x:Name="aoVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Ao_Checked" Unchecked="Ao_Unchecked"/>
+                <CheckBox Content="Tendency" x:Name="tendencyVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Tendency_Checked" Unchecked="Tendency_Unchecked"/>
+                <CheckBox Content="AI prediction" x:Name="predicitionVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Prediction_Checked" Unchecked="Prediction_Unchecked"/>
+            </DockPanel>
         </Grid>
         <Canvas x:Name="graph" Margin="5,5,5,5" Grid.Row="2" RenderTransformOrigin="0.5,0.5" Grid.ColumnSpan="2">
         </Canvas>

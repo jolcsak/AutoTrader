@@ -35,6 +35,8 @@ namespace AutoTrader.Traders
 
         public IAgent AoAgent { get; set; }
 
+        protected TradeSetting TradeSettings => TradeSetting.Instance;
+
         public NiceHashTraderBase()
         {
             GraphCollection = new GraphCollection(this);

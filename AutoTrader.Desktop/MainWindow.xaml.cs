@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using AutoTrader.Db;
 using AutoTrader.Db.Entities;
 using AutoTrader.Log;
 using AutoTrader.Traders;
@@ -17,6 +18,10 @@ namespace AutoTrader.Desktop
         private TraderThread traderThread;
 
         private LogWindow logWindow = null;
+
+        protected static Store Store => Store.Instance;
+
+        protected static TradeSetting TradeSettings => TradeSetting.Instance;
 
         public bool IsLogWindowClosed { get; set; } = true;
 
@@ -37,16 +42,14 @@ namespace AutoTrader.Desktop
             InitializeComponent();
         }
 
-        protected override void OnActivated(EventArgs e)
-        {
-            base.OnActivated(e);
-        }
-
         protected override void OnInitialized(EventArgs e)
         {
             WpfLogger.Init(logWindow.Console, null, openedOrders, closedOrders, balance, currencies, graph, selectedCurrency, totalBalance);
+            
+            Store.Connect();
+            Store.LoadSettings();
 
-            SetRatios();
+            SetSettings();
 
             traderThread = new TraderThread();
             Task.Run(traderThread.Trade);
@@ -54,9 +57,20 @@ namespace AutoTrader.Desktop
             base.OnInitialized(e);
         }
 
-        private void SetRatios()
+        private void SetSettings()
         {
+            TradeSettings.SetCanSave(false);
+
             minYield.Text = TradeSettings.MinSellYield.ToString();
+
+            balanceVisible.IsChecked = TradeSettings.BalanceGraphVisible;
+            pricesVisible.IsChecked = TradeSettings.PriceGraphVisible;
+            smaVisible.IsChecked = TradeSettings.SmaGraphVisible;
+            aoVisible.IsChecked = TradeSettings.AoGraphVisible;
+            tendencyVisible.IsChecked = TradeSettings.TendencyGraphVisible;
+            predicitionVisible.IsChecked = TradeSettings.AiPredicitionVisible;
+
+            TradeSettings.SetCanSave(true);
         }
 
         private void CanBuy_Checked(object sender, RoutedEventArgs e)
@@ -78,6 +92,7 @@ namespace AutoTrader.Desktop
                 {
                     TradeSettings.MinSellYield = minSellYieldValue;
                     minYield.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("White"));
+                    Store.SaveSettings();
                 }
                 else
                 {
@@ -135,11 +150,7 @@ namespace AutoTrader.Desktop
             if (selectedTradeOrder?.Id != Logger.SelectedTradeOrder?.Id)
             {
                 Logger.SelectedTradeOrder = selectedTradeOrder;
-                var trader = CurrentTrader;
-                if (trader != null)
-                {
-                    Logger.RefreshGraph(trader);
-                }
+                Logger.RefreshGraph(CurrentTrader);
             }
         }
 
@@ -157,6 +168,90 @@ namespace AutoTrader.Desktop
         private void Window_Closed(object sender, EventArgs e)
         {
             Application.Current.Shutdown(0);
+        }
+
+        private void Balance_Checked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.BalanceGraphVisible = true;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void Balance_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.BalanceGraphVisible = false;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void Price_Checked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.PriceGraphVisible = true;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void Price_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.PriceGraphVisible = false;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void Sma_Checked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.SmaGraphVisible = true;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void Sma_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.SmaGraphVisible = false;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void Ao_Checked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.AoGraphVisible = true;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void Ao_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.AoGraphVisible = false;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void Tendency_Checked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.TendencyGraphVisible = true;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void Tendency_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.TendencyGraphVisible = false;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void Prediction_Checked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.AiPredicitionVisible = true;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void Prediction_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.AiPredicitionVisible = false;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
         }
     }
 }

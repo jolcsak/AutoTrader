@@ -19,13 +19,24 @@ namespace AutoTrader.Db
 
         public TotalBalances TotalBalances { get; private set; }
 
+        public TradeSettings TradeSettings { get; private set; }
+
+        public void SaveSettings()
+        {
+            if (TradeSetting.Instance.GetCanSave())
+            {
+                TradeSetting.Instance = TradeSettings.SaveOrUpdate(TradeSetting.Instance);
+            }
+        }
+
+        public void LoadSettings()
+        {
+            TradeSetting.Instance = TradeSettings.GetTradeSettings();
+        }
+
         private Store()
         {
-            Con = R.Connection()
-                     .Hostname("jolcsak-nas")
-                     .Port(32773)
-                     .Timeout(20)
-                     .Connect();
+            Con = R.Connection().Hostname("jolcsak-nas").Port(32773).Timeout(20).Connect();
 
             Instance = this;
 
@@ -33,6 +44,7 @@ namespace AutoTrader.Db
             OrderBooks = new OrderBooks();
             LastPrices = new LastPrices();
             TotalBalances = new TotalBalances();
+            TradeSettings = new TradeSettings();
         }
 
         public static Store Connect()

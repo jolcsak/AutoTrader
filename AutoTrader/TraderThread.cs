@@ -7,8 +7,6 @@ using AutoTrader.Db;
 using AutoTrader.Traders;
 using AutoTrader.Api;
 using AutoTrader.Log;
-using AutoTrader.Api.Objects;
-using System.Reflection;
 using System.IO;
 using System.Text;
 using System.Globalization;
@@ -19,15 +17,14 @@ namespace AutoTrader
     public class TraderThread
     {
         private const string VERSION = "0.24";
-
         private const int COLLECTOR_WAIT = 1 * 60 * 1000;
         private const int TRADE_WAIT = 20 * 1000;
         private const int BUYER_NUMBER = 12;
-
         private const string FIAT = "HUF";
 
-        private ITradeLogger Logger = TradeLogManager.GetLogger("AutoTrader");
+        protected static Store Store => Store.Instance;
 
+        private ITradeLogger Logger = TradeLogManager.GetLogger("AutoTrader");
         public static List<ITrader> Traders { get; } = new List<ITrader>();
 
         public ITrader GetTrader(string targetCurrency)
@@ -60,7 +57,7 @@ namespace AutoTrader
 
             niceHashApi.QueryServerTime();
             Logger.Info("Server time:" + niceHashApi.ServerTime);
-            
+
             CreateTraders(niceHashApi);
 
             do
