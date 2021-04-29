@@ -54,6 +54,7 @@ namespace AutoTrader.Traders
                 Dates = new List<DateTime>(prices.Select(p => p.Time));
                 smaProvider.SetData(PastPrices);
                 AoProvider.SetData(new ObservableCollection<double>(smaProvider.Sma.Where(sma =>sma > -1)));
+                //AoProvider.SetData(PastPrices);
                 SmaSkip = smaProvider.Sma.Count - Ao.Count;
                 PricesSkip = PastPrices.Count - Ao.Count;
             }

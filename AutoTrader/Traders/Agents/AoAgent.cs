@@ -21,12 +21,14 @@ namespace AutoTrader.Traders.Agents
             this.graphCollection = graphCollection;
         }
 
-        public bool IsBuy(int i = -1)
+        public bool Buy(int i = -1)
         {
             if (i < 0)
             {
                 i = graphCollection.AoProvider.AoIndex;
             }
+
+            int oi = i;
 
             if (i >= 2)
             {
@@ -37,17 +39,24 @@ namespace AutoTrader.Traders.Agents
                            ColorCountBefore(ref i, AoColor.Green) == COLOR_COUNT &&                            
                            ColorCountBefore(ref i, AoColor.Red) > COLOR_COUNT;
                 }
+                Ao[oi].BuyMore = buy;
+                Ao[oi].Buy = buy && PreviousBuyPrice(oi) <= Ao[oi].Price;
                 return buy;
             }
+            Ao[oi].Buy = false;
+            Ao[oi].BuyMore = false;
             return false;
         }
 
-        public bool IsSell(int i = -1)
+        public bool Sell(int i = -1)
         {
             if (i < 0)
             {
                 i = graphCollection.AoProvider.AoIndex;
             }
+
+            int oi = i;
+
             if (i >= 2)
             {
                 bool sell = Ao[i - 1]?.Value > 0 && Ao[i].Value < 0;
@@ -57,6 +66,8 @@ namespace AutoTrader.Traders.Agents
                         Ao[i].Value > 0 && Ao[i].Color == AoColor.Red && 
                         ColorCountBefore(ref i, AoColor.Green) > COLOR_COUNT;
                 }
+                Ao[oi].SellMore = sell;
+                Ao[oi].Sell = sell && PreviousSellPrice(oi) <= Ao[oi].Price;
                 return sell;
             }
             return false;
@@ -71,6 +82,41 @@ namespace AutoTrader.Traders.Agents
                 c++;
             } while (i >= 0 && Ao[i].Color == color);
             return c; 
+        }
+
+        private double PreviousBuyPrice(int i)
+        {
+            int oi = i;
+            double sumPrice = 0;
+            int c = 0;
+            do
+            {
+                if (Ao[i].Sell)
+                {
+                    sumPrice += Ao[i].Price - Ao[oi].Price;
+                }
+                else
+                {
+                    sumPrice += Ao[i].Price;
+                }
+                c++;
+                i--;
+            } while (i >= 0 && !Ao[i].BuyMore);
+            return i < 0 || Ao[i].Sell ? Ao[oi].Price : sumPrice / c;
+        }
+
+        private double PreviousSellPrice(int i)
+        {
+            int oi = i;
+            double sumPrice = 0;
+            int c = 0;
+            do
+            {
+                sumPrice += Ao[i].Price;
+                c++;
+                i--;
+            } while (i >= 0 && !Ao[i].SellMore && !Ao[i].Buy);
+            return i < 0 || Ao[i].Buy ? Ao[oi].Price : sumPrice / c;
         }
 
         private double ValueOf(AoColor color, int i)
@@ -118,8 +164,8 @@ namespace AutoTrader.Traders.Agents
             int lastIndex = graphCollection.AoProvider.AoIndex;
             if (lastIndex >= 0)
             {
-                Ao[lastIndex].Buy = IsBuy(lastIndex);
-                Ao[lastIndex].Sell = IsSell(lastIndex);
+                Buy(lastIndex);
+                Sell(lastIndex);
             }
         }
 
@@ -127,8 +173,8 @@ namespace AutoTrader.Traders.Agents
         {
             for (int i = 0; i < Ao.Count; i++)
             {
-                Ao[i].Buy = IsBuy(i);
-                Ao[i].Sell = IsSell(i);
+                Buy(i);
+                Sell(i);
             }
         }
     }

@@ -100,7 +100,7 @@ namespace AutoTrader.Traders
 
         private bool Buy(double amount, double actualPrice, double actualAmount)
         {
-            if (AoAgent.IsBuy())
+            if (AoAgent.Buy())
             {
                 Logger.Info($"Time to buy at price {actualPrice}, amount: {amount}");
 
@@ -129,7 +129,7 @@ namespace AutoTrader.Traders
 
         private bool Sell(double actualPrice)
         {
-            if (AoAgent.IsSell())
+            if (AoAgent.Sell())
             {
                 Logger.Info($"Time to sell at price {actualPrice}");
                 foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))
