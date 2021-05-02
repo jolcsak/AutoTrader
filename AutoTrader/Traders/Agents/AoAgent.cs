@@ -14,6 +14,8 @@ namespace AutoTrader.Traders.Agents
         protected SmaProvider SlowSmaProvider => graphCollection.AoProvider.SlowSmaProvider;
         protected SmaProvider FastSmaProvider => graphCollection.AoProvider.FastSmaProvider;
 
+        protected IList<double> Tendency => graphCollection.Tendency;
+
         public bool IsBuy => Ao.Count > 0 && Ao[Ao.Count - 1].Buy;
 
         public bool IsSell => Ao.Count > 0 && Ao[Ao.Count - 1].Buy;
@@ -40,7 +42,7 @@ namespace AutoTrader.Traders.Agents
                     previousBuyMoreSma = Ao[i].SmaIndex;
                     lastBuy = !Ao[i].BuyMore;
                 }
-                Ao[i].Buy = !lastBuy && (Ao[i].Value < 0) && (FastSmaProvider.Sma[Ao[i].SmaIndex]) > FastSmaProvider.Sma[previousBuyMoreSma];
+                Ao[i].Buy = !lastBuy && (Ao[i].Value < 0) && (FastSmaProvider.Sma[Ao[i].SmaIndex]) > FastSmaProvider.Sma[previousBuyMoreSma] && T(i) > 0;
                 if (Ao[i].Buy)
                 {
                     lastBuy = true;
@@ -65,6 +67,15 @@ namespace AutoTrader.Traders.Agents
                     lastSell = true;
                 }
             }
+        }
+
+        private int T(int i)
+        {
+            if (Tendency[Ao[i].SmaIndex] > Tendency[Ao[i - 1].SmaIndex])
+            {
+                return 1;
+            }
+            return -1;
         }
 
         public void RefreshAll()

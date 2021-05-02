@@ -59,7 +59,7 @@ namespace AutoTrader.Traders
             double amplitude = AoProvider.Amplitude;
             if (!double.IsNaN(amplitude))
             {
-                var filter = OnlineFilter.CreateLowpass(ImpulseResponse.Finite, 50, amplitude);
+                var filter = OnlineFilter.CreateLowpass(ImpulseResponse.Finite, 60, amplitude * 10);
                 Tendency = filter.ProcessSamples(prices);
             }
             else
