@@ -7,7 +7,7 @@ namespace AutoTrader.GraphProviders
     public class SmaProvider
     {
         private int period;
-        private ObservableCollection<double> data;
+        public ObservableCollection<double> Data { get; set; }
 
         public ObservableCollection<double> Sma { get; } = new ObservableCollection<double>();
 
@@ -26,9 +26,9 @@ namespace AutoTrader.GraphProviders
 
         public void SetData(ObservableCollection<double> data)
         {
-            this.data = data;
+            this.Data = data;
             Calculate();
-            this.data.CollectionChanged += DataChanged;
+            this.Data.CollectionChanged += DataChanged;
         }
 
         public double GetMa(int ii)
@@ -38,7 +38,7 @@ namespace AutoTrader.GraphProviders
                 double summ = 0;
                 for (int i = ii; i > ii - period; i--)
                 {
-                    summ += data[i];
+                    summ += Data[i];
                 }
                 return summ / period;
             }
@@ -48,7 +48,8 @@ namespace AutoTrader.GraphProviders
         public void Calculate()
         {
             Sma.Clear();
-            for (int i = 0; i < data.Count; i++)
+            Current = -1;
+            for (int i = 0; i < Data.Count; i++)
             {
                 Add(GetMa(i));
             }
@@ -56,7 +57,7 @@ namespace AutoTrader.GraphProviders
 
         public void Refresh()
         {
-            Add(GetMa(data.Count - 1));
+            Add(GetMa(Data.Count - 1));
         }
 
         private void Add(double ma)

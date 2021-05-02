@@ -11,9 +11,13 @@ namespace AutoTrader.Traders
 {
     public class GraphCollection
     {
-        private const int SMA_SMOOTHNESS = 20;
+        private const int PERIOD = 15;
+        private const int SMA_SMOOTHNESS = 5;
 
         private ITrader trader;
+
+        private double priceSum = 0;
+        private int counter = 0;
 
         protected SmaProvider smaProvider = new SmaProvider(SMA_SMOOTHNESS);
 
@@ -26,7 +30,6 @@ namespace AutoTrader.Traders
 
         public ObservableCollection<double> PastPrices { get; set; }
 
-        public IList<double> MlPrices { get; set; }
         public IList<double> Sma => smaProvider.Sma;
         public IList<AoValue> Ao => AoProvider.Ao;
 
@@ -47,38 +50,38 @@ namespace AutoTrader.Traders
         {
             if (PastPrices == null)
             {
-                IList<Db.Entities.Price> prices = Store.Prices.GetPricesForTrader(trader);
+                var candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateTime.Now.AddMonths(-1), DateTime.Now, 60);
+                var prices = candleSticks.Select(cs => cs.open).ToArray();
 
-                MlPrices = prices.Select(p => p.Value).ToList();
-                PastPrices = new ObservableCollection<double>(prices.Select(p => p.Value));
-                Dates = new List<DateTime>(prices.Select(p => p.Time));
+                PastPrices = new ObservableCollection<double>(prices);
+                Dates = new List<DateTime>(candleSticks.Select(cs => NiceHashApi.UnixTimestampToDateTime(cs.time)));
                 smaProvider.SetData(PastPrices);
-                AoProvider.SetData(new ObservableCollection<double>(smaProvider.Sma.Where(sma =>sma > -1)));
-                //AoProvider.SetData(PastPrices);
+                AoProvider.SetData(PastPrices);
                 SmaSkip = smaProvider.Sma.Count - Ao.Count;
                 PricesSkip = PastPrices.Count - Ao.Count;
             }
             else 
             {
-                if (actualPrice.HasValue)
+                if (actualPrice.HasValue && counter == PERIOD - 1)
                 {
-                    PastPrices.Add(actualPrice.Value);
-                    //var input = new ModelInput { Col0 = DateTime.Now.Ticks };
+                    counter = 0;
+                    priceSum += actualPrice.Value;
+                    double avgPrice = priceSum / PERIOD;
+                    PastPrices.Add(avgPrice);
 
-                    // Load model and predict output of sample data
-                    //if (trader.TargetCurrency == "PPT")
-                    //{
-                    //    ModelOutput result = ConsumeModel.Predict(input);
-                    //    MlPrices.Add(result.Score);
-                    //}
-                    //else
+                    if (date.HasValue)
                     {
-                        MlPrices.Add(actualPrice.Value);
+                        Dates.Add(date.Value);
                     }
+
+                    priceSum = 0;
                 }
-                if (date.HasValue)
+                else
                 {
-                    Dates.Add(date.Value);
+                    if (actualPrice.HasValue) {
+                        priceSum += actualPrice.Value;
+                        counter++;
+                    }
                 }
             }
 

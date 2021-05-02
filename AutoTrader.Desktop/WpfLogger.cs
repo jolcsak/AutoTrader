@@ -218,12 +218,6 @@ namespace AutoTrader.Desktop
                     new BarGraph(graph, "Awesome Oscillator", graphCollection.Ao, Colors.Yellow, Colors.Blue).Draw();
                 }
 
-
-                //Complex[] signal = graphCollection.PastPrices.Select(val => new Complex(val, 0)).ToArray();
-                //Fourier.Inverse(signal, FourierOptions.Matlab);
-                //var result = signal.Select(x => new AoValue { Value = x.Magnitude, Color = AoColor.Green }).Take(signal.Length / 2).Skip(3).ToArray();
-                //new BarGraph(graph, "FFT", result, Colors.LightBlue, Colors.Orange).Draw();
-
                 if (TradeSettings.TendencyGraphVisible)
                 {
                     DrawTendencies(graphCollection, trader);
@@ -231,7 +225,6 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.AiPredicitionVisible)
                 {
-                    new Graph(graph, "Predicted BTC Price ratio", graphCollection.MlPrices, Colors.DarkRed, showPoints: true).Draw(graphCollection.PricesSkip);
                 }
                 if (TradeSettings.PriceGraphVisible)
                 {

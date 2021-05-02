@@ -98,7 +98,7 @@ namespace AutoTrader.GraphProviders
             var ma = fastMa - slowMa;
             if (fastMa > -1 && slowMa > -1)
             {
-                Ao.Add(new AoValue { Value = ma, Price = fastMa, Color = previousMa > ma ? AoColor.Red : AoColor.Green, SmaIndex = smaIndex });
+                Ao.Add(new AoValue { Value = ma, Price = slowMa, Color = previousMa > ma ? AoColor.Red : AoColor.Green, SmaIndex = smaIndex });
             }
             previousMa = ma;
         }

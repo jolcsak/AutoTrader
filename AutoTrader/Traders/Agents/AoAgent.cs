@@ -6,15 +6,19 @@ namespace AutoTrader.Traders.Agents
 {
     public class AoAgent : IAgent
     {
-        private const int COLOR_COUNT = 2;
-
-        public static double Ratio { get; set; } = 0;
+        public static double Ratio { get; set; } = 1;
 
         protected GraphCollection graphCollection;
         protected IList<AoValue> Ao => graphCollection.Ao;
 
         protected SmaProvider SlowSmaProvider => graphCollection.AoProvider.SlowSmaProvider;
         protected SmaProvider FastSmaProvider => graphCollection.AoProvider.FastSmaProvider;
+
+        protected bool lastBuy = false;
+        protected bool lastSell = false;
+
+        protected int previousBuyMoreSma = 0;
+        protected int previousSellMoreSma = 0;
 
         public AoAgent(GraphCollection graphCollection)
         {
@@ -28,23 +32,24 @@ namespace AutoTrader.Traders.Agents
                 i = graphCollection.AoProvider.AoIndex;
             }
 
-            int oi = i;
-
             if (i >= 2)
             {
-                bool buy = Ao[i - 1].Value < 0 && Ao[i].Value > 0;
-                if (!buy)
+                Ao[i].BuyMore = Math.Sign(Ao[i - 1].Value * Ao[i].Value) < 0;
+                Ao[i].BuyMore |= Ao[i].Value < 0 && Ao[i].Color == AoColor.Green && Ao[i - 1].Color == AoColor.Red;
+                if (Ao[i].BuyMore)
                 {
-                    buy |= Ao[i].Value < 0 && Ao[i].Color == AoColor.Green && 
-                           ColorCountBefore(ref i, AoColor.Green) == COLOR_COUNT &&                            
-                           ColorCountBefore(ref i, AoColor.Red) > COLOR_COUNT;
+                    previousBuyMoreSma = Ao[i].SmaIndex;
+                    lastBuy = !Ao[i].BuyMore;
                 }
-                Ao[oi].BuyMore = buy;
-                Ao[oi].Buy = buy && PreviousBuyPrice(oi) <= Ao[oi].Price;
-                return buy;
+                Ao[i].Buy = !lastBuy && (Ao[i].Value < 0) && (FastSmaProvider.Sma[Ao[i].SmaIndex]) > FastSmaProvider.Sma[previousBuyMoreSma];
+                if (Ao[i].Buy)
+                {
+                    lastBuy = true;
+                }
+                return lastBuy;
             }
-            Ao[oi].Buy = false;
-            Ao[oi].BuyMore = false;
+            Ao[i].Buy = false;
+            Ao[i].BuyMore = false;
             return false;
         }
 
@@ -55,92 +60,24 @@ namespace AutoTrader.Traders.Agents
                 i = graphCollection.AoProvider.AoIndex;
             }
 
-            int oi = i;
-
             if (i >= 2)
             {
-                bool sell = Ao[i - 1]?.Value > 0 && Ao[i].Value < 0;
-                if (!sell)
+                Ao[i].SellMore = Math.Sign(Ao[i - 1].Value * Ao[i].Value) < 0;
+                Ao[i].SellMore |= Ao[i].Value > 0 && Ao[i].Color == AoColor.Red && Ao[i - 1].Color == AoColor.Green;
+                if (Ao[i].SellMore)
                 {
-                    sell |= 
-                        Ao[i].Value > 0 && Ao[i].Color == AoColor.Red && 
-                        ColorCountBefore(ref i, AoColor.Green) > COLOR_COUNT;
+                    previousSellMoreSma = Ao[i].SmaIndex;
+                    lastSell = !Ao[i].SellMore;
                 }
-                Ao[oi].SellMore = sell;
-                Ao[oi].Sell = sell && PreviousSellPrice(oi) <= Ao[oi].Price;
-                return sell;
-            }
-            return false;
-        }
-
-        private int ColorCountBefore(ref int i, AoColor color)
-        {
-            int c = 0;
-            do
-            {
-                i--;
-                c++;
-            } while (i >= 0 && Ao[i].Color == color);
-            return c; 
-        }
-
-        private double PreviousBuyPrice(int i)
-        {
-            int oi = i;
-            double sumPrice = 0;
-            int c = 0;
-            do
-            {
+                Ao[i].Sell = !lastSell && (FastSmaProvider.Data[Ao[i].SmaIndex]) <= FastSmaProvider.Data[previousSellMoreSma];
                 if (Ao[i].Sell)
                 {
-                    sumPrice += Ao[i].Price - Ao[oi].Price;
+                    lastSell = true;
                 }
-                else
-                {
-                    sumPrice += Ao[i].Price;
-                }
-                c++;
-                i--;
-            } while (i >= 0 && !Ao[i].BuyMore);
-            return i < 0 || Ao[i].Sell ? Ao[oi].Price : sumPrice / c;
-        }
-
-        private double PreviousSellPrice(int i)
-        {
-            int oi = i;
-            double sumPrice = 0;
-            int c = 0;
-            do
-            {
-                sumPrice += Ao[i].Price;
-                c++;
-                i--;
-            } while (i >= 0 && !Ao[i].SellMore && !Ao[i].Buy);
-            return i < 0 || Ao[i].Buy ? Ao[oi].Price : sumPrice / c;
-        }
-
-        private double ValueOf(AoColor color, int i)
-        {
-            double a = Ao[i].Value;
-            int c = ColorCountBefore(ref i, color);
-            double valueA = Math.Abs(a);
-            double valueB = Math.Abs(Ao[i].Value);
-            var r = valueA > valueB ? valueA / valueB : valueB / valueA;
-            return r * (r / c) * 10;
-        }
-
-        private bool IsInflexionPoint(int i)
-        {
-            if (i > 0)
-            {
-                var smaCurrent = SlowSmaProvider.Sma[Ao[i].SmaIndex];
-                var smaPrevious = SlowSmaProvider.Sma[Ao[i - 1].SmaIndex];
-                if (Ao[i].Value >= 0)
-                {
-                    return smaPrevious <= smaCurrent;
-                }
-                return smaCurrent >= smaPrevious;
+                return lastSell;
             }
+            Ao[i].Sell = false;
+            Ao[i].SellMore = false;
             return false;
         }
 
@@ -164,8 +101,8 @@ namespace AutoTrader.Traders.Agents
             int lastIndex = graphCollection.AoProvider.AoIndex;
             if (lastIndex >= 0)
             {
-                Buy(lastIndex);
                 Sell(lastIndex);
+                Buy(lastIndex);
             }
         }
 
@@ -173,8 +110,8 @@ namespace AutoTrader.Traders.Agents
         {
             for (int i = 0; i < Ao.Count; i++)
             {
-                Buy(i);
                 Sell(i);
+                Buy(i);
             }
         }
     }

@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 
 namespace AutoTrader.Api
 {
+
     public class NiceHashApi
     {
         private static string TEST_URL_ROOT = "https://api-test.nicehash.com";
@@ -62,11 +63,18 @@ namespace AutoTrader.Api
             return Get<HistoricPrice[]>($"/exchange/api/v2/info/trades?market={market}&limit={limit}");
         }
 
-        public CandleStick[] GetCandleSticks(string market, DateTime from, DateTime to)
+        public CandleStick[] GetCandleSticks(string market, DateTime from, DateTime to, int resolution = 1)
         {
             long fromSec = new DateTimeOffset(from).ToUnixTimeSeconds();
             long toSec = new DateTimeOffset(to).ToUnixTimeSeconds();
-            return Get<CandleStick[]>($"/exchange/api/v2/info/candlesticks?market={market}&from={fromSec}&to={toSec}&resolution=1");
+            return Get<CandleStick[]>($"/exchange/api/v2/info/candlesticks?market={market}&from={fromSec}&to={toSec}&resolution={resolution}");
+        }
+
+        public static DateTime UnixTimestampToDateTime(double unixTime)
+        {
+            DateTime unixStart = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            long unixTimeStampInTicks = (long)(unixTime * TimeSpan.TicksPerSecond);
+            return new DateTime(unixStart.Ticks + unixTimeStampInTicks, System.DateTimeKind.Utc);
         }
 
         public OrderTrade Order(string market, bool isBuy, double amount, double minSecQuantity = 0)
