@@ -74,7 +74,7 @@ namespace AutoTrader.Traders
             actualAmount = lastPrice.Amount;
             LastPriceDate = lastPrice.Date;
 
-            AoAgent.Refresh(actualPrice, LastPriceDate);
+            AoAgent.RefreshAll();
 
             if (previousPrice == double.MaxValue)
             {
@@ -100,7 +100,7 @@ namespace AutoTrader.Traders
 
         private bool Buy(double amount, double actualPrice, double actualAmount)
         {
-            if (AoAgent.Buy())
+            if (AoAgent.IsBuy)
             {
                 Logger.Info($"Time to buy at price {actualPrice}, amount: {amount}");
 
@@ -129,7 +129,7 @@ namespace AutoTrader.Traders
 
         private bool Sell(double actualPrice)
         {
-            if (AoAgent.Sell())
+            if (AoAgent.IsSell)
             {
                 Logger.Info($"Time to sell at price {actualPrice}");
                 foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))

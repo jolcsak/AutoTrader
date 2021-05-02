@@ -9,7 +9,6 @@ using System.Windows.Threading;
 using AutoTrader.Db.Entities;
 using AutoTrader.Log;
 using AutoTrader.Traders;
-using MathNet.Filtering;
 
 namespace AutoTrader.Desktop
 {
@@ -212,7 +211,7 @@ namespace AutoTrader.Desktop
                 Dispatcher?.Invoke(() => graph.Children.Clear());
 
                 GraphCollection graphCollection = trader.GraphCollection;
-                graphCollection.Refresh();
+
                 if (TradeSettings.AoGraphVisible)
                 {
                     new BarGraph(graph, "Awesome Oscillator", graphCollection.Ao, Colors.Yellow, Colors.Blue).Draw();
@@ -220,7 +219,7 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.TendencyGraphVisible)
                 {
-                    DrawTendencies(graphCollection, trader);
+                    new Graph(graph, "Tendency", graphCollection.Tendency, Colors.Orange, showPoints: false).Draw(85);
                 }
 
                 if (TradeSettings.AiPredicitionVisible)
@@ -252,17 +251,6 @@ namespace AutoTrader.Desktop
                 {
                     new PriceLine(graph, "Selected price", graphCollection.PastPrices, SelectedTradeOrder.Price, Colors.Brown).Draw(graphCollection.PricesSkip);
                 }
-            }
-        }
-
-        private static void DrawTendencies(GraphCollection graphCollection, ITrader trader)
-        {
-            double amplitude = trader.Amplitude;
-            if (!double.IsNaN(amplitude))
-            {
-                var filter = OnlineFilter.CreateLowpass(ImpulseResponse.Finite, 50, amplitude);
-                var lowpassFilterResults = filter.ProcessSamples(graphCollection.PastPrices.ToArray());
-                new Graph(graph, "Price low-pass", lowpassFilterResults, Colors.Orange, showPoints: false).Draw(85);
             }
         }
     }

@@ -14,6 +14,10 @@ namespace AutoTrader.Traders.Agents
         protected SmaProvider SlowSmaProvider => graphCollection.AoProvider.SlowSmaProvider;
         protected SmaProvider FastSmaProvider => graphCollection.AoProvider.FastSmaProvider;
 
+        public bool IsBuy => Ao.Count > 0 && Ao[Ao.Count - 1].Buy;
+
+        public bool IsSell => Ao.Count > 0 && Ao[Ao.Count - 1].Buy;
+
         protected bool lastBuy = false;
         protected bool lastSell = false;
 
@@ -25,13 +29,8 @@ namespace AutoTrader.Traders.Agents
             this.graphCollection = graphCollection;
         }
 
-        public bool Buy(int i = -1)
+        public void Buy(int i)
         {
-            if (i < 0)
-            {
-                i = graphCollection.AoProvider.AoIndex;
-            }
-
             if (i >= 2)
             {
                 Ao[i].BuyMore = Math.Sign(Ao[i - 1].Value * Ao[i].Value) < 0;
@@ -46,20 +45,11 @@ namespace AutoTrader.Traders.Agents
                 {
                     lastBuy = true;
                 }
-                return lastBuy;
             }
-            Ao[i].Buy = false;
-            Ao[i].BuyMore = false;
-            return false;
         }
 
-        public bool Sell(int i = -1)
+        public void Sell(int i)
         {
-            if (i < 0)
-            {
-                i = graphCollection.AoProvider.AoIndex;
-            }
-
             if (i >= 2)
             {
                 Ao[i].SellMore = Math.Sign(Ao[i - 1].Value * Ao[i].Value) < 0;
@@ -74,40 +64,12 @@ namespace AutoTrader.Traders.Agents
                 {
                     lastSell = true;
                 }
-                return lastSell;
-            }
-            Ao[i].Sell = false;
-            Ao[i].SellMore = false;
-            return false;
-        }
-
-        public void Refresh(double? actualPrice, DateTime? date)
-        {
-            bool empty = graphCollection.PastPrices == null;
-            graphCollection.Refresh(actualPrice, date);
-
-            if (empty)
-            {
-                RefreshAll();
-            }
-            else if (actualPrice.HasValue)
-            {
-                RefreshLast();
-            }
-        }
-
-        private void RefreshLast()
-        {
-            int lastIndex = graphCollection.AoProvider.AoIndex;
-            if (lastIndex >= 0)
-            {
-                Sell(lastIndex);
-                Buy(lastIndex);
             }
         }
 
         public void RefreshAll()
         {
+            graphCollection.Refresh();
             for (int i = 0; i < Ao.Count; i++)
             {
                 Sell(i);

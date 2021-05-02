@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace AutoTrader.GraphProviders
@@ -8,20 +7,13 @@ namespace AutoTrader.GraphProviders
     public class AoProvider
     {
         private static int lastAmps = 5;
-        private int slowPeriod;
-        private int fastPeriod;
 
-        private ObservableCollection<double> data;
-
-        double previousMa = -1;
+        private IList<double> data;
 
         public SmaProvider SlowSmaProvider { get; set; }
         public SmaProvider FastSmaProvider { get; set; }
 
         public IList<AoValue> Ao { get; } = new List<AoValue>();
-
-        public int AoIndex => Ao.Count - 1;
-        private int DataIndex => data.Count - 1;
 
         public AoValue Current => Ao.Any() ? Ao.Last() : null;
 
@@ -69,45 +61,27 @@ namespace AutoTrader.GraphProviders
             }
         }
 
-        public AoProvider(int slowPeriod = 34, int fastPeriod = 5)
-        {
-            this.slowPeriod = slowPeriod;
-            this.fastPeriod = fastPeriod;
-        }
-
-        public void SetData(ObservableCollection<double> data)
+        public AoProvider(IList<double> data, int slowPeriod = 34, int fastPeriod = 5)
         {
             this.data = data;
-            SlowSmaProvider = new SmaProvider(data, SmaChanged, slowPeriod);
-            FastSmaProvider = new SmaProvider(data, SmaChanged, fastPeriod);
-            previousMa = -1;
+            SlowSmaProvider = new SmaProvider(data, slowPeriod);
+            FastSmaProvider = new SmaProvider(data, fastPeriod);
             Calculate();
         }
 
         public void Calculate()
         {
-            Ao.Clear();
+            double previousMa = -1;
             for (int i = 0; i < SlowSmaProvider.Sma.Count; i++)
-            {
-                AddAo(SlowSmaProvider.Sma[i], FastSmaProvider.Sma[i], i);
-            }
-        }
-
-        private void AddAo(double slowMa, double fastMa, int smaIndex)
-        {
-            var ma = fastMa - slowMa;
-            if (fastMa > -1 && slowMa > -1)
-            {
-                Ao.Add(new AoValue { Value = ma, Price = slowMa, Color = previousMa > ma ? AoColor.Red : AoColor.Green, SmaIndex = smaIndex });
-            }
-            previousMa = ma;
-        }
-
-        private void SmaChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (DataIndex >= 2 && SlowSmaProvider.Sma.Count == FastSmaProvider.Sma.Count)
-            {
-                AddAo(SlowSmaProvider.Current, FastSmaProvider.Current, FastSmaProvider.Sma.Count - 1);
+            {                
+                double slowMa = SlowSmaProvider.Sma[i];
+                double fastMa = FastSmaProvider.Sma[i];
+                var ma = fastMa - slowMa;
+                if (fastMa > -1 && slowMa > -1)
+                {
+                    Ao.Add(new AoValue { Value = ma, Price = slowMa, Color = previousMa > ma ? AoColor.Red : AoColor.Green, SmaIndex = i });
+                }
+                previousMa = ma;
             }
         }
     }

@@ -4,10 +4,10 @@ namespace AutoTrader.Traders.Agents
 {
     public interface IAgent
     {
-        bool Buy(int i = -1);
-        bool Sell(int i = -1);
-        void Refresh(double? actualPrice, DateTime? date);
-
+        bool IsBuy { get; }
+        bool IsSell { get; }
+        void Buy(int i);
+        void Sell(int i);
         void RefreshAll();
     }
 }
