@@ -122,7 +122,7 @@ namespace AutoTrader.Desktop
             if (CurrentTrader != null)
             {
                 foreach (ITrader trader in TraderThread.Traders) {
-                    trader.AoAgent.RefreshAll();
+                    trader.AoAgent.RefreshAll(trader.TargetCurrency);
                 }
                 currencies_SelectedCellsChanged(sender, null);
             }

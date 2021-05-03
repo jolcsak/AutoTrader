@@ -219,7 +219,7 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.TendencyGraphVisible)
                 {
-                    new Graph(graph, "Tendency", graphCollection.Tendency, Colors.Orange, showPoints: false).Draw(graphCollection.SmaSkip);
+                    new Graph(graph, "Tendency", graphCollection.Tendency, Colors.Orange, showPoints: false).Draw(85);
                 }
 
                 if (TradeSettings.AiPredicitionVisible)
@@ -231,8 +231,8 @@ namespace AutoTrader.Desktop
                 }
                 if (TradeSettings.SmaGraphVisible)
                 {
-                    new Graph(graph, "Fast Simple Moving Average", graphCollection.AoProvider.FastSmaProvider.Sma, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
-                    new Graph(graph, "Slow Simple Moving Average", graphCollection.AoProvider.SlowSmaProvider.Sma, Colors.LightBlue, showPoints: false).Draw(graphCollection.SmaSkip);
+                    var ret = new Graph(graph, "Fast Simple Moving Average", graphCollection.SmaFast, Colors.OrangeRed, showPoints: true).Draw(graphCollection.SmaSkip);
+                    new Graph(graph, "Slow Simple Moving Average", graphCollection.SmaSlow, Colors.LightBlue, showPoints: true).Draw(graphCollection.SmaSkip, ret.Item1, ret.Item2);
                 }
                 new DateGraph(graph, graphCollection.Dates).Draw(graphCollection.PricesSkip);
                 if (graphCollection.Balances.Count > 0)

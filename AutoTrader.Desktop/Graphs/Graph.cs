@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -44,42 +45,43 @@ namespace AutoTrader.Desktop
             lineBrush.Freeze();
         }
 
-        public void Draw(int skip)
+        public Tuple<double?, double> Draw(int skip, double? fixedCheight = null, double fixedMinValue = 0)
         {
+            double? cHeight = null;
             if (!values.Any() || values.Any(v => double.IsNaN(v)))
             {
-                return;
+                return new Tuple<double?, double> (cHeight, 0);
             }
 
             var drawValues = values.Skip(skip);
             if (!drawValues.Any())
             {
-                return;
+                return new Tuple<double?, double>(cHeight, 0);
             }
 
             double maxValue = drawValues.Max();
             double minValue = drawValues.Min();
             if (maxValue == minValue)
             {
-                return;
+                return new Tuple<double?, double>(cHeight, 0);
             }
 
-            Dispatcher?.BeginInvoke(() =>
+            Dispatcher?.Invoke(() =>
             {
-
                 int halfPointSize = lineWeight / 2;
                 double priceHeight = maxValue - minValue;
                 double width = graph.ActualWidth;
                 double height = graph.ActualHeight;
                 double priceWidth = values.Count - 1 - skip;
                 double cWidth = width / priceWidth;
-                double cHeight = height / priceHeight;
+                cHeight = fixedCheight.HasValue ? fixedCheight.Value : height / priceHeight;
+                minValue = fixedCheight.HasValue ? fixedMinValue : minValue;
                 double currentX = 0;
 
                 var points = new PointCollection();
                 foreach (double value in drawValues)
                 {
-                    double y = (value - minValue) * cHeight;
+                    double y = (value - minValue) * cHeight.Value;
                     points.Add(new Point(currentX, height - y));
                     currentX += cWidth;
                 }
@@ -88,17 +90,20 @@ namespace AutoTrader.Desktop
                 if (showPoints)
                 {
                     currentX = 0;
+                    int i = 0;
                     foreach (double value in drawValues)
                     {
-                        double y = (value - minValue) * cHeight;
-                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = pointFillBrush, Width = lineWeight, Height = lineWeight, ToolTip = value.ToString(toolTipFormat)};
+                        double y = (value - minValue) * cHeight.Value;
+                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = pointFillBrush, Width = lineWeight, Height = lineWeight, ToolTip =  i + " " + value.ToString(toolTipFormat)};
                         Canvas.SetLeft(rect, currentX - halfPointSize);
                         Canvas.SetBottom(rect, y - halfPointSize);
                         graph.Children.Add(rect);
                         currentX += cWidth;
+                        i++;
                     }
                 }
             });
+            return new Tuple<double?, double>(cHeight, minValue);
         }
     }
 }

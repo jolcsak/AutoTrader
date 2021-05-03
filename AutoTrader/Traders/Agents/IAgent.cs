@@ -6,8 +6,8 @@ namespace AutoTrader.Traders.Agents
     {
         bool IsBuy { get; }
         bool IsSell { get; }
-        void Buy(int i);
+        void Buy(string currency, int i);
         void Sell(int i);
-        void RefreshAll();
+        void RefreshAll(string currency);
     }
 }

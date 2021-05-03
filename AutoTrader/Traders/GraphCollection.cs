@@ -11,11 +11,13 @@ namespace AutoTrader.Traders
 {
     public class GraphCollection
     {
-        private const int SMA_SMOOTHNESS = 5;
+        private const int SMA_FAST_SMOOTHNESS = 5;
+        private const int SMA_SLOW_SMOOTHNESS = 20;
 
         private ITrader trader;
 
-        protected SmaProvider smaProvider;
+        protected SmaProvider smaSlowProvider;
+        protected SmaProvider smaFastProvider;
 
         public AoProvider AoProvider { get; private set; }
 
@@ -26,7 +28,9 @@ namespace AutoTrader.Traders
 
         public IList<double> PastPrices { get; set; }
 
-        public IList<double> Sma => smaProvider.Sma;
+        public IList<double> SmaSlow => smaSlowProvider.Sma;
+        public IList<double> SmaFast => smaFastProvider.Sma;
+
         public IList<AoValue> Ao => AoProvider.Ao;
 
         public IList<double> Tendency { get; private set; }
@@ -51,15 +55,18 @@ namespace AutoTrader.Traders
 
             PastPrices = prices;
             Dates = new List<DateTime>(candleSticks.Select(cs => NiceHashApi.UnixTimestampToDateTime(cs.time)));
-            smaProvider = new SmaProvider(PastPrices, SMA_SMOOTHNESS);
+
+            smaSlowProvider = new SmaProvider(PastPrices, SMA_SLOW_SMOOTHNESS);
+            smaFastProvider = new SmaProvider(PastPrices, SMA_FAST_SMOOTHNESS);
+
             AoProvider =  new AoProvider(PastPrices);
-            SmaSkip = smaProvider.Sma.Count - Ao.Count;
             PricesSkip = PastPrices.Count - Ao.Count;
+            SmaSkip = PricesSkip;
 
             double amplitude = AoProvider.Amplitude;
             if (!double.IsNaN(amplitude))
             {
-                var filter = OnlineFilter.CreateLowpass(ImpulseResponse.Finite, 60, amplitude * 10);
+                var filter = OnlineFilter.CreateLowpass(ImpulseResponse.Finite, 50, amplitude);
                 Tendency = filter.ProcessSamples(prices);
             }
             else

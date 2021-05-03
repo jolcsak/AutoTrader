@@ -74,7 +74,7 @@ namespace AutoTrader.Traders
             actualAmount = lastPrice.Amount;
             LastPriceDate = lastPrice.Date;
 
-            AoAgent.RefreshAll();
+            AoAgent.RefreshAll(TargetCurrency);
 
             if (previousPrice == double.MaxValue)
             {
