@@ -25,6 +25,7 @@ namespace AutoTrader.Traders.Agents
 
         protected int previousBuyMoreSma = 0;
         protected int previousSellMoreSma = 0;
+        protected double priceChange = 0;
 
         public AoAgent(GraphCollection graphCollection)
         {
@@ -36,13 +37,16 @@ namespace AutoTrader.Traders.Agents
             if (i >= 2)
             {
                 Ao[i].BuyMore = Math.Sign(Ao[i - 1].Value * Ao[i].Value) < 0;
-                Ao[i].BuyMore |= Ao[i].Value < 0 && Ao[i].Color == AoColor.Green && Ao[i - 1].Color == AoColor.Red;
+                Ao[i].BuyMore |= Ao[i].Value < 0 && Ao[i].Color == AoColor.Green && Ao[i - 1].Color == AoColor.Red && Ao[i - 2].Color == AoColor.Red;
+                //Ao[i].BuyMore |= Tendency[Ao[i].SmaIndex] > 0 && Tendency[Ao[i - 1].SmaIndex] < 0;
                 if (Ao[i].BuyMore)
                 {
+                    priceChange = FastSmaProvider.Sma[Ao[i].SmaIndex] / FastSmaProvider.Sma[previousBuyMoreSma];
                     previousBuyMoreSma = Ao[i].SmaIndex;
                     lastBuy = !Ao[i].BuyMore;
                 }
-                Ao[i].Buy = !lastBuy && (Ao[i].Value < 0) && (FastSmaProvider.Sma[Ao[i].SmaIndex]) > FastSmaProvider.Sma[previousBuyMoreSma] && T(i) > 0;
+                Ao[i].Buy = !lastBuy && (Ao[i].Value < 0) && FastSmaProvider.Sma[Ao[i].SmaIndex] >= FastSmaProvider.Sma[previousBuyMoreSma] && priceChange < 0.91;
+                Ao[i].Buy |= Tendency[Ao[i].SmaIndex] > 0 && Tendency[Ao[i-1].SmaIndex] < 0;
                 if (Ao[i].Buy)
                 {
                     lastBuy = true;
@@ -55,27 +59,22 @@ namespace AutoTrader.Traders.Agents
             if (i >= 2)
             {
                 Ao[i].SellMore = Math.Sign(Ao[i - 1].Value * Ao[i].Value) < 0;
-                Ao[i].SellMore |= Ao[i].Value > 0 && Ao[i].Color == AoColor.Red && Ao[i - 1].Color == AoColor.Green;
+                Ao[i].SellMore |= Ao[i].Value > 0 && Ao[i].Color == AoColor.Red && Ao[i - 1].Color == AoColor.Green && Ao[i - 2].Color == AoColor.Green;
+                Ao[i].SellMore |= Tendency[Ao[i].SmaIndex] < 0 && Tendency[Ao[i - 1].SmaIndex] > 0;
+
                 if (Ao[i].SellMore)
                 {
+                    priceChange = FastSmaProvider.Sma[Ao[i].SmaIndex] / FastSmaProvider.Sma[previousBuyMoreSma];
                     previousSellMoreSma = Ao[i].SmaIndex;
                     lastSell = !Ao[i].SellMore;
                 }
-                Ao[i].Sell = !lastSell && (FastSmaProvider.Data[Ao[i].SmaIndex]) <= FastSmaProvider.Data[previousSellMoreSma];
+                Ao[i].Sell = !lastSell && (FastSmaProvider.Data[Ao[i].SmaIndex]) <= FastSmaProvider.Data[previousSellMoreSma] && priceChange > 1.1;
+                Ao[i].Sell |= Tendency[Ao[i].SmaIndex] < 0 && Tendency[Ao[i - 1].SmaIndex] > 0;
                 if (Ao[i].Sell)
                 {
                     lastSell = true;
                 }
             }
-        }
-
-        private int T(int i)
-        {
-            if (Tendency[Ao[i].SmaIndex] > Tendency[Ao[i - 1].SmaIndex])
-            {
-                return 1;
-            }
-            return -1;
         }
 
         public void RefreshAll()

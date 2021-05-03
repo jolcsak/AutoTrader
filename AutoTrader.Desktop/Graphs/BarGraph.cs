@@ -72,7 +72,7 @@ namespace AutoTrader.Desktop
                 double cHeight = Math.Abs(minValue) > Math.Abs(maxValue) ? zeroY / Math.Abs(minValue) : zeroY / Math.Abs(maxValue);
                 double rectWidth = cWidth < 1 ? 1 : cWidth;
                 double currentX = 0;
-                    
+                int i = 0;    
                 foreach (AoValue value in values)
                 {
                     SetAttributes(buyFillColor, sellFillColor, pointFillRedBrush, pointFillGreenBrush, value, out var fill, out var toolTip);
@@ -82,11 +82,11 @@ namespace AutoTrader.Desktop
 
                     if (rectWidth == 1)
                     {
-                        graph.Children.Add(new Line { X1 = currentX, X2 = currentX, Y1 = zeroY, Y2 = zeroY + y, Stroke = fill, ToolTip = toolTip });
+                        graph.Children.Add(new Line { X1 = currentX, X2 = currentX, Y1 = zeroY, Y2 = zeroY + y, Stroke = fill, ToolTip = i + " "+ toolTip });
                     }
                     else
                     {
-                        var rect = new Rectangle { Width = rectWidth, Height = absY < 1 ? 1 : absY, Fill = fill, ToolTip = toolTip };
+                        var rect = new Rectangle { Width = rectWidth, Height = absY < 1 ? 1 : absY, Fill = fill, ToolTip = i + " " + toolTip };
                         Canvas.SetLeft(rect, currentX);
                         if (Math.Sign(value.Value) >= 0)
                         {
@@ -99,6 +99,7 @@ namespace AutoTrader.Desktop
                         graph.Children.Add(rect);
                     }
                     currentX += cWidth;
+                    i++;
                 }
             });
         }
