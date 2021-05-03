@@ -219,7 +219,7 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.TendencyGraphVisible)
                 {
-                    new Graph(graph, "Tendency", graphCollection.Tendency, Colors.Orange, showPoints: true).Draw(graphCollection.SmaSkip);
+                    new Graph(graph, "Tendency", graphCollection.Tendency, Colors.Orange, showPoints: false).Draw(graphCollection.SmaSkip);
                 }
 
                 if (TradeSettings.AiPredicitionVisible)
