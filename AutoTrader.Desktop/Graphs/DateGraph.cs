@@ -1,5 +1,4 @@
-﻿using AutoTrader.Desktop.Graphs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -7,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using AutoTrader.Desktop.Graphs;
 
 namespace AutoTrader.Desktop
 {
@@ -72,9 +72,10 @@ namespace AutoTrader.Desktop
                         double xt = currentX - textBlock.ActualWidth / 2;
                         Canvas.SetLeft(textBlock, xt);
                         Canvas.SetTop(textBlock, y);
-                        graph.Children.Add(textBlock);
+                        graph.Children.Add(textBlock);                        
                         previousDate = value;
                     }
+
                     currentX += cWidth;
                 }
 

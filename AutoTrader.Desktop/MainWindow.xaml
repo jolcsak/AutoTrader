@@ -141,9 +141,11 @@
             <Label x:Name="selectedCurrency" Grid.Column="1" FontWeight="Bold" HorizontalAlignment="Left"/>
             <DockPanel Grid.Column="2">
                 <CheckBox Content="Balance" x:Name="balanceVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Checked="Balance_Checked" Unchecked="Balance_Unchecked"/>
-                <CheckBox Content="Price" x:Name="pricesVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Unchecked="Price_Unchecked" Checked="Price_Checked"/>
-                <CheckBox Content="Fast SMA" x:Name="smaVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Sma_Checked" Unchecked="Sma_Unchecked"/>
-                <CheckBox Content="Awesome Oscillator" x:Name="aoVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Ao_Checked" Unchecked="Ao_Unchecked"/>
+                <CheckBox Content="Prices" x:Name="pricesVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Unchecked="Price_Unchecked" Checked="Price_Checked"/>
+                <CheckBox Content="Trades" x:Name="tradesVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Trades_Checked" Unchecked="Trades_Unchecked"/>
+                <CheckBox Content="SMA" x:Name="smaVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Sma_Checked" Unchecked="Sma_Unchecked"/>
+                <CheckBox Content="AO" x:Name="aoVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Ao_Checked" Unchecked="Ao_Unchecked"/>
+                <CheckBox Content="Rsi" x:Name="rsiVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Rsi_Checked" Unchecked="Rsi_Unchecked" />
                 <CheckBox Content="Tendency" x:Name="tendencyVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Tendency_Checked" Unchecked="Tendency_Unchecked"/>
                 <CheckBox Content="AI prediction" x:Name="predicitionVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Prediction_Checked" Unchecked="Prediction_Unchecked"/>
             </DockPanel>

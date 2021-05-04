@@ -23,7 +23,7 @@ namespace AutoTrader.Db
 
         public void SaveSettings()
         {
-            if (TradeSetting.Instance.GetCanSave())
+            if (TradeSetting.Instance.CanSave())
             {
                 TradeSetting.Instance = TradeSettings.SaveOrUpdate(TradeSetting.Instance);
             }

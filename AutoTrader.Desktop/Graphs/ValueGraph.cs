@@ -1,4 +1,5 @@
 ﻿using AutoTrader.GraphProviders;
+using AutoTrader.Traders.Agents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,8 +28,13 @@ namespace AutoTrader.Desktop
         private static SolidColorBrush pointOutlineBrush = new SolidColorBrush { Color = Colors.Black };
         private static SolidColorBrush pointFillBrush = new SolidColorBrush { Color = Colors.Yellow };
 
+        private static SolidColorBrush buyBrush = new SolidColorBrush { Color = Colors.IndianRed };
+        private static SolidColorBrush sellBrush = new SolidColorBrush { Color = Colors.LightGreen };
+
         static ValueGraph()
         {
+            buyBrush.Freeze();
+            sellBrush.Freeze();
             pointOutlineBrush.Freeze();
             pointFillBrush.Freeze();
         }
@@ -46,7 +52,7 @@ namespace AutoTrader.Desktop
             lineBrush.Freeze();
         }
 
-        public Tuple<double?, double> Draw(int skip, double? fixedCheight = null, double fixedMinValue = 0)
+        public Tuple<double?, double> Draw(int skip, double? fixedCheight = null, double fixedMinValue = 0, IList<TradeItem> trades = null)
         {
             double? cHeight = null;
             if (!values.Any() || values.Any(v => double.IsNaN(v.Value)))
@@ -69,7 +75,8 @@ namespace AutoTrader.Desktop
 
             Dispatcher?.Invoke(() =>
             {
-                int halfPointSize = lineWeight * 3;
+                int pointWidth = lineWeight * 3;
+                int halfPointSize = pointWidth / 2;
                 double priceHeight = maxValue - minValue;
                 double width = graph.ActualWidth;
                 double height = graph.ActualHeight;
@@ -90,28 +97,39 @@ namespace AutoTrader.Desktop
 
                 currentX = 0;
                 int i = 0;
+                var rotate = new RotateTransform(45);
                 foreach (T value in drawValues)
                 {
+                    RotateTransform currentTransform = null;
                     var tradeValue = value as TradeValueBase;
-                    if (tradeValue?.IsBuy == true || tradeValue?.IsSell == true || showPoints)
+
+                    var tradeItem = trades?.FirstOrDefault(ti => ti.Date == value.CandleStick.Date);
+
+                    if (tradeValue?.IsBuy == true || tradeValue?.IsSell == true || showPoints || tradeItem != null)
                     {
+                        Brush currentBrush = pointFillBrush;
                         double y = (value.Value - minValue) * cHeight.Value;
                         string prefix = "";
-                        int pointWidth = lineWeight * 2;
-                        if (tradeValue?.IsBuy == true)
+                        if (tradeValue?.IsBuy == true || tradeItem?.Type == TradeType.Buy)
                         {
+                            currentBrush = buyBrush;
                             prefix = "Buy at";
-                            pointWidth = lineWeight * 3;
+                            currentTransform = rotate;
                         }
-                        if (tradeValue?.IsSell == true)
+                        if (tradeValue?.IsSell == true || tradeItem?.Type == TradeType.Sell)
                         {
+                            currentBrush = sellBrush;
                             prefix = "Sell at";
-                            pointWidth = lineWeight * 3;
                         }
 
-                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = pointFillBrush, Width = pointWidth, Height = lineWeight *3, ToolTip = prefix + " " + value.Value.ToString(toolTipFormat) };
+                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = currentBrush, Width = pointWidth, Height = pointWidth, ToolTip = prefix + " " + value.Value.ToString(toolTipFormat) };
+                        rect.RenderTransformOrigin = new Point(0.5, 0.5);
                         Canvas.SetLeft(rect, currentX - halfPointSize);
                         Canvas.SetBottom(rect, y - halfPointSize);
+                        if (currentTransform != null)
+                        {
+                            rect.RenderTransform = currentTransform;
+                        }
                         graph.Children.Add(rect);
                     }
                     currentX += cWidth;

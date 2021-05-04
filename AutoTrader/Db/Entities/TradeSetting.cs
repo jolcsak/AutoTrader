@@ -31,12 +31,16 @@ namespace AutoTrader
 
         public bool AiPredicitionVisible { get; set; }
 
+        public bool RsiVisible { get; set; }
+
+        public bool TradesVisible { get; set; }
+
         public void SetCanSave(bool canSave)
         {
             this.canSave = canSave;
         }
 
-        public bool GetCanSave()
+        public bool CanSave()
         {
             return canSave;
         }

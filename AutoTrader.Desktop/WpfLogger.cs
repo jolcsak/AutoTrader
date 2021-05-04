@@ -228,7 +228,7 @@ namespace AutoTrader.Desktop
                 }
                 if (TradeSettings.PriceGraphVisible)
                 {
-                    new Graph(graph, "BTC Price ratio", graphCollection.PastPrices.Select(c => c.close), Colors.DarkGray, showPoints: true).Draw(graphCollection.PricesSkip);
+                    new ValueGraph<ValueBase>(graph, "Prices", graphCollection.PastPrices.Select(p => new ValueBase { Value = p.close, CandleStick = p }).ToList(), Colors.DarkGray, showPoints: false).Draw(graphCollection.PricesSkip, null, 0, TradeSettings.TradesVisible ? graphCollection.Trades : null);
                 }
                 if (TradeSettings.SmaGraphVisible)
                 {
@@ -236,8 +236,10 @@ namespace AutoTrader.Desktop
                     new ValueGraph<SmaValue>(graph, "Slow Simple Moving Average", graphCollection.SmaSlow, Colors.LightBlue, showPoints: true).Draw(graphCollection.SmaSkip, ret.Item1, ret.Item2);
                 }
 
-                new ValueGraph<RsiValue>(graph, "Relative Strength Index", graphCollection.Rsi, Colors.DarkViolet).Draw(graphCollection.SmaSkip - GraphCollection.RSI_PERIOD);
-
+                if (TradeSettings.RsiVisible)
+                {
+                    new ValueGraph<RsiValue>(graph, "Relative Strength Index", graphCollection.Rsi, Colors.DarkViolet).Draw(graphCollection.SmaSkip - GraphCollection.RSI_PERIOD);
+                }
 
                 new DateGraph(graph, graphCollection.Dates).Draw(graphCollection.PricesSkip);
                 if (graphCollection.Balances.Count > 0)

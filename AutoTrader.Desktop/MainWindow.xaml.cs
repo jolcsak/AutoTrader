@@ -69,6 +69,8 @@ namespace AutoTrader.Desktop
             aoVisible.IsChecked = TradeSettings.AoGraphVisible;
             tendencyVisible.IsChecked = TradeSettings.TendencyGraphVisible;
             predicitionVisible.IsChecked = TradeSettings.AiPredicitionVisible;
+            rsiVisible.IsChecked = TradeSettings.RsiVisible;
+            tradesVisible.IsChecked = TradeSettings.TradesVisible;
 
             TradeSettings.SetCanSave(true);
         }
@@ -250,6 +252,34 @@ namespace AutoTrader.Desktop
         private void Prediction_Unchecked(object sender, RoutedEventArgs e)
         {
             TradeSettings.AiPredicitionVisible = false;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void Rsi_Checked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.RsiVisible = true;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void Rsi_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.RsiVisible = false;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void Trades_Checked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.TradesVisible = true;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void Trades_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.TradesVisible = false;
             Store.SaveSettings();
             Logger.RefreshGraph(CurrentTrader);
         }
