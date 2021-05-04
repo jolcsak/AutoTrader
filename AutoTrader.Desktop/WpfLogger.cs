@@ -31,6 +31,7 @@ namespace AutoTrader.Desktop
         private static Label selectedCurrencyLabel;
         private static Label totalBalanceText;
         private static TradeOrder selectedTradeOrder;
+        private static Label projectedIncomeText;
 
         private static readonly ObservableCollection<Currency> currencyList = new ObservableCollection<Currency>();
         private static readonly ObservableCollection<TradeOrder> openedOrdersData = new ObservableCollection<TradeOrder>();
@@ -72,7 +73,7 @@ namespace AutoTrader.Desktop
 
         protected Dispatcher Dispatcher => Application.Current != null ? Application.Current.Dispatcher : null;
 
-        public static void Init(TextBox consoleInstance, ScrollViewer consoleScrollInstance, DataGrid openedOrdersInstance, DataGrid closedOrdersInstance, Label balanceInstance, DataGrid currenciesInstance, Canvas graphInstance, Label selectedCurrencyInst, Label totalBalanceInstance)
+        public static void Init(TextBox consoleInstance, ScrollViewer consoleScrollInstance, DataGrid openedOrdersInstance, DataGrid closedOrdersInstance, Label balanceInstance, DataGrid currenciesInstance, Canvas graphInstance, Label selectedCurrencyInst, Label totalBalanceInstance, Label projectedIncome)
         {
             TradeLogManager.Init(new WpfLogger(string.Empty));
             console = consoleInstance;
@@ -84,6 +85,7 @@ namespace AutoTrader.Desktop
             graph = graphInstance;
             selectedCurrencyLabel = selectedCurrencyInst;
             totalBalanceText = totalBalanceInstance;
+            projectedIncomeText = projectedIncome;
 
             currencies.ItemsSource = currencyList;
             openedOrders.ItemsSource = openedOrdersData;
@@ -259,6 +261,19 @@ namespace AutoTrader.Desktop
                 {
                     new PriceLine(graph, "Selected price", graphCollection.PastPrices.Select(pp => pp.close), SelectedTradeOrder.Price, Colors.Brown).Draw(graphCollection.PricesSkip);
                 }
+            }
+        }
+
+        public void LogProjectedIncome(ITrader trader)
+        {
+            if (trader == null)
+            {
+                return;
+            }
+            if (SelectedCurrency.Equals(trader.TargetCurrency))
+            {
+                double projectedIncome = trader.GraphCollection.ProjectedIncome;
+                Dispatcher?.Invoke(() => projectedIncomeText.Content = (100 * projectedIncome - 100).ToString("N4") + " %");
             }
         }
     }

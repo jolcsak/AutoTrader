@@ -44,7 +44,7 @@ namespace AutoTrader.Desktop
 
         protected override void OnInitialized(EventArgs e)
         {
-            WpfLogger.Init(logWindow.Console, null, openedOrders, closedOrders, balance, currencies, graph, selectedCurrency, totalBalance);
+            WpfLogger.Init(logWindow.Console, null, openedOrders, closedOrders, balance, currencies, graph, selectedCurrency, totalBalance, projectedIncome);
             
             Store.Connect();
             Store.LoadSettings();
@@ -116,6 +116,8 @@ namespace AutoTrader.Desktop
             {
                 Logger.SelectedCurrency = currentTrader.TargetCurrency;
                 Logger.SelectedTradeOrder = null;
+                CurrentTrader?.GraphCollection.Refresh();
+                Logger.LogProjectedIncome(currentTrader);
                 Logger.RefreshGraph(currentTrader);
             }
         }
@@ -292,6 +294,7 @@ namespace AutoTrader.Desktop
             Store.SaveSettings();
             CurrentTrader?.GraphCollection.Refresh();
             Logger.RefreshGraph(CurrentTrader);
+            Logger.LogProjectedIncome(CurrentTrader);
         }
 
         private void SmaBotEnabled_Unchecked(object sender, RoutedEventArgs e)
@@ -300,6 +303,7 @@ namespace AutoTrader.Desktop
             Store.SaveSettings();
             CurrentTrader?.GraphCollection.Refresh();
             Logger.RefreshGraph(CurrentTrader);
+            Logger.LogProjectedIncome(CurrentTrader);
         }
 
         private void RsiBotEnabled_Checked(object sender, RoutedEventArgs e)
@@ -308,6 +312,7 @@ namespace AutoTrader.Desktop
             Store.SaveSettings();
             CurrentTrader?.GraphCollection.Refresh();
             Logger.RefreshGraph(CurrentTrader);
+            Logger.LogProjectedIncome(CurrentTrader);
         }
 
         private void RsiBotEnabled_Unchecked(object sender, RoutedEventArgs e)
@@ -316,6 +321,7 @@ namespace AutoTrader.Desktop
             Store.SaveSettings();
             CurrentTrader?.GraphCollection.Refresh();
             Logger.RefreshGraph(CurrentTrader);
+            Logger.LogProjectedIncome(CurrentTrader);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using AutoTrader.Api;
 using AutoTrader.Api.Objects;
 using AutoTrader.Db;
+using AutoTrader.Db.Entities;
 using AutoTrader.GraphProviders;
 using AutoTrader.Log;
 using AutoTrader.Traders.Agents;
@@ -63,6 +64,8 @@ namespace AutoTrader.Traders
 
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 
+        public double ProjectedIncome => GetProjectedIncome();
+
 
         public GraphCollection(ITrader trader)
         {
@@ -72,7 +75,7 @@ namespace AutoTrader.Traders
             RsiAgent = new RsiAgent(this);
         }
 
-        public void Refresh(double? actualPrice = null, DateTime? date = null)
+        public void Refresh()
         {
             var candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateTime.Now.AddMonths(-1), DateTime.Now, 60);
 
@@ -110,7 +113,56 @@ namespace AutoTrader.Traders
             {
                 Trades.AddRange(RsiAgent.RefreshAll());
             }
+
             Trades = Trades.OrderBy(t => t.Date).ToList();
+        }
+
+        private double GetProjectedIncome()
+        {
+            if (Trades == null  || !Trades.Any()) {
+                return 1;
+            }
+
+            double money = 100 * Trades.First().Price;
+            double startMoney = money;
+            double amount = 25;
+            IList<TradeOrder> tradeItems = new List<TradeOrder>();
+            foreach (var trade in Trades)
+            {
+                if (trade.Type == TradeType.Buy)
+                {
+                    if (money >= amount * trade.Price)
+                    {
+                        double transactionMoney = amount * trade.Price;
+                        money -= transactionMoney;
+                        tradeItems.Add(new TradeOrder(Guid.NewGuid().ToString(), trade.Price, amount, amount, "CUR", 0, "TRADER"));
+                    }
+                }
+                else if (trade.Type == TradeType.Sell)
+                {
+                    money += Sell(tradeItems, trade);
+                }
+            }
+
+            money += Sell(tradeItems, Trades.Last());
+
+            return money / startMoney;
+        }
+
+        private static double Sell( IList<TradeOrder> tradeItems, TradeItem trade)
+        {
+            double money = 0;
+            foreach (var tradeItem in tradeItems)
+            {
+                if (tradeItem.Type == TradeOrderType.OPEN && trade.Price > tradeItem.Price * 1.03)
+                {
+                    tradeItem.SellPrice = trade.Price;
+                    tradeItem.Type = TradeOrderType.CLOSED;
+                    money += tradeItem.Amount * trade.Price;
+                }
+            }
+
+            return money;
         }
     }
 }
