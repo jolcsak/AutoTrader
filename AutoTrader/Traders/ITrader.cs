@@ -24,8 +24,6 @@ namespace AutoTrader.Traders
 
         public GraphCollection GraphCollection { get; }
 
-        public IAgent AoAgent { get; set; }
-
         public void Trade(bool canBuy);
 
         ActualPrice GetAndStoreCurrentOrders();

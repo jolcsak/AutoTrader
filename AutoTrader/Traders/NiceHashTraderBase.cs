@@ -33,10 +33,6 @@ namespace AutoTrader.Traders
         public double Order => GraphCollection.AoProvider != null ? GraphCollection.AoProvider.Frequency * GraphCollection.AoProvider.Amplitude : 0;
         public DateTime LastPriceDate { get; set; } = DateTime.MinValue;
 
-        public IAgent AoAgent { get; set; }
-
-        public IAgent RsiAgent { get; set; }
-
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 
         public NiceHashTraderBase()

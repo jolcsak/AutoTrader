@@ -10,15 +10,16 @@ using System.Windows.Threading;
 
 namespace AutoTrader.Desktop
 {
-    public class ValueGraph
+    public class ValueGraph<T>  where T : ValueBase
     {
         private Canvas graph;
 
+        private bool showPoints;
         private int lineWeight = 2;
         private string toolTipFormat = "N10";
         protected Dispatcher Dispatcher => Application.Current != null ? Application.Current.Dispatcher : null;
         
-        protected IList<RsiValue> values;
+        protected IList<T> values;
 
         private string graphName;
 
@@ -32,13 +33,14 @@ namespace AutoTrader.Desktop
             pointFillBrush.Freeze();
         }
 
-        public ValueGraph(Canvas graph, string graphName, IList<RsiValue> values, Color lineColor, string toolTipFormat = "N10", int lineWeight = 2)
+        public ValueGraph(Canvas graph, string graphName, IList<T> values, Color lineColor, bool showPoints = false, string toolTipFormat = "N10", int lineWeight = 2)            
         {
             this.graph = graph;
             this.values = values;
             this.graphName = graphName;
             this.toolTipFormat = toolTipFormat;
             this.lineWeight = lineWeight;
+            this.showPoints = showPoints; 
 
             lineBrush = new SolidColorBrush { Color = lineColor };
             lineBrush.Freeze();
@@ -78,7 +80,7 @@ namespace AutoTrader.Desktop
                 double currentX = 0;
 
                 var points = new PointCollection();
-                foreach (RsiValue value in drawValues)
+                foreach (T value in drawValues)
                 {
                     double y = (value.Value - minValue) * cHeight.Value;
                     points.Add(new Point(currentX, height - y));
@@ -88,19 +90,20 @@ namespace AutoTrader.Desktop
 
                 currentX = 0;
                 int i = 0;
-                foreach (RsiValue value in drawValues)
+                foreach (T value in drawValues)
                 {
-                    if (value.IsBuy || value.IsSell)
+                    var tradeValue = value as TradeValueBase;
+                    if (tradeValue?.IsBuy == true || tradeValue?.IsSell == true || showPoints)
                     {
                         double y = (value.Value - minValue) * cHeight.Value;
                         string prefix = "";
                         int pointWidth = lineWeight * 2;
-                        if (value.IsBuy)
+                        if (tradeValue?.IsBuy == true)
                         {
                             prefix = "Buy at";
                             pointWidth = lineWeight * 3;
                         }
-                        if (value.IsSell)
+                        if (tradeValue?.IsSell == true)
                         {
                             prefix = "Sell at";
                             pointWidth = lineWeight * 3;

@@ -21,8 +21,6 @@ namespace AutoTrader.Traders
         public BtcTrader(string targetCurrency) : base()
         {
             TargetCurrency = targetCurrency;
-            AoAgent = new AoAgent(GraphCollection);
-            RsiAgent = new RsiAgent(GraphCollection);
         }
 
         protected override ITradeLogger Logger => TradeLogManager.GetLogger(BTC + "->" + TargetCurrency);
@@ -75,8 +73,7 @@ namespace AutoTrader.Traders
             actualAmount = lastPrice.Amount;
             LastPriceDate = lastPrice.Date;
 
-            AoAgent.RefreshAll(TargetCurrency);
-            RsiAgent.RefreshAll(TargetCurrency);
+            GraphCollection.Refresh();
 
             if (previousPrice == double.MaxValue)
             {
@@ -102,7 +99,7 @@ namespace AutoTrader.Traders
 
         private bool Buy(double amount, double actualPrice, double actualAmount)
         {
-            if (AoAgent.IsBuy)
+            if (GraphCollection.IsBuy)
             {
                 Logger.Info($"Time to buy at price {actualPrice}, amount: {amount}");
 
@@ -131,7 +128,7 @@ namespace AutoTrader.Traders
 
         private bool Sell(double actualPrice)
         {
-            if (AoAgent.IsSell)
+            if (GraphCollection.IsSell)
             {
                 Logger.Info($"Time to sell at price {actualPrice}");
                 foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))

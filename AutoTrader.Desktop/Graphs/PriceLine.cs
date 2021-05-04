@@ -16,7 +16,7 @@ namespace AutoTrader.Desktop
         private string toolTipFormat = "N10";
         protected Dispatcher Dispatcher => Application.Current != null ? Application.Current.Dispatcher : null;
         
-        protected IList<double> values;
+        protected IEnumerable<double> values;
         protected double value;
         
         private string graphName;
@@ -30,7 +30,7 @@ namespace AutoTrader.Desktop
             outlineBrush.Freeze();
         }
 
-        public PriceLine(Canvas graph, string graphName, IList<double> values, double value, Color lineColor, string toolTipFormat = "N10")
+        public PriceLine(Canvas graph, string graphName, IEnumerable<double> values, double value, Color lineColor, string toolTipFormat = "N10")
         {
             this.graph = graph;
             this.values = values;

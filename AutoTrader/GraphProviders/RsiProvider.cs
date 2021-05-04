@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using AutoTrader.Api.Objects;
+using System.Collections.Generic;
 
 namespace AutoTrader.GraphProviders
 {
@@ -7,12 +8,12 @@ namespace AutoTrader.GraphProviders
     /// </summary>
     public class RsiProvider
     {
-        public IList<double> Data { get; private set; } = new List<double>();
+        public IList<CandleStick> Data { get; private set; }
         public IList<RsiValue> Rsi { get; private set; } = new List<RsiValue>();
 
         public int  Period { get; private set; }
 
-        public RsiProvider(IList<double> data, int period)
+        public RsiProvider(IList<CandleStick> data, int period)
         {
             Data = data;            
             Period = period;
@@ -26,7 +27,7 @@ namespace AutoTrader.GraphProviders
             double lossSum = 0;
             for (int i = 1; i < Period; i++)
             {
-                double thisChange = Data[i] - Data[i - 1];
+                double thisChange = Data[i].close - Data[i - 1].close;
                 if (thisChange > 0)
                 {
                     gainSum += thisChange;
@@ -41,11 +42,11 @@ namespace AutoTrader.GraphProviders
             var averageLoss = lossSum / Period;
             var rs = averageGain / averageLoss;
             var rsi = 100 - (100 / (1 + rs));
-            Rsi.Add(new RsiValue(rsi));
+            Rsi.Add(new RsiValue(rsi, Data[Period]));
 
             for (int i = Period + 1; i < Data.Count; i++)
             {
-                double thisChange = Data[i]- Data[i - 1];
+                double thisChange = Data[i].close- Data[i - 1].close;
                 if (thisChange > 0)
                 {
                     averageGain = (averageGain * (Period - 1) + thisChange) / Period;
@@ -58,7 +59,7 @@ namespace AutoTrader.GraphProviders
                 }
                 rs = averageGain / averageLoss;
                 rsi = 100 - (100 / (1 + rs));
-                Rsi.Add(new RsiValue(rsi));
+                Rsi.Add(new RsiValue(rsi, Data[i]));
             }
         }
     }

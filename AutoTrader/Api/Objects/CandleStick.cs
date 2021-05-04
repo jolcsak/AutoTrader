@@ -1,4 +1,6 @@
-﻿namespace AutoTrader.Api.Objects
+﻿using System;
+
+namespace AutoTrader.Api.Objects
 {
     public class CandleStick
     {
@@ -10,5 +12,7 @@
         public double volume { get; set; }
         public double quote_volume { get; set; }
         public int count { get; set; }
+
+        public DateTime Date => NiceHashApi.UnixTimestampToDateTime(time);
     }
 }

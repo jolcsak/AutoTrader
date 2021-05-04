@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace AutoTrader.Traders.Agents
 {
@@ -6,8 +7,8 @@ namespace AutoTrader.Traders.Agents
     {
         bool IsBuy { get; }
         bool IsSell { get; }
-        void Buy(string currency, int i);
-        void Sell(int i);
-        void RefreshAll(string currency);
+        bool Buy(int i);
+        bool Sell(int i);
+        List<TradeItem> RefreshAll();
     }
 }

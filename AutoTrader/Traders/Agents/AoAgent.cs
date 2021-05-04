@@ -30,24 +30,25 @@ namespace AutoTrader.Traders.Agents
 
         protected double lastPrice = 0;
 
-        protected ITradeLogger Logger => TradeLogManager.GetLogger(this.GetType().Name);
+        protected ITradeLogger Logger => TradeLogManager.GetLogger(GetType().Name);
 
         public AoAgent(GraphCollection graphCollection)
         {
             this.graphCollection = graphCollection;
         }
 
-        public void Buy(string currency, int i)
+        public bool Buy(int i)
         {
             if (i >= 2)
             {
                 int j = i + graphCollection.PricesSkip;
-                Ao[i].Buy = graphCollection.SmaFast[j - 1] <= graphCollection.SmaSlow[j - 1] && graphCollection.SmaFast[j] >= graphCollection.SmaSlow[j];
+                Ao[i].Buy = graphCollection.SmaFast[j - 1].Value <= graphCollection.SmaSlow[j - 1].Value && graphCollection.SmaFast[j].Value >= graphCollection.SmaSlow[j].Value;
                 double ratio = Ao[i].Value < 0 ? 1.1 : 1.01;
-                Ao[i].Buy &= graphCollection.SmaFast[j] * ratio < lastPrice;
+                Ao[i].Buy &= graphCollection.SmaFast[j].Value * ratio < lastPrice;
                 if (Ao[i].Buy)
                 {
-                    lastPrice = graphCollection.SmaFast[j];
+                    lastPrice = graphCollection.SmaFast[j].Value;
+                    return true;
                 }
 
                 //graphCollection.SmaFast[Ao[i].SmaIndex] - graphCollection.SmaFast[Ao[i -1].SmaIndex]
@@ -67,20 +68,22 @@ namespace AutoTrader.Traders.Agents
                 //    lastBuy = true;
                 //}
             }
+            return false;
         }
 
-        public void Sell(int i)
+        public bool Sell(int i)
         {
             if (i >= 2)
             {
 
                 int j = i + graphCollection.PricesSkip;
-                Ao[i].Sell = graphCollection.SmaFast[j - 1] >= graphCollection.SmaSlow[j - 1] && graphCollection.SmaFast[j] <= graphCollection.SmaSlow[j];
+                Ao[i].Sell = graphCollection.SmaFast[j - 1].Value >= graphCollection.SmaSlow[j - 1].Value && graphCollection.SmaFast[j].Value <= graphCollection.SmaSlow[j].Value;
                 double ratio = Ao[i].Value > 0 ? 1.1 : 1.01;
-                Ao[i].Sell &= graphCollection.SmaFast[j] > lastPrice * ratio;
+                Ao[i].Sell &= graphCollection.SmaFast[j].Value > lastPrice * ratio;
                 if (Ao[i].Sell)
                 {
-                    lastPrice = graphCollection.SmaFast[j];
+                    lastPrice = graphCollection.SmaFast[j].Value;
+                    return true;
                 }
 
                 //Ao[i].SellMore = Math.Sign(Ao[i - 1].Value * Ao[i].Value) < 0;
@@ -100,19 +103,30 @@ namespace AutoTrader.Traders.Agents
                 //    lastSell = true;
                 //}
             }
+            return false;
         }
 
-        public void RefreshAll(string currency)
+        public List<TradeItem> RefreshAll()
         {
-            graphCollection.Refresh();
             previousBuyMoreSma = 0;
             previousSellMoreSma = 0;
             priceChange = 0;
+            List<TradeItem> tradeItems = new List<TradeItem>();
             for (int i = 0; i < Ao.Count; i++)
             {
-                Sell(i);
-                Buy(currency, i);
+                bool isBuy = false;
+                bool isSell = Sell(i);
+                if (!isSell)
+                {
+                    isBuy = Buy(i);
+                }
+
+                if (isBuy || isSell)
+                {
+                    tradeItems.Add(new TradeItem(Ao[i].CandleStick.Date, Ao[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell));
+                }
             }
+            return tradeItems;
         }
     }
 }

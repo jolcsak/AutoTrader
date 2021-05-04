@@ -1,11 +1,14 @@
 ﻿
+using AutoTrader.Api.Objects;
+
 namespace AutoTrader.GraphProviders
 {
-    public class RsiValue
+    public class RsiValue : TradeValueBase
     {
-        public RsiValue(double value)
+        public RsiValue(double value, CandleStick candleStick)
         {
             Value = value;
+            CandleStick = candleStick;
         }
 
         public RsiValue(double value, bool isBuy, bool isSell)
@@ -14,9 +17,5 @@ namespace AutoTrader.GraphProviders
             IsBuy = isBuy;
             IsSell = isSell;
         }
-
-        public double Value { get; set; }
-        public bool IsBuy { get; set; }
-        public bool IsSell { get; set; }
     }
 }

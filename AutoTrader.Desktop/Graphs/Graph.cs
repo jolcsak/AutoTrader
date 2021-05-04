@@ -17,7 +17,7 @@ namespace AutoTrader.Desktop
         private string toolTipFormat = "N10";
         protected Dispatcher Dispatcher => Application.Current != null ? Application.Current.Dispatcher : null;
         
-        protected IList<double> values;
+        protected IEnumerable<double> values;
 
         private string graphName;
         private bool showPoints;
@@ -32,7 +32,7 @@ namespace AutoTrader.Desktop
             pointFillBrush.Freeze();
         }
 
-        public Graph(Canvas graph, string graphName, IList<double> values, Color lineColor, bool showPoints, string toolTipFormat = "N10", int lineWeight = 2)
+        public Graph(Canvas graph, string graphName, IEnumerable<double> values, Color lineColor, bool showPoints, string toolTipFormat = "N10", int lineWeight = 2)
         {
             this.graph = graph;
             this.values = values;
@@ -73,7 +73,7 @@ namespace AutoTrader.Desktop
                 double priceHeight = maxValue - minValue;
                 double width = graph.ActualWidth;
                 double height = graph.ActualHeight;
-                double priceWidth = values.Count - 1 - skip;
+                double priceWidth = values.Count() - 1 - skip;
                 double cWidth = width / priceWidth;
                 cHeight = fixedCheight.HasValue ? fixedCheight.Value : height / priceHeight;
                 minValue = fixedCheight.HasValue ? fixedMinValue : minValue;

@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 using AutoTrader.Db.Entities;
+using AutoTrader.GraphProviders;
 using AutoTrader.Log;
 using AutoTrader.Traders;
 
@@ -227,15 +228,15 @@ namespace AutoTrader.Desktop
                 }
                 if (TradeSettings.PriceGraphVisible)
                 {
-                    new Graph(graph, "BTC Price ratio", graphCollection.PastPrices, Colors.DarkGray, showPoints: true).Draw(graphCollection.PricesSkip);
+                    new Graph(graph, "BTC Price ratio", graphCollection.PastPrices.Select(c => c.close), Colors.DarkGray, showPoints: true).Draw(graphCollection.PricesSkip);
                 }
                 if (TradeSettings.SmaGraphVisible)
                 {
-                    var ret = new Graph(graph, "Fast Simple Moving Average", graphCollection.SmaFast, Colors.Blue, showPoints: true).Draw(graphCollection.SmaSkip);
-                    new Graph(graph, "Slow Simple Moving Average", graphCollection.SmaSlow, Colors.LightBlue, showPoints: true).Draw(graphCollection.SmaSkip, ret.Item1, ret.Item2);
+                    var ret = new ValueGraph<SmaValue>(graph, "Fast Simple Moving Average", graphCollection.SmaFast, Colors.Blue, showPoints: true).Draw(graphCollection.SmaSkip);
+                    new ValueGraph<SmaValue>(graph, "Slow Simple Moving Average", graphCollection.SmaSlow, Colors.LightBlue, showPoints: true).Draw(graphCollection.SmaSkip, ret.Item1, ret.Item2);
                 }
 
-                new ValueGraph(graph, "Relative Strength Index", graphCollection.Rsi, Colors.DarkViolet).Draw(graphCollection.SmaSkip - GraphCollection.RSI_PERIOD);
+                new ValueGraph<RsiValue>(graph, "Relative Strength Index", graphCollection.Rsi, Colors.DarkViolet).Draw(graphCollection.SmaSkip - GraphCollection.RSI_PERIOD);
 
 
                 new DateGraph(graph, graphCollection.Dates).Draw(graphCollection.PricesSkip);
@@ -254,7 +255,7 @@ namespace AutoTrader.Desktop
 
                 if (SelectedTradeOrder != null)
                 {
-                    new PriceLine(graph, "Selected price", graphCollection.PastPrices, SelectedTradeOrder.Price, Colors.Brown).Draw(graphCollection.PricesSkip);
+                    new PriceLine(graph, "Selected price", graphCollection.PastPrices.Select(pp => pp.close), SelectedTradeOrder.Price, Colors.Brown).Draw(graphCollection.PricesSkip);
                 }
             }
         }

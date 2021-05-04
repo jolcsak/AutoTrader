@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoTrader.Api.Objects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,7 +9,7 @@ namespace AutoTrader.GraphProviders
     {
         private static int lastAmps = 5;
 
-        private IList<double> data;
+        private IList<CandleStick> data;
 
         public SmaProvider SlowSmaProvider { get; set; }
         public SmaProvider FastSmaProvider { get; set; }
@@ -61,7 +62,7 @@ namespace AutoTrader.GraphProviders
             }
         }
 
-        public AoProvider(IList<double> data, int slowPeriod = 34, int fastPeriod = 5)
+        public AoProvider(IList<CandleStick> data, int slowPeriod = 34, int fastPeriod = 5)
         {
             this.data = data;
             SlowSmaProvider = new SmaProvider(data, slowPeriod);
@@ -74,12 +75,12 @@ namespace AutoTrader.GraphProviders
             double previousMa = -1;
             for (int i = 0; i < SlowSmaProvider.Sma.Count; i++)
             {                
-                double slowMa = SlowSmaProvider.Sma[i];
-                double fastMa = FastSmaProvider.Sma[i];
+                double slowMa = SlowSmaProvider.Sma[i].Value;
+                double fastMa = FastSmaProvider.Sma[i].Value;
                 var ma = fastMa - slowMa;
                 if (fastMa > -1 && slowMa > -1)
                 {
-                    Ao.Add(new AoValue { Value = ma, Price = slowMa, Color = previousMa > ma ? AoColor.Red : AoColor.Green, SmaIndex = i });
+                    Ao.Add(new AoValue { Value = ma, Color = previousMa > ma ? AoColor.Red : AoColor.Green, SmaIndex = i, CandleStick = SlowSmaProvider.Sma[i].CandleStick });
                 }
                 previousMa = ma;
             }

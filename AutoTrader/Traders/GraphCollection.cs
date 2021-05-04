@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoTrader.Api;
+using AutoTrader.Api.Objects;
 using AutoTrader.Db;
 using AutoTrader.GraphProviders;
 using AutoTrader.Log;
+using AutoTrader.Traders.Agents;
 using MathNet.Filtering;
 
 namespace AutoTrader.Traders
@@ -29,10 +31,10 @@ namespace AutoTrader.Traders
 
         protected static NiceHashApi NiceHashApi => NiceHashApi.Instance;
 
-        public IList<double> PastPrices { get; set; }
+        public IList<CandleStick> PastPrices { get; set; }
 
-        public IList<double> SmaSlow => smaSlowProvider.Sma;
-        public IList<double> SmaFast => smaFastProvider.Sma;
+        public IList<SmaValue> SmaSlow => smaSlowProvider.Sma;
+        public IList<SmaValue> SmaFast => smaFastProvider.Sma;
 
         public IList<AoValue> Ao => AoProvider.Ao;
 
@@ -43,28 +45,42 @@ namespace AutoTrader.Traders
         public IList<DateTime> Dates { get; set; }  
 
         public IList<double> Balances { get; set; }
+
+        public List<TradeItem> Trades { get; private set; }
+
         public int PricesSkip { get; set; }
         public int SmaSkip { get; set; } = 0;
-        public double MaxPeriodPrice => PastPrices.Any() ? PastPrices.Max() : 0;
-        public double MinPeriodPrice => PastPrices.Any() ? PastPrices.Min() : 0;
+        public double MaxPeriodPrice => PastPrices.Any() ? PastPrices.Select(pp => pp.close).Max() : 0;
+        public double MinPeriodPrice => PastPrices.Any() ? PastPrices.Select(pp => pp.close).Min() : 0;
+
+        public IAgent AoAgent { get; set; }
+
+        public IAgent RsiAgent { get; set; }
+
+        public bool IsBuy => Trades.LastOrDefault(t => t.Date.AddHours(1) >= DateTime.Now)?.Type  == TradeType.Buy;
+
+        public bool IsSell => Trades.LastOrDefault(t => t.Date.AddHours(1) >= DateTime.Now)?.Type == TradeType.Sell;
+
 
         public GraphCollection(ITrader trader)
         {
             this.trader = trader;
+
+            AoAgent = new AoAgent(this);
+            RsiAgent = new RsiAgent(this);
         }
 
         public void Refresh(double? actualPrice = null, DateTime? date = null)
         {
             var candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateTime.Now.AddMonths(-1), DateTime.Now, 60);
-            var prices = candleSticks.Select(cs => cs.close).ToArray();
 
-            PastPrices = prices;
-            Dates = new List<DateTime>(candleSticks.Select(cs => NiceHashApi.UnixTimestampToDateTime(cs.time)));
+            PastPrices = candleSticks;
+            Dates = new List<DateTime>(candleSticks.Select(cs =>cs.Date));
 
-            smaSlowProvider = new SmaProvider(PastPrices, SMA_SLOW_SMOOTHNESS);
-            smaFastProvider = new SmaProvider(PastPrices, SMA_FAST_SMOOTHNESS);
+            smaSlowProvider = new SmaProvider(candleSticks, SMA_SLOW_SMOOTHNESS);
+            smaFastProvider = new SmaProvider(candleSticks, SMA_FAST_SMOOTHNESS);
 
-            AoProvider =  new AoProvider(PastPrices);
+            AoProvider =  new AoProvider(candleSticks);
             PricesSkip = PastPrices.Count - Ao.Count;
             SmaSkip = PricesSkip;
 
@@ -74,7 +90,7 @@ namespace AutoTrader.Traders
             if (!double.IsNaN(amplitude))
             {
                 var filter = OnlineFilter.CreateLowpass(ImpulseResponse.Finite, 50, amplitude);
-                Tendency = filter.ProcessSamples(prices);
+                Tendency = filter.ProcessSamples(PastPrices.Select(pp => pp.close).ToArray());
             }
             else
             {
@@ -82,6 +98,10 @@ namespace AutoTrader.Traders
             }
 
             Balances = Store.TotalBalances.GetTotalBalances(trader).Select(b => b.Balance).ToList();
+
+            Trades = AoAgent.RefreshAll();
+            Trades.AddRange(RsiAgent.RefreshAll());
+            Trades = Trades.OrderBy(t => t.Date).ToList();
         }
     }
 }
