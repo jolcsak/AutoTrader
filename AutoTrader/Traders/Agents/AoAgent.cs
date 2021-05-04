@@ -43,13 +43,10 @@ namespace AutoTrader.Traders.Agents
             {
                 int j = i + graphCollection.PricesSkip;
                 Ao[i].Buy = graphCollection.SmaFast[j - 1] <= graphCollection.SmaSlow[j - 1] && graphCollection.SmaFast[j] >= graphCollection.SmaSlow[j];
-                Ao[i].Buy &= graphCollection.SmaFast[j] < lastPrice;
+                double ratio = Ao[i].Value < 0 ? 1.1 : 1.01;
+                Ao[i].Buy &= graphCollection.SmaFast[j] * ratio < lastPrice;
                 if (Ao[i].Buy)
                 {
-                    if (currency == "PPT")
-                    {
-                        Logger.Info($"{i} {j}");
-                    }
                     lastPrice = graphCollection.SmaFast[j];
                 }
 
@@ -79,7 +76,8 @@ namespace AutoTrader.Traders.Agents
 
                 int j = i + graphCollection.PricesSkip;
                 Ao[i].Sell = graphCollection.SmaFast[j - 1] >= graphCollection.SmaSlow[j - 1] && graphCollection.SmaFast[j] <= graphCollection.SmaSlow[j];
-                Ao[i].Sell &= graphCollection.SmaFast[j] > lastPrice;
+                double ratio = Ao[i].Value > 0 ? 1.1 : 1.01;
+                Ao[i].Sell &= graphCollection.SmaFast[j] > lastPrice * ratio;
                 if (Ao[i].Sell)
                 {
                     lastPrice = graphCollection.SmaFast[j];

@@ -11,13 +11,16 @@ namespace AutoTrader.Traders
 {
     public class GraphCollection
     {
+        public const int RSI_PERIOD = 14;
         private const int SMA_FAST_SMOOTHNESS = 5;
-        private const int SMA_SLOW_SMOOTHNESS = 20;
+        private const int SMA_SLOW_SMOOTHNESS = 9;
 
         private ITrader trader;
 
         protected SmaProvider smaSlowProvider;
         protected SmaProvider smaFastProvider;
+
+        public RsiProvider RsiProvider { get; private set; }
 
         public AoProvider AoProvider { get; private set; }
 
@@ -32,6 +35,8 @@ namespace AutoTrader.Traders
         public IList<double> SmaFast => smaFastProvider.Sma;
 
         public IList<AoValue> Ao => AoProvider.Ao;
+
+        public IList<RsiValue> Rsi => RsiProvider.Rsi;
 
         public IList<double> Tendency { get; private set; }
 
@@ -51,7 +56,7 @@ namespace AutoTrader.Traders
         public void Refresh(double? actualPrice = null, DateTime? date = null)
         {
             var candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateTime.Now.AddMonths(-1), DateTime.Now, 60);
-            var prices = candleSticks.Select(cs => cs.open).ToArray();
+            var prices = candleSticks.Select(cs => cs.close).ToArray();
 
             PastPrices = prices;
             Dates = new List<DateTime>(candleSticks.Select(cs => NiceHashApi.UnixTimestampToDateTime(cs.time)));
@@ -62,6 +67,8 @@ namespace AutoTrader.Traders
             AoProvider =  new AoProvider(PastPrices);
             PricesSkip = PastPrices.Count - Ao.Count;
             SmaSkip = PricesSkip;
+
+            RsiProvider = new RsiProvider(PastPrices, RSI_PERIOD);
 
             double amplitude = AoProvider.Amplitude;
             if (!double.IsNaN(amplitude))

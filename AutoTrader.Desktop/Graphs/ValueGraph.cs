@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoTrader.GraphProviders;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -9,7 +10,7 @@ using System.Windows.Threading;
 
 namespace AutoTrader.Desktop
 {
-    public class Graph
+    public class ValueGraph
     {
         private Canvas graph;
 
@@ -17,27 +18,25 @@ namespace AutoTrader.Desktop
         private string toolTipFormat = "N10";
         protected Dispatcher Dispatcher => Application.Current != null ? Application.Current.Dispatcher : null;
         
-        protected IList<double> values;
+        protected IList<RsiValue> values;
 
         private string graphName;
-        private bool showPoints;
 
         private SolidColorBrush lineBrush;
         private static SolidColorBrush pointOutlineBrush = new SolidColorBrush { Color = Colors.Black };
-        private static SolidColorBrush pointFillBrush = new SolidColorBrush { Color = Colors.Orange };
+        private static SolidColorBrush pointFillBrush = new SolidColorBrush { Color = Colors.Yellow };
 
-        static Graph()
+        static ValueGraph()
         {
             pointOutlineBrush.Freeze();
             pointFillBrush.Freeze();
         }
 
-        public Graph(Canvas graph, string graphName, IList<double> values, Color lineColor, bool showPoints, string toolTipFormat = "N10", int lineWeight = 2)
+        public ValueGraph(Canvas graph, string graphName, IList<RsiValue> values, Color lineColor, string toolTipFormat = "N10", int lineWeight = 2)
         {
             this.graph = graph;
             this.values = values;
             this.graphName = graphName;
-            this.showPoints = showPoints;
             this.toolTipFormat = toolTipFormat;
             this.lineWeight = lineWeight;
 
@@ -48,7 +47,7 @@ namespace AutoTrader.Desktop
         public Tuple<double?, double> Draw(int skip, double? fixedCheight = null, double fixedMinValue = 0)
         {
             double? cHeight = null;
-            if (!values.Any() || values.Any(v => double.IsNaN(v)))
+            if (!values.Any() || values.Any(v => double.IsNaN(v.Value)))
             {
                 return new Tuple<double?, double> (cHeight, 0);
             }
@@ -59,8 +58,8 @@ namespace AutoTrader.Desktop
                 return new Tuple<double?, double>(cHeight, 0);
             }
 
-            double maxValue = drawValues.Max();
-            double minValue = drawValues.Min();
+            double maxValue = drawValues.Select(v => v.Value).Max();
+            double minValue = drawValues.Select(v => v.Value).Min();
             if (maxValue == minValue)
             {
                 return new Tuple<double?, double>(cHeight, 0);
@@ -68,8 +67,7 @@ namespace AutoTrader.Desktop
 
             Dispatcher?.Invoke(() =>
             {
-                int pointSize = 3;
-                int halfPointSize = pointSize / 2;
+                int halfPointSize = lineWeight * 3;
                 double priceHeight = maxValue - minValue;
                 double width = graph.ActualWidth;
                 double height = graph.ActualHeight;
@@ -80,28 +78,41 @@ namespace AutoTrader.Desktop
                 double currentX = 0;
 
                 var points = new PointCollection();
-                foreach (double value in drawValues)
+                foreach (RsiValue value in drawValues)
                 {
-                    double y = (value - minValue) * cHeight.Value;
+                    double y = (value.Value - minValue) * cHeight.Value;
                     points.Add(new Point(currentX, height - y));
                     currentX += cWidth;
                 }
                 graph.Children.Add(new Polyline { Stroke = lineBrush, StrokeThickness = lineWeight, Points = points, ToolTip = graphName });
 
-                if (showPoints)
+                currentX = 0;
+                int i = 0;
+                foreach (RsiValue value in drawValues)
                 {
-                    currentX = 0;
-                    int i = 0;
-                    foreach (double value in drawValues)
+                    if (value.IsBuy || value.IsSell)
                     {
-                        double y = (value - minValue) * cHeight.Value;
-                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = pointFillBrush, Width = pointSize, Height = pointSize, ToolTip =  i + " " + value.ToString(toolTipFormat)};
+                        double y = (value.Value - minValue) * cHeight.Value;
+                        string prefix = "";
+                        int pointWidth = lineWeight * 2;
+                        if (value.IsBuy)
+                        {
+                            prefix = "Buy at";
+                            pointWidth = lineWeight * 3;
+                        }
+                        if (value.IsSell)
+                        {
+                            prefix = "Sell at";
+                            pointWidth = lineWeight * 3;
+                        }
+
+                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = pointFillBrush, Width = pointWidth, Height = lineWeight *3, ToolTip = prefix + " " + value.Value.ToString(toolTipFormat) };
                         Canvas.SetLeft(rect, currentX - halfPointSize);
                         Canvas.SetBottom(rect, y - halfPointSize);
                         graph.Children.Add(rect);
-                        currentX += cWidth;
-                        i++;
                     }
+                    currentX += cWidth;
+                    i++;
                 }
             });
             return new Tuple<double?, double>(cHeight, minValue);

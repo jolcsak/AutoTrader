@@ -231,9 +231,13 @@ namespace AutoTrader.Desktop
                 }
                 if (TradeSettings.SmaGraphVisible)
                 {
-                    var ret = new Graph(graph, "Fast Simple Moving Average", graphCollection.SmaFast, Colors.OrangeRed, showPoints: true).Draw(graphCollection.SmaSkip);
+                    var ret = new Graph(graph, "Fast Simple Moving Average", graphCollection.SmaFast, Colors.Blue, showPoints: true).Draw(graphCollection.SmaSkip);
                     new Graph(graph, "Slow Simple Moving Average", graphCollection.SmaSlow, Colors.LightBlue, showPoints: true).Draw(graphCollection.SmaSkip, ret.Item1, ret.Item2);
                 }
+
+                new ValueGraph(graph, "Relative Strength Index", graphCollection.Rsi, Colors.DarkViolet).Draw(graphCollection.SmaSkip - GraphCollection.RSI_PERIOD);
+
+
                 new DateGraph(graph, graphCollection.Dates).Draw(graphCollection.PricesSkip);
                 if (graphCollection.Balances.Count > 0)
                 {

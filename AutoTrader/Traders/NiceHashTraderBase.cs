@@ -35,6 +35,8 @@ namespace AutoTrader.Traders
 
         public IAgent AoAgent { get; set; }
 
+        public IAgent RsiAgent { get; set; }
+
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 
         public NiceHashTraderBase()

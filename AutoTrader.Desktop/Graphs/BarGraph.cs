@@ -50,7 +50,7 @@ namespace AutoTrader.Desktop
             {
                 return;
             }
-            Dispatcher?.BeginInvoke(() =>
+            Dispatcher?.Invoke(() =>
             {
                 if (!values.Any())
                 {

@@ -22,6 +22,7 @@ namespace AutoTrader.Traders
         {
             TargetCurrency = targetCurrency;
             AoAgent = new AoAgent(GraphCollection);
+            RsiAgent = new RsiAgent(GraphCollection);
         }
 
         protected override ITradeLogger Logger => TradeLogManager.GetLogger(BTC + "->" + TargetCurrency);
@@ -75,6 +76,7 @@ namespace AutoTrader.Traders
             LastPriceDate = lastPrice.Date;
 
             AoAgent.RefreshAll(TargetCurrency);
+            RsiAgent.RefreshAll(TargetCurrency);
 
             if (previousPrice == double.MaxValue)
             {
