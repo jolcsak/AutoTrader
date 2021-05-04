@@ -35,6 +35,11 @@ namespace AutoTrader
 
         public bool TradesVisible { get; set; }
 
+        public bool SmaBotEnabled { get; set; }
+
+        public bool RsiBotEnabled { get; set; }
+
+
         public void SetCanSave(bool canSave)
         {
             this.canSave = canSave;

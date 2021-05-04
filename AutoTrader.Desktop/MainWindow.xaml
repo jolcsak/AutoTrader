@@ -140,6 +140,7 @@
             <Label Content="Selected Currency:" FontWeight="SemiBold" Grid.Column="0"/>
             <Label x:Name="selectedCurrency" Grid.Column="1" FontWeight="Bold" HorizontalAlignment="Left"/>
             <DockPanel Grid.Column="2">
+                <Image Source="/barchart.png" DockPanel.Dock="Left" Margin="0,0,10,0" ToolTip="Graphs"/>
                 <CheckBox Content="Balance" x:Name="balanceVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Checked="Balance_Checked" Unchecked="Balance_Unchecked"/>
                 <CheckBox Content="Prices" x:Name="pricesVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Unchecked="Price_Unchecked" Checked="Price_Checked"/>
                 <CheckBox Content="Trades" x:Name="tradesVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Trades_Checked" Unchecked="Trades_Unchecked"/>
@@ -148,6 +149,12 @@
                 <CheckBox Content="Rsi" x:Name="rsiVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Rsi_Checked" Unchecked="Rsi_Unchecked" />
                 <CheckBox Content="Tendency" x:Name="tendencyVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Tendency_Checked" Unchecked="Tendency_Unchecked"/>
                 <CheckBox Content="AI prediction" x:Name="predicitionVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Prediction_Checked" Unchecked="Prediction_Unchecked"/>
+                <DockPanel HorizontalAlignment="Right" Margin="0,0,18,0">
+                    <CheckBox Content="RSI bot" x:Name="rsiBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="RsiBotEnabled_Checked" Unchecked="RsiBotEnabled_Unchecked"/>
+                    <CheckBox Content="SMA bot" x:Name="smaBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="SmaBotEnabled_Checked" Unchecked="SmaBotEnabled_Unchecked"/>
+                    <Image Source="/bot.png" Margin="0,0,5,0" ToolTip="Bots"/>
+                </DockPanel>
+
             </DockPanel>
         </Grid>
         <Canvas x:Name="graph" Margin="5,5,5,5" Grid.Row="2" RenderTransformOrigin="0.5,0.5" Grid.ColumnSpan="2">

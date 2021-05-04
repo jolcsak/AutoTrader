@@ -61,6 +61,8 @@ namespace AutoTrader.Traders
 
         public bool IsSell => Trades.LastOrDefault(t => t.Date.AddHours(1) >= DateTime.Now)?.Type == TradeType.Sell;
 
+        protected TradeSetting TradeSettings => TradeSetting.Instance;
+
 
         public GraphCollection(ITrader trader)
         {
@@ -75,12 +77,12 @@ namespace AutoTrader.Traders
             var candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateTime.Now.AddMonths(-1), DateTime.Now, 60);
 
             PastPrices = candleSticks;
-            Dates = new List<DateTime>(candleSticks.Select(cs =>cs.Date));
+            Dates = new List<DateTime>(candleSticks.Select(cs => cs.Date));
 
             smaSlowProvider = new SmaProvider(candleSticks, SMA_SLOW_SMOOTHNESS);
             smaFastProvider = new SmaProvider(candleSticks, SMA_FAST_SMOOTHNESS);
 
-            AoProvider =  new AoProvider(candleSticks);
+            AoProvider = new AoProvider(candleSticks);
             PricesSkip = PastPrices.Count - Ao.Count;
             SmaSkip = PricesSkip;
 
@@ -99,8 +101,15 @@ namespace AutoTrader.Traders
 
             Balances = Store.TotalBalances.GetTotalBalances(trader).Select(b => b.Balance).ToList();
 
-            Trades = AoAgent.RefreshAll();
-            Trades.AddRange(RsiAgent.RefreshAll());
+            Trades = new List<TradeItem>();
+            if (TradeSettings.SmaBotEnabled)
+            {
+                Trades.AddRange(AoAgent.RefreshAll());
+            }
+            if (TradeSettings.RsiBotEnabled)
+            {
+                Trades.AddRange(RsiAgent.RefreshAll());
+            }
             Trades = Trades.OrderBy(t => t.Date).ToList();
         }
     }

@@ -8,11 +8,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="barchart.png" />
+    <None Remove="bot.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MathNet.Numerics" Version="4.15.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AutoTrader\AutoTrader.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="barchart.png" />
+    <Resource Include="bot.png" />
   </ItemGroup>
 
 </Project>

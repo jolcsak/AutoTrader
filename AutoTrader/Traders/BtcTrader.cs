@@ -3,7 +3,6 @@ using System.Linq;
 using AutoTrader.Api;
 using AutoTrader.Db.Entities;
 using AutoTrader.Log;
-using AutoTrader.Traders.Agents;
 
 namespace AutoTrader.Traders
 {

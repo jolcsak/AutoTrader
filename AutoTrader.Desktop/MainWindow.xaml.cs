@@ -71,6 +71,8 @@ namespace AutoTrader.Desktop
             predicitionVisible.IsChecked = TradeSettings.AiPredicitionVisible;
             rsiVisible.IsChecked = TradeSettings.RsiVisible;
             tradesVisible.IsChecked = TradeSettings.TradesVisible;
+            smaBotEnabled.IsChecked = TradeSettings.SmaBotEnabled;
+            rsiBotEnabled.IsChecked = TradeSettings.RsiBotEnabled;
 
             TradeSettings.SetCanSave(true);
         }
@@ -281,6 +283,38 @@ namespace AutoTrader.Desktop
         {
             TradeSettings.TradesVisible = false;
             Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void SmaBotEnabled_Checked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.SmaBotEnabled = true;
+            Store.SaveSettings();
+            CurrentTrader?.GraphCollection.Refresh();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void SmaBotEnabled_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.SmaBotEnabled = false;
+            Store.SaveSettings();
+            CurrentTrader?.GraphCollection.Refresh();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void RsiBotEnabled_Checked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.RsiBotEnabled = true;
+            Store.SaveSettings();
+            CurrentTrader?.GraphCollection.Refresh();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void RsiBotEnabled_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.RsiBotEnabled = false;
+            Store.SaveSettings();
+            CurrentTrader?.GraphCollection.Refresh();
             Logger.RefreshGraph(CurrentTrader);
         }
     }
