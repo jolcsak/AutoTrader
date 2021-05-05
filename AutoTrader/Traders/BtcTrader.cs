@@ -10,7 +10,7 @@ namespace AutoTrader.Traders
     {
         public const string BTC = "BTC";
 
-        protected static double minBtcTradeAmount = 0.00025;
+        public static double MinBtcTradeAmount = 0.00025;
 
         protected double actualPrice;
         protected double actualAmount;
@@ -81,9 +81,12 @@ namespace AutoTrader.Traders
 
             changeRatio = actualPrice / previousPrice;
 
-            if (TradeSettings.CanBuy && canBuy && btcBalance >= minBtcTradeAmount)
+            if (TradeSettings.CanBuy && canBuy && btcBalance >= MinBtcTradeAmount)
             {
-                Buy(minBtcTradeAmount, actualPrice, actualAmount);
+                if (GraphCollection.IsBuy)
+                {
+                    Buy(MinBtcTradeAmount, actualPrice, actualAmount);
+                }
             }
 
             Sell(actualPrice);
@@ -94,35 +97,6 @@ namespace AutoTrader.Traders
             Logger.Info($"Change: {changeRatio}, Cur: {actualPrice} x {actualAmount}");
             Logger.LogTradeOrders(AllTradeOrders);
             Logger.LogCurrency(this, actualPrice, actualAmount);
-        }
-
-        private bool Buy(double amount, double actualPrice, double actualAmount)
-        {
-            if (GraphCollection.IsBuy)
-            {
-                Logger.Info($"Time to buy at price {actualPrice}, amount: {amount}");
-
-                if (actualAmount > amount)
-                {
-                    var orderResponse = NiceHashApi.Order(TargetCurrency + "BTC", isBuy: true, amount);
-                    if (orderResponse.state == "FULL")
-                    {
-                        var r = NiceHashApi.GetOrder(TargetCurrency + "BTC", orderResponse.orderId);
-                        if (r != null)
-                        {
-                            StoreTradeOrder(orderResponse.orderId, actualPrice, amount, r.qty, r.fee, TargetCurrency);
-                        } else
-                        {
-                            Logger.Err($"BUY: Can't query order with market: {TargetCurrency}, id: {orderResponse.orderId}");
-                        }
-                    }
-                }   
-                else
-                {
-                    Logger.Warn($"Buy cancelled because actualAmount: {actualAmount} < amount: {amount}!");
-                }
-            }
-            return true;
         }
 
         private bool Sell(double actualPrice)

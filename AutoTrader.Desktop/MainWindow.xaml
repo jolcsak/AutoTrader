@@ -69,6 +69,13 @@
                             <DataGridTextColumn Binding="{Binding Amplitude, StringFormat={}{0:N4}}" Header="Ampl" />
                             <DataGridTextColumn Binding="{Binding Order, StringFormat={}{0:N4}}" Header="Order" />
                             <DataGridTextColumn Binding="{Binding LastUpdate}" Header="Last Update" FontStyle="Italic"/>
+                            <DataGridTemplateColumn>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Click="Buy">Buy</Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
@@ -105,6 +112,13 @@
                                     <DataGridTextColumn Binding="{Binding Fee, StringFormat={}{0:N8}}" Header="Fee" />
                                     <DataGridTextColumn Binding="{Binding ActualPrice, StringFormat={}{0:N8}}" Header="Actual Price" />
                                     <DataGridTextColumn Binding="{Binding ActualYield, StringFormat={}{0:N2}%}" Header="Actual Yield" />
+                                    <DataGridTemplateColumn>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Click="Sell">Sell</Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </DockPanel>

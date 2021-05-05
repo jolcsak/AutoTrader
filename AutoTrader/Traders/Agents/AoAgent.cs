@@ -83,7 +83,7 @@ namespace AutoTrader.Traders.Agents
 
                 int j = i + graphCollection.PricesSkip;
                 Ao[i].Sell = SmaFast[j - 1].Value >= SmaSlow[j - 1].Value && SmaFast[j].Value <= SmaSlow[j].Value;
-                Ao[i].Sell |= graphCollection.SmaFast[j].CandleStick.close > lastPrice * 1.02;
+                //Ao[i].Sell |= graphCollection.SmaFast[j].CandleStick.close > lastPrice * 1.02;
                 double ratio = Ao[i].Value > 0 ? 1.15 : 1.05;
                 Ao[i].Sell &= SmaFast[j].CandleStick.close > lastPrice * ratio;
                 if (Ao[i].Sell)

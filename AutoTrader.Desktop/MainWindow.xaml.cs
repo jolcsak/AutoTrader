@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using AutoTrader.Db;
 using AutoTrader.Db.Entities;
@@ -141,12 +142,22 @@ namespace AutoTrader.Desktop
 
         private void SellAll_Click(object sender, RoutedEventArgs e)
         {
-            CurrentTrader?.SellAll(false);
+            var result = MessageBox.Show("Are you sure?", "Sell", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                CurrentTrader?.SellAll(false);
+                MessageBox.Show("All orders all sold.", "Sell", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
 
         private void SellAllProfitable_Click(object sender, RoutedEventArgs e)
         {
-            CurrentTrader?.SellAll(true);
+            var result = MessageBox.Show("Are you sure?", "Sell", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                CurrentTrader?.SellAll(true);
+                MessageBox.Show("All orders all sold.", "Sell", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
 
         private void openedOrders_SelectedCellsChanged(object sender, System.Windows.Controls.SelectedCellsChangedEventArgs e)
@@ -322,6 +333,49 @@ namespace AutoTrader.Desktop
             CurrentTrader?.GraphCollection.Refresh();
             Logger.RefreshGraph(CurrentTrader);
             Logger.LogProjectedIncome(CurrentTrader);
+        }
+
+        private void Buy(object sender, RoutedEventArgs e)
+        {
+            if (CurrentTrader != null)
+            {
+                double btcBalance = CurrentTrader.RefreshBalance();
+
+                var currency = (sender as Button).DataContext as Currency;
+                if (btcBalance >= BtcTrader.MinBtcTradeAmount)
+                {
+                    if (CurrentTrader.Buy(BtcTrader.MinBtcTradeAmount, currency.Price, currency.Amount))
+                    {
+                        CurrentTrader.RefreshBalance();
+                        Logger.LogTradeOrders(CurrentTrader.AllTradeOrders);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Buy failed! See the log.", "Buy", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Not enough balance to buy!", "Buy", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+
+        private void Sell(object sender, RoutedEventArgs e)
+        {
+            if (CurrentTrader != null)
+            {
+                var tradeOrder = (sender as Button).DataContext as TradeOrder;
+                if (CurrentTrader.Sell(tradeOrder.ActualPrice, tradeOrder))
+                {
+                    CurrentTrader.RefreshBalance();
+                    Logger.LogTradeOrders(CurrentTrader.AllTradeOrders);
+                }
+                else
+                {
+                    MessageBox.Show("Sell failed! See the log.", "Sell", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
     }
 }

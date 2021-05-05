@@ -5,7 +5,6 @@ using AutoTrader.Api;
 using AutoTrader.Db;
 using AutoTrader.Db.Entities;
 using AutoTrader.Log;
-using AutoTrader.Traders.Agents;
 
 namespace AutoTrader.Traders
 {
@@ -54,7 +53,40 @@ namespace AutoTrader.Traders
             Store.OrderBooks.Save(new TradeOrder(orderId, price, amount, targetAmount, currency, fee, TraderId));
         }
 
-        public void Sell(double actualPrice, TradeOrder tradeOrder)
+        public bool Buy(double amount, double actualPrice, double actualAmount)
+        {
+            Logger.Info($"Time to buy at price {actualPrice}, amount: {amount}");
+
+            if (actualAmount > amount)
+            {
+                var orderResponse = NiceHashApi.Order(TargetCurrency + "BTC", isBuy: true, amount);
+                if (orderResponse.state == "FULL")
+                {
+                    var r = NiceHashApi.GetOrder(TargetCurrency + "BTC", orderResponse.orderId);
+                    if (r != null)
+                    {
+                        StoreTradeOrder(orderResponse.orderId, actualPrice, amount, r.qty, r.fee, TargetCurrency);
+                        return true;
+                    }
+                    else
+                    {
+                        Logger.Err($"BUY: Can't query order with market: {TargetCurrency}, id: {orderResponse.orderId}");
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                Logger.Warn($"Buy cancelled because actualAmount: {actualAmount} < amount: {amount}!");
+                return false;
+            }
+        }   
+
+        public bool Sell(double actualPrice, TradeOrder tradeOrder)
         {
             Logger.Info($"Time to sell at price {actualPrice}, amount: {tradeOrder.TargetAmount}, buy price: {tradeOrder.Price}, sell price: {actualPrice}, yield: {actualPrice / tradeOrder.Price * 100}%");
             OrderTrade orderResponse = NiceHashApi.Order(tradeOrder.Currency + "BTC", isBuy: false, tradeOrder.TargetAmount - tradeOrder.Fee, tradeOrder.Amount);
@@ -64,7 +96,9 @@ namespace AutoTrader.Traders
                 tradeOrder.SellPrice = actualPrice;
                 tradeOrder.SellDate = DateTime.Now;
                 Store.OrderBooks.SaveOrUpdate(tradeOrder);
+                return true;
             }
+            return false;
         }
 
         public void SellAll(bool onlyProfitable)
@@ -89,7 +123,7 @@ namespace AutoTrader.Traders
 
         protected abstract double GetBalance();
 
-        protected double RefreshBalance()
+        public double RefreshBalance()
         {
             var balance = GetBalance();
             Logger.LogBalance(balance);
