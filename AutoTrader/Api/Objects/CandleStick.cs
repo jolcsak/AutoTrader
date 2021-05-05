@@ -14,5 +14,20 @@ namespace AutoTrader.Api.Objects
         public int count { get; set; }
 
         public DateTime Date => NiceHashApi.UnixTimestampToDateTime(time);
+
+        public CandleStick Clone()
+        {
+            return new CandleStick
+            {
+                time = time,
+                open = open,
+                close = close,
+                low = low,
+                high = high,
+                volume = volume,
+                quote_volume = quote_volume,
+                count = count
+            };
+        }
     }
 }

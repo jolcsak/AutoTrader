@@ -40,7 +40,7 @@ namespace AutoTrader.GraphProviders
         /// </summary>
         /// <see cref="http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_averages"/>
         /// <returns></returns>
-        public void Calculate()
+        public IList<EmaValue> Calculate()
         {
             var multiplier = !this.Wilder ? (2.0 / (double)(Period + 1)) : (1.0 / (double)Period);
 
@@ -111,6 +111,7 @@ namespace AutoTrader.GraphProviders
                     Ema.Add(null);
                 }
             }
+            return Ema;
         }
     }
 }
