@@ -230,7 +230,7 @@ namespace AutoTrader.Desktop
                 }
                 if (TradeSettings.PriceGraphVisible)
                 {
-                    new ValueGraph<ValueBase>(graph, "Prices", graphCollection.PastPrices.Select(p => new ValueBase { Value = p.close, CandleStick = p }).ToList(), Colors.DarkGray, showPoints: false).Draw(graphCollection.PricesSkip, null, 0, TradeSettings.TradesVisible ? graphCollection.Trades : null);
+                    new ValueGraph<ValueBase>(graph, "Prices", graphCollection.PastPrices.Select(p => new ValueBase { Value = p.close, CandleStick = p }).ToList(), Colors.DarkGray, showPoints: false).Draw(graphCollection.PricesSkip, null, 0, TradeSettings.TradesVisible ? graphCollection.Trades : null, TradeSettings.TradesVisible ? trader.TradeOrders : null);
                 }
                 if (TradeSettings.SmaGraphVisible)
                 {
@@ -244,6 +244,7 @@ namespace AutoTrader.Desktop
                 }
 
                 new DateGraph(graph, graphCollection.Dates).Draw(graphCollection.PricesSkip);
+
                 if (graphCollection.Balances.Count > 0)
                 {
                     if (TradeSettings.BalanceGraphVisible)

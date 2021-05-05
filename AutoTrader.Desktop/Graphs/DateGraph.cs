@@ -72,7 +72,7 @@ namespace AutoTrader.Desktop
                         double xt = currentX - textBlock.ActualWidth / 2;
                         Canvas.SetLeft(textBlock, xt);
                         Canvas.SetTop(textBlock, y);
-                        graph.Children.Add(textBlock);                        
+                        graph.Children.Add(textBlock);
                         previousDate = value;
                     }
 

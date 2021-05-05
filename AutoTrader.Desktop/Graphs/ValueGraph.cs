@@ -1,4 +1,6 @@
-﻿using AutoTrader.GraphProviders;
+﻿using AutoTrader.Db.Entities;
+using AutoTrader.Desktop.Graphs;
+using AutoTrader.GraphProviders;
 using AutoTrader.Traders.Agents;
 using System;
 using System.Collections.Generic;
@@ -52,7 +54,7 @@ namespace AutoTrader.Desktop
             lineBrush.Freeze();
         }
 
-        public Tuple<double?, double> Draw(int skip, double? fixedCheight = null, double fixedMinValue = 0, IList<TradeItem> trades = null)
+        public Tuple<double?, double> Draw(int skip, double? fixedCheight = null, double fixedMinValue = 0, IList<TradeItem> trades = null, IList<TradeOrder> tradeOrders = null)
         {
             double? cHeight = null;
             if (!values.Any() || values.Any(v => double.IsNaN(v.Value)))
@@ -98,30 +100,28 @@ namespace AutoTrader.Desktop
                 currentX = 0;
                 int i = 0;
                 var rotate = new RotateTransform(45);
+                DateTime previousDate = drawValues.First().CandleStick.Date;
+                T lastValue = drawValues.Last();
                 foreach (T value in drawValues)
                 {
+                    double y = (value.Value - minValue) * cHeight.Value;
+
+                    DateTime currenDate = value.CandleStick.Date;
                     RotateTransform currentTransform = null;
                     var tradeValue = value as TradeValueBase;
 
                     var tradeItem = trades?.FirstOrDefault(ti => ti.Date == value.CandleStick.Date);
+                    var tradeOrder =
+                        value == lastValue ?
+                            tradeOrders?.FirstOrDefault(to => to.BuyDate >= previousDate && to.BuyDate > value.CandleStick.Date) :
+                            tradeOrders?.FirstOrDefault(to => to.BuyDate >= previousDate && to.BuyDate <= value.CandleStick.Date);
+
+                    DrawTradeOrder(height, currentX, y, tradeOrder);
 
                     if (tradeValue?.IsBuy == true || tradeValue?.IsSell == true || showPoints || tradeItem != null)
                     {
                         Brush currentBrush = pointFillBrush;
-                        double y = (value.Value - minValue) * cHeight.Value;
-                        string prefix = "";
-                        if (tradeValue?.IsBuy == true || tradeItem?.Type == TradeType.Buy)
-                        {
-                            currentBrush = buyBrush;
-                            prefix = "Buy at";
-                            currentTransform = rotate;
-                        }
-                        if (tradeValue?.IsSell == true || tradeItem?.Type == TradeType.Sell)
-                        {
-                            currentBrush = sellBrush;
-                            prefix = "Sell at";
-                        }
-
+                        string prefix = GetSellBuyPrefix(rotate, ref currentTransform, tradeValue, tradeItem, ref currentBrush);
                         var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = currentBrush, Width = pointWidth, Height = pointWidth, ToolTip = prefix + " " + value.Value.ToString(toolTipFormat) };
                         rect.RenderTransformOrigin = new Point(0.5, 0.5);
                         Canvas.SetLeft(rect, currentX - halfPointSize);
@@ -134,9 +134,61 @@ namespace AutoTrader.Desktop
                     }
                     currentX += cWidth;
                     i++;
+                    previousDate = currenDate;
                 }
             });
             return new Tuple<double?, double>(cHeight, minValue);
+        }
+
+        private static string GetSellBuyPrefix(RotateTransform rotate, ref RotateTransform currentTransform, TradeValueBase tradeValue, TradeItem tradeItem, ref Brush currentBrush)
+        {
+            string prefix = "";
+            if (tradeValue?.IsBuy == true || tradeItem?.Type == TradeType.Buy)
+            {
+                currentBrush = buyBrush;
+                prefix = "Buy at";
+                currentTransform = rotate;
+            }
+            if (tradeValue?.IsSell == true || tradeItem?.Type == TradeType.Sell)
+            {
+                currentBrush = sellBrush;
+                prefix = "Sell at";
+            }
+
+            return prefix;
+        }
+
+        private void DrawTradeOrder(double height, double currentX, double y, TradeOrder tradeOrder)
+        {
+            if (tradeOrder != null)
+            {
+                Brush currentBrush = pointFillBrush;
+                string operation = string.Empty;
+                string prefix = string.Empty;
+                if (tradeOrder.Type == TradeOrderType.OPEN)
+                {
+                    operation = "Buy";
+                    prefix = "B";
+                    currentBrush = buyBrush;
+                }
+                else
+                if (tradeOrder.Type == TradeOrderType.CLOSED)
+                {
+                    operation = "Sell";
+                    prefix = "S";
+                    currentBrush = sellBrush;
+                }
+
+                var orderTooltip = operation + " at " + tradeOrder.Price.ToString(toolTipFormat);
+                double ly = height - y;
+                var orderLine = new Line { Stroke = currentBrush, StrokeThickness = lineWeight, X1 = currentX, Y1 = ly, X2 = currentX, Y2 = ly - 20, ToolTip = orderTooltip };
+                graph.Children.Add(orderLine);
+
+                OutlinedText textBlock = new OutlinedText { Text = prefix, Stroke = pointOutlineBrush, Fill = currentBrush, StrokeThickness = 1, FontSize = 14, Bold = true, ToolTip = orderTooltip };
+                Canvas.SetLeft(textBlock, currentX - 5);
+                Canvas.SetTop(textBlock, ly - 30);
+                graph.Children.Add(textBlock);
+            }
         }
     }
 }
