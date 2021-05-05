@@ -7,7 +7,6 @@ using Newtonsoft.Json;
 
 namespace AutoTrader.Api
 {
-
     public class NiceHashApi
     {
         private static string TEST_URL_ROOT = "https://api-test.nicehash.com";

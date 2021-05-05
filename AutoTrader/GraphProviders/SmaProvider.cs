@@ -17,7 +17,7 @@ namespace AutoTrader.GraphProviders
 
         public SmaProvider(IList<CandleStick> data, int period = 8) : this(period)
         {
-            this.Data = data;
+            Data = data;
             Calculate();
         }
 
