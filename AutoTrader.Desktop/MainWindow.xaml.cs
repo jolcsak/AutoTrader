@@ -348,6 +348,7 @@ namespace AutoTrader.Desktop
                     {
                         CurrentTrader.RefreshBalance();
                         Logger.LogTradeOrders(CurrentTrader.AllTradeOrders);
+                        MessageBox.Show($"{BtcTrader.MinBtcTradeAmount} {currency.Name} bought at price {currency.Price:N8}.", "Sell", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     else
                     {
@@ -370,6 +371,7 @@ namespace AutoTrader.Desktop
                 {
                     CurrentTrader.RefreshBalance();
                     Logger.LogTradeOrders(CurrentTrader.AllTradeOrders);
+                    MessageBox.Show($"Order sold at price {tradeOrder.ActualPrice:N8}.", "Sell", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
