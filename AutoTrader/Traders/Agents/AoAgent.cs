@@ -12,6 +12,10 @@ namespace AutoTrader.Traders.Agents
         protected GraphCollection graphCollection;
         protected IList<AoValue> Ao => graphCollection.Ao;
 
+        protected IList<SmaValue> SmaSlow => graphCollection.SmaSlow;
+
+        protected IList<SmaValue> SmaFast => graphCollection.SmaFast;
+
         protected SmaProvider SlowSmaProvider => graphCollection.AoProvider.SlowSmaProvider;
         protected SmaProvider FastSmaProvider => graphCollection.AoProvider.FastSmaProvider;
 
@@ -42,12 +46,13 @@ namespace AutoTrader.Traders.Agents
             if (i >= 2)
             {
                 int j = i + graphCollection.PricesSkip;
-                Ao[i].Buy = graphCollection.SmaFast[j - 1].Value <= graphCollection.SmaSlow[j - 1].Value && graphCollection.SmaFast[j].Value >= graphCollection.SmaSlow[j].Value;
-                double ratio = Ao[i].Value < 0 ? 1.1 : 1.01;
-                Ao[i].Buy &= graphCollection.SmaFast[j].Value * ratio < lastPrice;
+                Ao[i].Buy = SmaFast[j - 1].Value <= SmaSlow[j - 1].Value && SmaFast[j].Value >= SmaSlow[j].Value;                
+                double ratio = Ao[i].Value < 0 ? 1.15 : 1.05;
+                Ao[i].Buy &= SmaFast[j].CandleStick.close * ratio < lastPrice;
+                Ao[i].Buy &= SmaSlow[j].Value < SmaSlow[j-1].Value;
                 if (Ao[i].Buy)
                 {
-                    lastPrice = graphCollection.SmaFast[j].Value;
+                    lastPrice = SmaFast[j].CandleStick.close;
                     return true;
                 }
 
@@ -77,12 +82,13 @@ namespace AutoTrader.Traders.Agents
             {
 
                 int j = i + graphCollection.PricesSkip;
-                Ao[i].Sell = graphCollection.SmaFast[j - 1].Value >= graphCollection.SmaSlow[j - 1].Value && graphCollection.SmaFast[j].Value <= graphCollection.SmaSlow[j].Value;
-                double ratio = Ao[i].Value > 0 ? 1.1 : 1.01;
-                Ao[i].Sell &= graphCollection.SmaFast[j].Value > lastPrice * ratio;
+                Ao[i].Sell = SmaFast[j - 1].Value >= SmaSlow[j - 1].Value && SmaFast[j].Value <= SmaSlow[j].Value;
+                Ao[i].Sell |= graphCollection.SmaFast[j].CandleStick.close > lastPrice * 1.02;
+                double ratio = Ao[i].Value > 0 ? 1.15 : 1.05;
+                Ao[i].Sell &= SmaFast[j].CandleStick.close > lastPrice * ratio;
                 if (Ao[i].Sell)
                 {
-                    lastPrice = graphCollection.SmaFast[j].Value;
+                    lastPrice = SmaFast[j].CandleStick.close;
                     return true;
                 }
 
@@ -112,18 +118,21 @@ namespace AutoTrader.Traders.Agents
             previousSellMoreSma = 0;
             priceChange = 0;
             List<TradeItem> tradeItems = new List<TradeItem>();
-            for (int i = 0; i < Ao.Count; i++)
-            {
-                bool isBuy = false;
-                bool isSell = Sell(i);
-                if (!isSell)
+            if (Ao.Count > 0) {
+                lastPrice = Ao[0].CandleStick.close;
+                for (int i = 0; i < Ao.Count; i++)
                 {
-                    isBuy = Buy(i);
-                }
+                    bool isBuy = false;
+                    bool isSell = Sell(i);
+                    if (!isSell)
+                    {
+                        isBuy = Buy(i);
+                    }
 
-                if (isBuy || isSell)
-                {
-                    tradeItems.Add(new TradeItem(Ao[i].CandleStick.Date, Ao[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell));
+                    if (isBuy || isSell)
+                    {
+                        tradeItems.Add(new TradeItem(Ao[i].CandleStick.Date, Ao[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell));
+                    }
                 }
             }
             return tradeItems;

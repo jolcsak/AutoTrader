@@ -234,8 +234,8 @@ namespace AutoTrader.Desktop
                 }
                 if (TradeSettings.SmaGraphVisible)
                 {
-                    var ret = new ValueGraph<SmaValue>(graph, "Fast Simple Moving Average", graphCollection.SmaFast, Colors.Blue, showPoints: true).Draw(graphCollection.SmaSkip);
-                    new ValueGraph<SmaValue>(graph, "Slow Simple Moving Average", graphCollection.SmaSlow, Colors.LightBlue, showPoints: true).Draw(graphCollection.SmaSkip, ret.Item1, ret.Item2);
+                    var ret = new ValueGraph<SmaValue>(graph, "Fast Simple Moving Average", graphCollection.SmaFast, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
+                    new ValueGraph<SmaValue>(graph, "Slow Simple Moving Average", graphCollection.SmaSlow, Colors.LightBlue, showPoints: false).Draw(graphCollection.SmaSkip, ret.Item1, ret.Item2);
                 }
 
                 if (TradeSettings.RsiVisible)

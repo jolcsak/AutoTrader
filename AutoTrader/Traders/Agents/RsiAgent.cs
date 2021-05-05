@@ -25,7 +25,7 @@ namespace AutoTrader.Traders.Agents
         {
             if (i > 0)
             {
-                Rsi[i].IsBuy = Rsi[i - 1].Value < OVERSOLD && Rsi[i].Value > OVERSOLD;
+                Rsi[i].IsBuy = Rsi[i - 1].Value > OVERSOLD && Rsi[i].Value < OVERSOLD;
             }
             return Rsi[i].IsBuy;
         }
@@ -34,7 +34,7 @@ namespace AutoTrader.Traders.Agents
         {
             if (i > 0)
             {
-                Rsi[i].IsSell = Rsi[i - 1].Value > OVERBOUGHT && Rsi[i].Value < OVERBOUGHT;
+                Rsi[i].IsSell = Rsi[i - 1].Value < OVERBOUGHT && Rsi[i].Value > OVERBOUGHT;
             }
             return Rsi[i].IsSell;
         }

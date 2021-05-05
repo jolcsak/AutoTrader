@@ -135,7 +135,7 @@ namespace AutoTrader.Traders
                     {
                         double transactionMoney = amount * trade.Price;
                         money -= transactionMoney;
-                        tradeItems.Add(new TradeOrder(Guid.NewGuid().ToString(), trade.Price, amount, amount, "CUR", 0, "TRADER"));
+                        tradeItems.Add(new TradeOrder("", trade.Price, amount, amount, "CUR", 0, "TRADER"));
                     }
                 }
                 else if (trade.Type == TradeType.Sell)
