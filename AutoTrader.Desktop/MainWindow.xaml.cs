@@ -156,7 +156,7 @@ namespace AutoTrader.Desktop
             if (result == MessageBoxResult.Yes)
             {
                 CurrentTrader?.SellAll(true);
-                MessageBox.Show("All orders all sold.", "Sell", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("All profitable orders all sold.", "Sell", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
