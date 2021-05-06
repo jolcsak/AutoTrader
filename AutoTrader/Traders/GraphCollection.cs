@@ -15,8 +15,13 @@ namespace AutoTrader.Traders
     public class GraphCollection
     {
         public const int RSI_PERIOD = 14;
+        
         private const int SMA_FAST_SMOOTHNESS = 5;
         private const int SMA_SLOW_SMOOTHNESS = 9;
+
+        private const int EMA_FAST = 13;
+        private const int EMA_SLOW = 21;
+        private const int MACD_SIGNAL = 5;
 
         private ITrader trader;
 
@@ -24,8 +29,9 @@ namespace AutoTrader.Traders
         protected SmaProvider smaFastProvider;
 
         public RsiProvider RsiProvider { get; private set; }
-
         public AoProvider AoProvider { get; private set; }
+
+        public MacdProvider MacdProvider { get; private set; }
 
         protected virtual ITradeLogger Logger => TradeLogManager.GetLogger(GetType());
         protected static Store Store => Store.Instance;
@@ -90,6 +96,7 @@ namespace AutoTrader.Traders
             SmaSkip = PricesSkip;
 
             RsiProvider = new RsiProvider(PastPrices, RSI_PERIOD);
+            MacdProvider = new MacdProvider(PastPrices, EMA_FAST, EMA_SLOW, MACD_SIGNAL);
 
             double amplitude = AoProvider.Amplitude;
             if (!double.IsNaN(amplitude))

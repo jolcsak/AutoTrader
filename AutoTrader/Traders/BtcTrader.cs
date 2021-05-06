@@ -56,10 +56,10 @@ namespace AutoTrader.Traders
         {
             double btcBalance = RefreshBalance();
 
-            if (btcBalance == 0)
-            {
-                return;
-            }
+            //if (btcBalance == 0)
+            //{
+            //    return;
+            //}
 
             var lastPrice = Store.LastPrices.GetLastPriceForTrader(this);
 
@@ -85,7 +85,7 @@ namespace AutoTrader.Traders
             {
                 if (GraphCollection.IsBuy)
                 {
-                    Buy(MinBtcTradeAmount, actualPrice, actualAmount);
+                   // Buy(MinBtcTradeAmount, actualPrice, actualAmount);
                 }
             }
 

@@ -33,6 +33,9 @@ namespace AutoTrader
 
         public bool RsiVisible { get; set; }
 
+        public bool MacdVisible { get; set; }
+
+
         public bool TradesVisible { get; set; }
 
         public bool SmaBotEnabled { get; set; }

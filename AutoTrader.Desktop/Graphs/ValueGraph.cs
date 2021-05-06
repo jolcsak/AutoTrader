@@ -57,7 +57,7 @@ namespace AutoTrader.Desktop
         public Tuple<double?, double> Draw(int skip, double? fixedCheight = null, double fixedMinValue = 0, IList<TradeItem> trades = null, IList<TradeOrder> tradeOrders = null)
         {
             double? cHeight = null;
-            if (!values.Any() || values.Any(v => double.IsNaN(v.Value)))
+            if (!values.Any() || values.Any(v => v != null && double.IsNaN(v.Value)))
             {
                 return new Tuple<double?, double> (cHeight, 0);
             }

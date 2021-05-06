@@ -74,6 +74,7 @@ namespace AutoTrader.Desktop
             tradesVisible.IsChecked = TradeSettings.TradesVisible;
             smaBotEnabled.IsChecked = TradeSettings.SmaBotEnabled;
             rsiBotEnabled.IsChecked = TradeSettings.RsiBotEnabled;
+            macdVisible.IsChecked = TradeSettings.MacdVisible;
 
             TradeSettings.SetCanSave(true);
         }
@@ -378,6 +379,20 @@ namespace AutoTrader.Desktop
                     MessageBox.Show("Sell failed! See the log.", "Sell", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+        }
+
+        private void Macd_Checked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.MacdVisible = true;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
+        }
+
+        private void Macd_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.MacdVisible = false;
+            Store.SaveSettings();
+            Logger.RefreshGraph(CurrentTrader);
         }
     }
 }

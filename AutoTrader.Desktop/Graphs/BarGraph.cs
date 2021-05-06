@@ -11,11 +11,11 @@ using Color = System.Windows.Media.Color;
 
 namespace AutoTrader.Desktop
 {
-    public class BarGraph
+    public class BarGraph<T> where T : ValueBase
     {
         private Canvas graph;
 
-        private IList<AoValue> values;
+        private IList<T> values;
         private string graphName;
         private string toolTipFormat = "N10";
 
@@ -23,19 +23,21 @@ namespace AutoTrader.Desktop
         SolidColorBrush sellFillColor;
         private static SolidColorBrush pointFillRedBrush = new SolidColorBrush { Color = Colors.Red };
         private static SolidColorBrush pointFillGreenBrush = new SolidColorBrush { Color = Colors.Green };
+        private static SolidColorBrush pointFillBrush = new SolidColorBrush { Color = Colors.DimGray };
         protected Dispatcher Dispatcher => Application.Current?.Dispatcher;
 
         static BarGraph()
         {
             pointFillRedBrush.Freeze();
             pointFillGreenBrush.Freeze();
+            pointFillBrush.Freeze();
         }
 
-        public BarGraph(Canvas graph, string graphName, IList<AoValue> values, Color buyColor, Color sellColor)
+        public BarGraph(Canvas graph, string graphName, IList<T> values, Color buyColor, Color sellColor)
         {
             this.graph = graph;
-            this.values = values;
             this.graphName = graphName;
+            this.values = values;
 
             buyFillColor = new SolidColorBrush { Color = buyColor };
             sellFillColor = new SolidColorBrush { Color = sellColor };
@@ -44,20 +46,21 @@ namespace AutoTrader.Desktop
             sellFillColor.Freeze();
         }
 
-        public void Draw(double xOffset = 0)
+        public void Draw(int skip = 0)
         {
-            if (!values.Any())
+            var drawValues = values.Skip(skip);
+            if (!drawValues.Any())
             {
                 return;
             }
             Dispatcher?.Invoke(() =>
             {
-                if (!values.Any())
+                if (!drawValues.Any())
                 {
                     return;
                 }
-                double maxValue = values.Max(v => v.Value);
-                double minValue = values.Min(v => v.Value);
+                double maxValue = drawValues.Max(v => v.Value);
+                double minValue = drawValues.Min(v => v.Value);
                 if (maxValue == minValue)
                 {
                     return;
@@ -67,13 +70,13 @@ namespace AutoTrader.Desktop
                 double height = graph.ActualHeight;
                 double zeroY = height / 2;
                 double priceHeight = maxValue - minValue;
-                double priceWidth = values.Count - 1;
+                double priceWidth = drawValues.Count() - 1;
                 double cWidth = width / priceWidth;                
                 double cHeight = Math.Abs(minValue) > Math.Abs(maxValue) ? zeroY / Math.Abs(minValue) : zeroY / Math.Abs(maxValue);
                 double rectWidth = cWidth < 1 ? 1 : cWidth;
                 double currentX = 0;
                 int i = 0;    
-                foreach (AoValue value in values)
+                foreach (T value in drawValues)
                 {
                     SetAttributes(buyFillColor, sellFillColor, pointFillRedBrush, pointFillGreenBrush, value, out var fill, out var toolTip);
 
@@ -104,21 +107,31 @@ namespace AutoTrader.Desktop
             });
         }
 
-        private void SetAttributes(SolidColorBrush buyFillColor, SolidColorBrush sellFillColor, SolidColorBrush pointFillRedBrush, SolidColorBrush pointFillGreenBrush, AoValue value, out Brush fill, out string toolTip)
+        private void SetAttributes(SolidColorBrush buyFillColor, SolidColorBrush sellFillColor, SolidColorBrush pointFillRedBrush, SolidColorBrush pointFillGreenBrush, T value, out Brush fill, out string toolTip)
         {
-            if (value.Buy)
+            AoValue aoValue = value as AoValue;
+
+            if (aoValue != null)
             {
-                fill = buyFillColor;
-                toolTip = $"Buy at: {value.Value.ToString(toolTipFormat)}";
-            }
-            else if (value.Sell)
-            {
-                fill = sellFillColor;
-                toolTip = $"Sell at: {value.Value.ToString(toolTipFormat)}";
+                if (aoValue.Buy)
+                {
+                    fill = buyFillColor;
+                    toolTip = $"Buy at: {value.Value.ToString(toolTipFormat)}";
+                }
+                else if (aoValue.Sell)
+                {
+                    fill = sellFillColor;
+                    toolTip = $"Sell at: {value.Value.ToString(toolTipFormat)}";
+                }
+                else
+                {
+                    fill = aoValue.Color == AoColor.Red ? pointFillRedBrush : pointFillGreenBrush;
+                    toolTip = value.Value.ToString(toolTipFormat);
+                }
             }
             else
             {
-                fill = value.Color == AoColor.Red ? pointFillRedBrush : pointFillGreenBrush;
+                fill = pointFillBrush;
                 toolTip = value.Value.ToString(toolTipFormat);
             }
         }

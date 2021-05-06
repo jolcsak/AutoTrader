@@ -29,7 +29,6 @@ namespace AutoTrader.GraphProviders
             Wilder = wilder;
             ColumnType = columnType;
             Data = data;
-            Calculate();
         }
 
         /// <summary>
@@ -42,7 +41,7 @@ namespace AutoTrader.GraphProviders
         /// <returns></returns>
         public IList<EmaValue> Calculate()
         {
-            var multiplier = !this.Wilder ? (2.0 / (double)(Period + 1)) : (1.0 / (double)Period);
+            var multiplier = !Wilder ? (2.0 / (double)(Period + 1)) : (1.0 / (double)Period);
 
             for (int i = 0; i < Data.Count; i++)
             {
