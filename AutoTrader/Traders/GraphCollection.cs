@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoTrader.Api;
 using AutoTrader.Api.Objects;
 using AutoTrader.Db;
@@ -88,21 +89,26 @@ namespace AutoTrader.Traders
             PastPrices = candleSticks;
             Dates = new List<DateTime>(candleSticks.Select(cs => cs.Date));
 
-            smaSlowProvider = new SmaProvider(candleSticks, SMA_SLOW_SMOOTHNESS);
-            smaFastProvider = new SmaProvider(candleSticks, SMA_FAST_SMOOTHNESS);
+            var tasks = new List<Task>
+            {
+                Task.Factory.StartNew(() => smaSlowProvider = new SmaProvider(candleSticks, SMA_SLOW_SMOOTHNESS)),
+                Task.Factory.StartNew(() => smaFastProvider = new SmaProvider(candleSticks, SMA_FAST_SMOOTHNESS)),
+                Task.Factory.StartNew(() => AoProvider = new AoProvider(candleSticks)),
+                Task.Factory.StartNew(() => RsiProvider = new RsiProvider(PastPrices, RSI_PERIOD)),
+                Task.Factory.StartNew(() => MacdProvider = new MacdProvider(PastPrices, EMA_FAST, EMA_SLOW, MACD_SIGNAL)),
+            };
+            Task.WaitAll(tasks.ToArray());
 
-            AoProvider = new AoProvider(candleSticks);
             PricesSkip = PastPrices.Count - Ao.Count;
             SmaSkip = PricesSkip;
 
-            RsiProvider = new RsiProvider(PastPrices, RSI_PERIOD);
-            MacdProvider = new MacdProvider(PastPrices, EMA_FAST, EMA_SLOW, MACD_SIGNAL);
+            tasks.Clear();
 
             double amplitude = AoProvider.Amplitude;
             if (!double.IsNaN(amplitude))
             {
                 var filter = OnlineFilter.CreateLowpass(ImpulseResponse.Finite, 50, amplitude);
-                Tendency = filter.ProcessSamples(PastPrices.Select(pp => pp.close).ToArray());
+                tasks.Add(Task.Factory.StartNew(() => Tendency = filter.ProcessSamples(PastPrices.Select(pp => pp.close).ToArray())));
             }
             else
             {
@@ -112,15 +118,22 @@ namespace AutoTrader.Traders
             Balances = Store.TotalBalances.GetTotalBalances(trader).Select(b => b.Balance).ToList();
 
             Trades = new List<TradeItem>();
+            List<TradeItem> aoTrades = new List<TradeItem>();
+            List<TradeItem> rsiTrades = new List<TradeItem>();
+
             if (TradeSettings.SmaBotEnabled)
             {
-                Trades.AddRange(AoAgent.RefreshAll());
+                tasks.Add(Task.Factory.StartNew(() => aoTrades = AoAgent.RefreshAll()));
             }
             if (TradeSettings.RsiBotEnabled)
             {
-                Trades.AddRange(RsiAgent.RefreshAll());
+                tasks.Add(Task.Factory.StartNew(() => rsiTrades = RsiAgent.RefreshAll()));
             }
 
+            Task.WaitAll(tasks.ToArray());
+
+            Trades.AddRange(aoTrades);
+            Trades.AddRange(rsiTrades);
             Trades = Trades.OrderBy(t => t.Date).ToList();
         }
 
