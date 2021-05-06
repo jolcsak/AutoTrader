@@ -1,7 +1,7 @@
 ﻿using AutoTrader.Db.Entities;
 using AutoTrader.Desktop.Graphs;
-using AutoTrader.GraphProviders;
-using AutoTrader.Traders.Agents;
+using AutoTrader.Indicators;
+using AutoTrader.Traders.Bots;
 using System;
 using System.Collections.Generic;
 using System.Linq;

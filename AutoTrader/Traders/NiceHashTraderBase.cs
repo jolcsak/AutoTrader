@@ -10,8 +10,6 @@ namespace AutoTrader.Traders
 {
     public abstract class NiceHashTraderBase : ITrader
     {
-        private const string FIAT = "HUF";
-
         protected static NiceHashApi NiceHashApi => NiceHashApi.Instance;
 
         protected static Store Store => Store.Instance;
@@ -26,17 +24,17 @@ namespace AutoTrader.Traders
 
         public virtual IList<TradeOrder> AllTradeOrders => Store.OrderBooks.GetAllOrders(this);
 
-        public GraphCollection GraphCollection { get; }
-        public double Frequency => GraphCollection.AoProvider.Frequency;
-        public double Amplitude => GraphCollection.AoProvider.Amplitude;
-        public double Order => GraphCollection.AoProvider != null ? GraphCollection.AoProvider.Frequency * GraphCollection.AoProvider.Amplitude : 0;
+        public TradingBotManager BotManager { get; }
+        public double Frequency => BotManager.AoProvider.Frequency;
+        public double Amplitude => BotManager.AoProvider.Amplitude;
+        public double Order => BotManager.AoProvider != null ? BotManager.AoProvider.Frequency * BotManager.AoProvider.Amplitude : 0;
         public DateTime LastPriceDate { get; set; } = DateTime.MinValue;
 
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 
         public NiceHashTraderBase()
         {
-            GraphCollection = new GraphCollection(this);
+            BotManager = new TradingBotManager(this);
         }
 
         public virtual void Trade(bool canBuy)

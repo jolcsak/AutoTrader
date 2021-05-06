@@ -7,7 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 using AutoTrader.Db.Entities;
-using AutoTrader.GraphProviders;
+using AutoTrader.Indicators;
 using AutoTrader.Log;
 using AutoTrader.Traders;
 
@@ -196,7 +196,7 @@ namespace AutoTrader.Desktop
                    }
                    else
                    {
-                       currencyInst.Refresh(price, amount, trader.GraphCollection.MinPeriodPrice, trader.GraphCollection.MaxPeriodPrice, trader.Frequency, trader.Amplitude, trader.Order, trader.LastPriceDate);
+                       currencyInst.Refresh(price, amount, trader.BotManager.MinPeriodPrice, trader.BotManager.MaxPeriodPrice, trader.Frequency, trader.Amplitude, trader.Order, trader.LastPriceDate);
                    }
                });
 
@@ -213,16 +213,16 @@ namespace AutoTrader.Desktop
             {
                 Dispatcher?.Invoke(() => graph.Children.Clear());
 
-                GraphCollection graphCollection = trader.GraphCollection;
+                TradingBotManager botManager = trader.BotManager;
 
                 if (TradeSettings.AoGraphVisible)
                 {
-                    new BarGraph<AoValue>(graph, "Awesome Oscillator", graphCollection.Ao, Colors.Yellow, Colors.Blue).Draw();
+                    new BarGraph<AoValue>(graph, "Awesome Oscillator", botManager.Ao, Colors.Yellow, Colors.Blue).Draw();
                 }
 
                 if (TradeSettings.TendencyGraphVisible)
                 {
-                    new Graph(graph, "Tendency", graphCollection.Tendency, Colors.Orange, showPoints: false).Draw(84);
+                    new Graph(graph, "Tendency", botManager.Tendency, Colors.Orange, showPoints: false).Draw(84);
                 }
 
                 if (TradeSettings.AiPredicitionVisible)
@@ -231,36 +231,36 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.PriceGraphVisible)
                 {
-                    new ValueGraph<ValueBase>(graph, "Prices", graphCollection.PastPrices.Select(p => new ValueBase { Value = p.close, CandleStick = p }).ToList(), Colors.DarkGray, showPoints: false).
-                        Draw(graphCollection.PricesSkip, null, 0, TradeSettings.TradesVisible ? graphCollection.Trades : null, TradeSettings.TradesVisible ? trader.TradeOrders : null);
+                    new ValueGraph<ValueBase>(graph, "Prices", botManager.PastPrices.Select(p => new ValueBase { Value = p.close, CandleStick = p }).ToList(), Colors.DarkGray, showPoints: false).
+                        Draw(botManager.PricesSkip, null, 0, TradeSettings.TradesVisible ? botManager.Trades : null, TradeSettings.TradesVisible ? trader.TradeOrders : null);
                 }
                 if (TradeSettings.SmaGraphVisible)
                 {
-                    var ret = new ValueGraph<SmaValue>(graph, "Fast Simple Moving Average", graphCollection.SmaFast, Colors.Blue, showPoints: false).Draw(graphCollection.SmaSkip);
-                    new ValueGraph<SmaValue>(graph, "Slow Simple Moving Average", graphCollection.SmaSlow, Colors.LightBlue, showPoints: false).Draw(graphCollection.SmaSkip, ret.Item1, ret.Item2);
+                    var ret = new ValueGraph<SmaValue>(graph, "Fast Simple Moving Average", botManager.SmaFast, Colors.Blue, showPoints: false).Draw(botManager.SmaSkip);
+                    new ValueGraph<SmaValue>(graph, "Slow Simple Moving Average", botManager.SmaSlow, Colors.LightBlue, showPoints: false).Draw(botManager.SmaSkip, ret.Item1, ret.Item2);
                 }
 
                 if (TradeSettings.RsiVisible)
                 {
-                    new ValueGraph<RsiValue>(graph, "Relative Strength Index", graphCollection.Rsi, Colors.DarkViolet).Draw(graphCollection.SmaSkip - GraphCollection.RSI_PERIOD);
+                    new ValueGraph<RsiValue>(graph, "Relative Strength Index", botManager.Rsi, Colors.DarkViolet).Draw(botManager.SmaSkip - TradingBotManager.RSI_PERIOD);
                 }
 
                 if (TradeSettings.MacdVisible)
                 {
-                    new BarGraph<MacdHistogramValue>(graph, "MACD Histogram", graphCollection.MacdProvider.Result.Histogram, Colors.Yellow, Colors.Blue).Draw(graphCollection.PricesSkip);
-                    new ValueGraph<EmaValue>(graph, "MACD Signal", graphCollection.MacdProvider.Result.Signal, Colors.DarkViolet).Draw(graphCollection.PricesSkip);
-                    new ValueGraph<MacdLineValue>(graph, "MACD Line", graphCollection.MacdProvider.Result.Line, Colors.Orange).Draw(graphCollection.PricesSkip);
+                    new BarGraph<MacdHistogramValue>(graph, "MACD Histogram", botManager.MacdProvider.Result.Histogram, Colors.Yellow, Colors.Blue).Draw(botManager.PricesSkip);
+                    new ValueGraph<EmaValue>(graph, "MACD Signal", botManager.MacdProvider.Result.Signal, Colors.DarkViolet).Draw(botManager.PricesSkip);
+                    new ValueGraph<MacdLineValue>(graph, "MACD Line", botManager.MacdProvider.Result.Line, Colors.Orange).Draw(botManager.PricesSkip);
                 }
 
-                new DateGraph(graph, graphCollection.Dates).Draw(graphCollection.PricesSkip);
+                new DateGraph(graph, botManager.Dates).Draw(botManager.PricesSkip);
 
-                if (graphCollection.Balances.Count > 0)
+                if (botManager.Balances.Count > 0)
                 {
                     if (TradeSettings.BalanceGraphVisible)
                     {
-                        new Graph(graph, "Total balance", graphCollection.Balances, Colors.DarkGray, showPoints: true, "N1", 4).Draw(0);
+                        new Graph(graph, "Total balance", botManager.Balances, Colors.DarkGray, showPoints: true, "N1", 4).Draw(0);
                     }
-                    Dispatcher?.Invoke(() => totalBalanceText.Content = graphCollection.Balances.Last().ToString("N1") + " HUF");
+                    Dispatcher?.Invoke(() => totalBalanceText.Content = botManager.Balances.Last().ToString("N1") + " HUF");
                 }
                 else
                 {
@@ -269,7 +269,7 @@ namespace AutoTrader.Desktop
 
                 if (SelectedTradeOrder != null)
                 {
-                    new PriceLine(graph, "Selected price", graphCollection.PastPrices.Select(pp => pp.close), SelectedTradeOrder.Price, Colors.Brown).Draw(graphCollection.PricesSkip);
+                    new PriceLine(graph, "Selected price", botManager.PastPrices.Select(pp => pp.close), SelectedTradeOrder.Price, Colors.Brown).Draw(botManager.PricesSkip);
                 }
             }
         }
@@ -282,7 +282,7 @@ namespace AutoTrader.Desktop
             }
             if (SelectedCurrency.Equals(trader.TargetCurrency))
             {
-                double projectedIncome = trader.GraphCollection.ProjectedIncome;
+                double projectedIncome = trader.BotManager.ProjectedIncome;
                 Dispatcher?.Invoke(() => projectedIncomeText.Content = (100 * projectedIncome - 100).ToString("N4") + " %");
             }
         }

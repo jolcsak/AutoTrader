@@ -1,4 +1,4 @@
-﻿namespace AutoTrader.GraphProviders
+﻿namespace AutoTrader.Indicators
 {
     public enum AoColor
     {

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace AutoTrader.Traders.Agents
+namespace AutoTrader.Traders.Bots
 {
-    public interface IAgent
+    public interface ITradingBot
     {
         bool IsBuy { get; }
         bool IsSell { get; }

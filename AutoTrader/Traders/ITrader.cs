@@ -21,7 +21,7 @@ namespace AutoTrader.Traders
 
         public IList<TradeOrder> AllTradeOrders { get; }
 
-        public GraphCollection GraphCollection { get; }
+        public TradingBotManager BotManager { get; }
 
         public void Trade(bool canBuy);
 

@@ -1,6 +1,6 @@
 ﻿
 
-namespace AutoTrader.GraphProviders
+namespace AutoTrader.Indicators
 {
     public class TradeValueBase : ValueBase
     {

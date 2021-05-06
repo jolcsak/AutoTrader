@@ -6,14 +6,14 @@ using AutoTrader.Api;
 using AutoTrader.Api.Objects;
 using AutoTrader.Db;
 using AutoTrader.Db.Entities;
-using AutoTrader.GraphProviders;
+using AutoTrader.Indicators;
 using AutoTrader.Log;
-using AutoTrader.Traders.Agents;
+using AutoTrader.Traders.Bots;
 using MathNet.Filtering;
 
 namespace AutoTrader.Traders
 {
-    public class GraphCollection
+    public class TradingBotManager
     {
         public const int RSI_PERIOD = 14;
         
@@ -61,9 +61,9 @@ namespace AutoTrader.Traders
         public double MaxPeriodPrice => PastPrices.Any() ? PastPrices.Select(pp => pp.close).Max() : 0;
         public double MinPeriodPrice => PastPrices.Any() ? PastPrices.Select(pp => pp.close).Min() : 0;
 
-        public IAgent AoAgent { get; set; }
+        public ITradingBot AoAgent { get; set; }
 
-        public IAgent RsiAgent { get; set; }
+        public ITradingBot RsiAgent { get; set; }
 
         public bool IsBuy => Trades.LastOrDefault(t => t.Date.AddHours(1) >= DateTime.Now)?.Type  == TradeType.Buy;
 
@@ -74,12 +74,12 @@ namespace AutoTrader.Traders
         public double ProjectedIncome => GetProjectedIncome();
 
 
-        public GraphCollection(ITrader trader)
+        public TradingBotManager(ITrader trader)
         {
             this.trader = trader;
 
-            AoAgent = new AoAgent(this);
-            RsiAgent = new RsiAgent(this);
+            AoAgent = new AoBot(this);
+            RsiAgent = new RsiBot(this);
         }
 
         public void Refresh()

@@ -72,7 +72,7 @@ namespace AutoTrader.Traders
             actualAmount = lastPrice.Amount;
             LastPriceDate = lastPrice.Date;
 
-            GraphCollection.Refresh();
+            BotManager.Refresh();
 
             if (previousPrice == double.MaxValue)
             {
@@ -83,7 +83,7 @@ namespace AutoTrader.Traders
 
             if (TradeSettings.CanBuy && canBuy && btcBalance >= MinBtcTradeAmount)
             {
-                if (GraphCollection.IsBuy)
+                if (BotManager.IsBuy)
                 {
                    // Buy(MinBtcTradeAmount, actualPrice, actualAmount);
                 }
@@ -101,7 +101,7 @@ namespace AutoTrader.Traders
 
         private bool Sell(double actualPrice)
         {
-            if (GraphCollection.IsSell)
+            if (BotManager.IsSell)
             {
                 Logger.Info($"Time to sell at price {actualPrice}");
                 foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))

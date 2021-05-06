@@ -1,6 +1,6 @@
 ﻿using AutoTrader.Api.Objects;
 
-namespace AutoTrader.GraphProviders
+namespace AutoTrader.Indicators
 {
     public class EmaValue : ValueBase
     { 

@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace AutoTrader.Traders.Agents
+namespace AutoTrader.Traders.Bots
 {
     public enum TradeType
     {

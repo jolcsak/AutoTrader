@@ -1,25 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using AutoTrader.GraphProviders;
+﻿using System.Collections.Generic;
+using AutoTrader.Indicators;
 using AutoTrader.Log;
 
-namespace AutoTrader.Traders.Agents
+namespace AutoTrader.Traders.Bots
 {
-    public class AoAgent : IAgent
+    public class AoBot : ITradingBot
     {
         public static double Ratio { get; set; } = 1;
 
-        protected GraphCollection graphCollection;
-        protected IList<AoValue> Ao => graphCollection.Ao;
+        protected TradingBotManager botManager;
+        protected IList<AoValue> Ao => botManager.Ao;
 
-        protected IList<SmaValue> SmaSlow => graphCollection.SmaSlow;
+        protected IList<SmaValue> SmaSlow => botManager.SmaSlow;
 
-        protected IList<SmaValue> SmaFast => graphCollection.SmaFast;
+        protected IList<SmaValue> SmaFast => botManager.SmaFast;
 
-        protected SmaProvider SlowSmaProvider => graphCollection.AoProvider.SlowSmaProvider;
-        protected SmaProvider FastSmaProvider => graphCollection.AoProvider.FastSmaProvider;
+        protected SmaProvider SlowSmaProvider => botManager.AoProvider.SlowSmaProvider;
+        protected SmaProvider FastSmaProvider => botManager.AoProvider.FastSmaProvider;
 
-        protected IList<double> Tendency => graphCollection.Tendency;
+        protected IList<double> Tendency => botManager.Tendency;
 
         public bool IsBuy => Ao.Count > 0 && Ao[Ao.Count - 1].Buy;
 
@@ -36,16 +35,16 @@ namespace AutoTrader.Traders.Agents
 
         protected ITradeLogger Logger => TradeLogManager.GetLogger(GetType().Name);
 
-        public AoAgent(GraphCollection graphCollection)
+        public AoBot(TradingBotManager botManager)
         {
-            this.graphCollection = graphCollection;
+            this.botManager = botManager;
         }
 
         public bool Buy(int i)
         {
             if (i >= 2)
             {
-                int j = i + graphCollection.PricesSkip;
+                int j = i + botManager.PricesSkip;
                 Ao[i].Buy = SmaFast[j - 1].Value <= SmaSlow[j - 1].Value && SmaFast[j].Value >= SmaSlow[j].Value;                
                 double ratio = Ao[i].Value < 0 ? 1.15 : 1.05;
                 Ao[i].Buy &= SmaFast[j].CandleStick.close * ratio < lastPrice;
@@ -81,7 +80,7 @@ namespace AutoTrader.Traders.Agents
             if (i >= 2)
             {
 
-                int j = i + graphCollection.PricesSkip;
+                int j = i + botManager.PricesSkip;
                 Ao[i].Sell = SmaFast[j - 1].Value >= SmaSlow[j - 1].Value && SmaFast[j].Value <= SmaSlow[j].Value;
                 //Ao[i].Sell |= graphCollection.SmaFast[j].CandleStick.close > lastPrice * 1.02;
                 double ratio = Ao[i].Value > 0 ? 1.15 : 1.05;

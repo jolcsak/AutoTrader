@@ -1,21 +1,21 @@
-﻿using AutoTrader.GraphProviders;
+﻿using AutoTrader.Indicators;
 using System;
 using System.Collections.Generic;
 
-namespace AutoTrader.Traders.Agents
+namespace AutoTrader.Traders.Bots
 {
-    public class RsiAgent : IAgent
+    public class RsiBot : ITradingBot
     {
         private const double OVERBOUGHT = 70;
         private const double OVERSOLD = 30;
 
-        protected GraphCollection graphCollection;
+        protected TradingBotManager botManager;
 
-        public IList<RsiValue> Rsi => graphCollection.Rsi;
+        public IList<RsiValue> Rsi => botManager.Rsi;
 
-        public RsiAgent(GraphCollection graphCollection)
+        public RsiBot(TradingBotManager botManager)
         {
-            this.graphCollection = graphCollection;
+            this.botManager = botManager;
         }
 
         public bool IsBuy => Rsi.Count > 0 && Rsi[Rsi.Count - 1].IsBuy;

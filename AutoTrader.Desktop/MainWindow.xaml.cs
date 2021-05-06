@@ -7,7 +7,7 @@ using AutoTrader.Db;
 using AutoTrader.Db.Entities;
 using AutoTrader.Log;
 using AutoTrader.Traders;
-using AutoTrader.Traders.Agents;
+using AutoTrader.Traders.Bots;
 
 namespace AutoTrader.Desktop
 {
@@ -119,7 +119,7 @@ namespace AutoTrader.Desktop
             {
                 Logger.SelectedCurrency = currentTrader.TargetCurrency;
                 Logger.SelectedTradeOrder = null;
-                CurrentTrader?.GraphCollection.Refresh();
+                CurrentTrader?.BotManager.Refresh();
                 Logger.LogProjectedIncome(currentTrader);
                 Logger.RefreshGraph(currentTrader);
             }
@@ -127,11 +127,11 @@ namespace AutoTrader.Desktop
 
         private void aoRatio_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            AoAgent.Ratio = e.NewValue;
+            AoBot.Ratio = e.NewValue;
             if (CurrentTrader != null)
             {
                 foreach (ITrader trader in TraderThread.Traders) {
-                    trader.GraphCollection.Refresh();
+                    trader.BotManager.Refresh();
                 }
                 currencies_SelectedCellsChanged(sender, null);
             }
@@ -305,7 +305,7 @@ namespace AutoTrader.Desktop
         {
             TradeSettings.SmaBotEnabled = true;
             Store.SaveSettings();
-            CurrentTrader?.GraphCollection.Refresh();
+            CurrentTrader?.BotManager.Refresh();
             Logger.RefreshGraph(CurrentTrader);
             Logger.LogProjectedIncome(CurrentTrader);
         }
@@ -314,7 +314,7 @@ namespace AutoTrader.Desktop
         {
             TradeSettings.SmaBotEnabled = false;
             Store.SaveSettings();
-            CurrentTrader?.GraphCollection.Refresh();
+            CurrentTrader?.BotManager.Refresh();
             Logger.RefreshGraph(CurrentTrader);
             Logger.LogProjectedIncome(CurrentTrader);
         }
@@ -323,7 +323,7 @@ namespace AutoTrader.Desktop
         {
             TradeSettings.RsiBotEnabled = true;
             Store.SaveSettings();
-            CurrentTrader?.GraphCollection.Refresh();
+            CurrentTrader?.BotManager.Refresh();
             Logger.RefreshGraph(CurrentTrader);
             Logger.LogProjectedIncome(CurrentTrader);
         }
@@ -332,7 +332,7 @@ namespace AutoTrader.Desktop
         {
             TradeSettings.RsiBotEnabled = false;
             Store.SaveSettings();
-            CurrentTrader?.GraphCollection.Refresh();
+            CurrentTrader?.BotManager.Refresh();
             Logger.RefreshGraph(CurrentTrader);
             Logger.LogProjectedIncome(CurrentTrader);
         }
@@ -341,7 +341,7 @@ namespace AutoTrader.Desktop
         {
             TradeSettings.MacdBotEnabled = true;
             Store.SaveSettings();
-            CurrentTrader?.GraphCollection.Refresh();
+            CurrentTrader?.BotManager.Refresh();
             Logger.RefreshGraph(CurrentTrader);
             Logger.LogProjectedIncome(CurrentTrader);
 
@@ -351,7 +351,7 @@ namespace AutoTrader.Desktop
         {
             TradeSettings.MacdBotEnabled = false;
             Store.SaveSettings();
-            CurrentTrader?.GraphCollection.Refresh();
+            CurrentTrader?.BotManager.Refresh();
             Logger.RefreshGraph(CurrentTrader);
             Logger.LogProjectedIncome(CurrentTrader);
         }

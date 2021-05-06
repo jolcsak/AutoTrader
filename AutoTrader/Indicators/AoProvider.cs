@@ -1,15 +1,13 @@
-﻿using AutoTrader.Api.Objects;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoTrader.Api.Objects;
 
-namespace AutoTrader.GraphProviders
+namespace AutoTrader.Indicators
 {
     public class AoProvider
     {
         private static int lastAmps = 5;
-
-        private IList<CandleStick> data;
 
         public SmaProvider SlowSmaProvider { get; set; }
         public SmaProvider FastSmaProvider { get; set; }
@@ -64,7 +62,6 @@ namespace AutoTrader.GraphProviders
 
         public AoProvider(IList<CandleStick> data, int slowPeriod = 34, int fastPeriod = 5)
         {
-            this.data = data;
             SlowSmaProvider = new SmaProvider(data, slowPeriod);
             FastSmaProvider = new SmaProvider(data, fastPeriod);
             Calculate();

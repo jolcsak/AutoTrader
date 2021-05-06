@@ -1,7 +1,7 @@
 ﻿using AutoTrader.Api.Objects;
 using System.Collections.Generic;
 
-namespace AutoTrader.GraphProviders
+namespace AutoTrader.Indicators
 {
     public class SmaProvider
     {
