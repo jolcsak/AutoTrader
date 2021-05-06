@@ -173,6 +173,17 @@ namespace AutoTrader.Desktop
             }
         }
 
+        private void closedOrders_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
+        {
+            var selectedTradeOrder = closedOrders?.SelectedItem as TradeOrder;
+            Logger.SelectedCurrency = selectedTradeOrder?.Currency;
+            if (selectedTradeOrder?.Id != Logger.SelectedTradeOrder?.Id)
+            {
+                Logger.SelectedTradeOrder = selectedTradeOrder;
+                Logger.RefreshGraph(CurrentTrader);
+            }
+        }
+
         private void showLog_Click(object sender, RoutedEventArgs e)
         {
             if (IsLogWindowClosed || logWindow == null)

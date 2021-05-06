@@ -135,7 +135,6 @@ namespace AutoTrader.Api
         {
             IRestResponse response;
             bool hasValidResponse;
-
             do
             {
                 hasValidResponse = true;

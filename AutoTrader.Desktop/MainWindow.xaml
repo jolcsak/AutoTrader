@@ -124,7 +124,7 @@
                         </DockPanel>
                         <DockPanel Grid.Column="0" Grid.Row="1" LastChildFill="True" >
                             <Label Content="Closed Orders" DockPanel.Dock="Top" FontWeight="SemiBold"/>
-                            <DataGrid x:Name="closedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" ScrollViewer.IsDeferredScrollingEnabled="True" CanUserDeleteRows="False">
+                            <DataGrid x:Name="closedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" ScrollViewer.IsDeferredScrollingEnabled="True" CanUserDeleteRows="False" SelectedCellsChanged="closedOrders_SelectedCellsChanged">
                                 <DataGrid.Resources>
                                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkGray"/>
                                 </DataGrid.Resources>

@@ -260,11 +260,11 @@ namespace AutoTrader.Desktop
                     {
                         new Graph(graph, "Total balance", botManager.Balances, Colors.DarkGray, showPoints: true, "N1", 4).Draw(0);
                     }
-                    Dispatcher?.Invoke(() => totalBalanceText.Content = botManager.Balances.Last().ToString("N1") + " HUF");
+                    Dispatcher?.BeginInvoke(() => totalBalanceText.Content = botManager.Balances.Last().ToString("N1") + " HUF");
                 }
                 else
                 {
-                    Dispatcher?.Invoke(() => totalBalanceText.Content = "N/A");
+                    Dispatcher?.BeginInvoke(() => totalBalanceText.Content = "N/A");
                 }
 
                 if (SelectedTradeOrder != null)

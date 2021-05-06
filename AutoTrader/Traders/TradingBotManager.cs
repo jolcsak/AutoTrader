@@ -181,7 +181,6 @@ namespace AutoTrader.Traders
                     money += tradeItem.Amount * trade.Price;
                 }
             }
-
             return money;
         }
     }

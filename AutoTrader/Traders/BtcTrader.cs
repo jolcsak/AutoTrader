@@ -10,6 +10,8 @@ namespace AutoTrader.Traders
     {
         public const string BTC = "BTC";
 
+        protected DateTime lastUpdate = DateTime.MinValue;
+
         public static double MinBtcTradeAmount = 0.00025;
 
         protected double actualPrice;
@@ -72,7 +74,11 @@ namespace AutoTrader.Traders
             actualAmount = lastPrice.Amount;
             LastPriceDate = lastPrice.Date;
 
-            BotManager.Refresh();
+            if (lastUpdate.AddHours(1) <= DateTime.Now)
+            {
+                BotManager.Refresh();
+                lastUpdate = DateTime.Now;
+            }
 
             if (previousPrice == double.MaxValue)
             {
