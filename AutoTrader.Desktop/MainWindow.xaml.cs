@@ -75,6 +75,7 @@ namespace AutoTrader.Desktop
             smaBotEnabled.IsChecked = TradeSettings.SmaBotEnabled;
             rsiBotEnabled.IsChecked = TradeSettings.RsiBotEnabled;
             macdVisible.IsChecked = TradeSettings.MacdVisible;
+            macdBotEnabled.IsChecked = TradeSettings.MacdBotEnabled;
 
             TradeSettings.SetCanSave(true);
         }
@@ -330,6 +331,25 @@ namespace AutoTrader.Desktop
         private void RsiBotEnabled_Unchecked(object sender, RoutedEventArgs e)
         {
             TradeSettings.RsiBotEnabled = false;
+            Store.SaveSettings();
+            CurrentTrader?.GraphCollection.Refresh();
+            Logger.RefreshGraph(CurrentTrader);
+            Logger.LogProjectedIncome(CurrentTrader);
+        }
+
+        private void MacdBotEnabled_Checked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.MacdBotEnabled = true;
+            Store.SaveSettings();
+            CurrentTrader?.GraphCollection.Refresh();
+            Logger.RefreshGraph(CurrentTrader);
+            Logger.LogProjectedIncome(CurrentTrader);
+
+        }
+
+        private void MacdBotEnabled_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.MacdBotEnabled = false;
             Store.SaveSettings();
             CurrentTrader?.GraphCollection.Refresh();
             Logger.RefreshGraph(CurrentTrader);

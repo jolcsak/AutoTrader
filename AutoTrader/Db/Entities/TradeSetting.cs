@@ -42,6 +42,7 @@ namespace AutoTrader
 
         public bool RsiBotEnabled { get; set; }
 
+        public bool MacdBotEnabled { get; set; }
 
         public void SetCanSave(bool canSave)
         {
