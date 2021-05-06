@@ -61,9 +61,11 @@ namespace AutoTrader.Traders
         public double MaxPeriodPrice => PastPrices.Any() ? PastPrices.Select(pp => pp.close).Max() : 0;
         public double MinPeriodPrice => PastPrices.Any() ? PastPrices.Select(pp => pp.close).Min() : 0;
 
-        public ITradingBot AoAgent { get; set; }
+        public ITradingBot AoBot { get; set; }
 
-        public ITradingBot RsiAgent { get; set; }
+        public ITradingBot RsiBot { get; set; }
+
+        public ITradingBot MacdBot { get; set; }
 
         public bool IsBuy => Trades.LastOrDefault(t => t.Date.AddHours(1) >= DateTime.Now)?.Type  == TradeType.Buy;
 
@@ -78,8 +80,10 @@ namespace AutoTrader.Traders
         {
             this.trader = trader;
 
-            AoAgent = new AoBot(this);
-            RsiAgent = new RsiBot(this);
+            AoBot = new AoBot(this);
+            RsiBot = new RsiBot(this);
+            MacdBot = new MacdBot(this);
+
         }
 
         public void Refresh()
@@ -123,11 +127,15 @@ namespace AutoTrader.Traders
 
             if (TradeSettings.SmaBotEnabled)
             {
-                tasks.Add(Task.Factory.StartNew(() => aoTrades = AoAgent.RefreshAll()));
+                tasks.Add(Task.Factory.StartNew(() => aoTrades = AoBot.RefreshAll()));
             }
             if (TradeSettings.RsiBotEnabled)
             {
-                tasks.Add(Task.Factory.StartNew(() => rsiTrades = RsiAgent.RefreshAll()));
+                tasks.Add(Task.Factory.StartNew(() => rsiTrades = RsiBot.RefreshAll()));
+            }
+            if (TradeSettings.MacdBotEnabled)
+            {
+                tasks.Add(Task.Factory.StartNew(() => rsiTrades = MacdBot.RefreshAll()));
             }
 
             Task.WaitAll(tasks.ToArray());
