@@ -236,13 +236,13 @@ namespace AutoTrader.Desktop
                 }
                 if (TradeSettings.SmaGraphVisible)
                 {
-                    var ret = new ValueGraph<SmaValue>(graph, "Fast Simple Moving Average", botManager.SmaFast, Colors.Blue, showPoints: false).Draw(botManager.SmaSkip);
-                    new ValueGraph<SmaValue>(graph, "Slow Simple Moving Average", botManager.SmaSlow, Colors.LightBlue, showPoints: false).Draw(botManager.SmaSkip, ret.Item1, ret.Item2);
+                    var ret = new ValueGraph<SmaValue>(graph, "Fast Simple Moving Average", botManager.SmaFast, Colors.Blue, showPoints: false).Draw(botManager.PricesSkip);
+                    new ValueGraph<SmaValue>(graph, "Slow Simple Moving Average", botManager.SmaSlow, Colors.LightBlue, showPoints: false).Draw(botManager.PricesSkip, ret.Item1, ret.Item2);
                 }
 
                 if (TradeSettings.RsiVisible)
                 {
-                    new ValueGraph<RsiValue>(graph, "Relative Strength Index", botManager.Rsi, Colors.DarkViolet).Draw(botManager.SmaSkip - TradingBotManager.RSI_PERIOD);
+                    new ValueGraph<RsiValue>(graph, "Relative Strength Index", botManager.Rsi, Colors.DarkViolet).Draw(botManager.PricesSkip - TradingBotManager.RSI_PERIOD);
                 }
 
                 if (TradeSettings.MacdVisible)

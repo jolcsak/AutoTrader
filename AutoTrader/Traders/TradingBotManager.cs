@@ -59,7 +59,6 @@ namespace AutoTrader.Traders
         public List<TradeItem> Trades { get; private set; }
 
         public int PricesSkip { get; set; }
-        public int SmaSkip { get; set; } = 0;
         public double MaxPeriodPrice => PastPrices.Any() ? PastPrices.Select(pp => pp.close).Max() : 0;
         public double MinPeriodPrice => PastPrices.Any() ? PastPrices.Select(pp => pp.close).Min() : 0;
 
@@ -92,6 +91,11 @@ namespace AutoTrader.Traders
         {
             var candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateTime.Now.AddMonths(-1), DateTime.Now, 60);
 
+            if (candleSticks == null)
+            {
+                return;
+            }
+
             PastPrices = candleSticks;
             Dates = new List<DateTime>(candleSticks.Select(cs => cs.Date));
 
@@ -106,7 +110,6 @@ namespace AutoTrader.Traders
             Task.WaitAll(tasks.ToArray());
 
             PricesSkip = PastPrices.Count - Ao.Count;
-            SmaSkip = PricesSkip;
 
             tasks.Clear();
 
