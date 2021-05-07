@@ -1,4 +1,6 @@
-﻿namespace AutoTrader.Api.Objects
+﻿using System;
+
+namespace AutoTrader.Api.Objects
 {
     public class HistoricPrice
     {
@@ -7,6 +9,8 @@
         public double price { get; set; }
         public double qty { get; set; }
         public double sndQty { get; set; }
-        public object time { get; set; }
+        public long time { get; set; }
+
+        public DateTime Date => NiceHashApi.UnixTimestampToDateTime(time / 1000000);
     }
 }

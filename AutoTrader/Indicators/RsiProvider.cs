@@ -22,7 +22,10 @@ namespace AutoTrader.Indicators
 
         public void Calculate()
         {
-            
+            if (Data.Count < 1)
+            {
+                return;
+            }
             double gainSum = 0;
             double lossSum = 0;
             for (int i = 1; i < Period; i++)

@@ -12,6 +12,8 @@ namespace AutoTrader.Api
         private static string TEST_URL_ROOT = "https://api-test.nicehash.com";
         private static string PROD_URL_ROOT = "https://api2.nicehash.com";
 
+        private static readonly long unixStartTicks = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).Ticks;
+
         private const int RETRY_PERIOD = 10;
         private string URL_ROOT;
         private NiceHashConnectApi api;
@@ -69,11 +71,10 @@ namespace AutoTrader.Api
             return Get<CandleStick[]>($"/exchange/api/v2/info/candlesticks?market={market}&from={fromSec}&to={toSec}&resolution={resolution}");
         }
 
-        public static DateTime UnixTimestampToDateTime(double unixTime)
-        {
-            DateTime unixStart = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
-            long unixTimeStampInTicks = (long)(unixTime * TimeSpan.TicksPerSecond);
-            return new DateTime(unixStart.Ticks + unixTimeStampInTicks, System.DateTimeKind.Utc);
+        public static DateTime UnixTimestampToDateTime(long unixTime)
+        {           
+            long unixTimeStampInTicks = unixTime * TimeSpan.TicksPerSecond;
+            return new DateTime(unixStartTicks + unixTimeStampInTicks, DateTimeKind.Utc);
         }
 
         public OrderTrade Order(string market, bool isBuy, double amount, double minSecQuantity = 0)

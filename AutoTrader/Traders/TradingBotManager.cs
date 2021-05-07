@@ -52,7 +52,9 @@ namespace AutoTrader.Traders
 
         public IList<DateTime> Dates { get; set; }  
 
-        public IList<double> Balances { get; set; }
+        public IList<double> FiatBalances { get; set; }
+
+        public IList<double> BtcBalances { get; set; }
 
         public List<TradeItem> Trades { get; private set; }
 
@@ -119,7 +121,10 @@ namespace AutoTrader.Traders
                 Tendency = Array.Empty<double>();
             }
 
-            Balances = Store.TotalBalances.GetTotalBalances(trader).Select(b => b.Balance).ToList();
+            var storedBalances = Store.TotalBalances.GetTotalBalances(trader).ToList();
+
+            FiatBalances = storedBalances.Select(b => b.FiatBalance).ToList();
+            BtcBalances = storedBalances.Select(b => b.BtcBalance).ToList();
 
             Trades = new List<TradeItem>();
             List<TradeItem> aoTrades = new List<TradeItem>();

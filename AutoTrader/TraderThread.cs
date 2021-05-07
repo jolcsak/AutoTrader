@@ -16,11 +16,12 @@ namespace AutoTrader
 {
     public class TraderThread
     {
-        private const string VERSION = "0.24";
+        private const string VERSION = "0.25";
         private const int COLLECTOR_WAIT = 1 * 60 * 1000;
         private const int TRADE_WAIT = 20 * 1000;
         private const int BUYER_NUMBER = 12;
         private const string FIAT = "HUF";
+        private const bool collectPrices = false;
 
         protected static Store Store => Store.Instance;
 
@@ -90,26 +91,30 @@ namespace AutoTrader
 
             CreateTraders(niceHashApi);
 
-            double previousTotalFiatBalance = double.MinValue;
+            Tuple<double, double> previousTotalBalance = new Tuple<double, double>(double.MinValue, double.MinValue);
 
             do
             {
-                double totalFiatBalance = GetTotalFiatBalance(niceHashApi);
-                if (totalFiatBalance != previousTotalFiatBalance)
+                var totalBalance = GetTotalFiatBalance(niceHashApi);
+                if (totalBalance.Item1 != previousTotalBalance.Item1 || totalBalance.Item2 != previousTotalBalance.Item2)
                 {
-                    Store.Instance.TotalBalances.Save(new Db.Entities.TotalBalance { Balance = totalFiatBalance, Date = DateTime.Now });
-                    previousTotalFiatBalance = totalFiatBalance;
+                    Logger.Info($"Balance changed: {totalBalance.Item1:N8} BTC => {totalBalance.Item2:N1} HUF");
+                    Store.Instance.TotalBalances.Save(new TotalBalance { BtcBalance = totalBalance.Item1, FiatBalance = totalBalance.Item2, Date = DateTime.Now });
+                    previousTotalBalance = totalBalance;
                 }
 
-                foreach (ITrader trader in Traders)
+                if (collectPrices)
                 {
-                    try
+                    foreach (ITrader trader in Traders)
                     {
-                        trader.GetAndStoreCurrentOrders();
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
+                        try
+                        {
+                            trader.GetAndStoreCurrentOrders();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
+                        }
                     }
                 }
                 Logger.Info($"Waiting {COLLECTOR_WAIT / 1000} seconds...");
@@ -156,11 +161,15 @@ namespace AutoTrader
             Logger.Info("Done");
         }
 
-        private static double GetTotalFiatBalance(NiceHashApi niceHashApi)
+        private static Tuple<double, double> GetTotalFiatBalance(NiceHashApi niceHashApi)
         {
             Api.Objects.TotalBalance totalBalance = niceHashApi.GetTotalBalance(FIAT);
             var btcCurrency = totalBalance.currencies.FirstOrDefault(c => c.currency == BtcTrader.BTC);
-            return (totalBalance?.total != null && btcCurrency != null)? totalBalance.total.totalBalance * btcCurrency.fiatRate : 0;
+            if (totalBalance?.total != null && btcCurrency != null)
+            {
+                return new Tuple<double, double>(totalBalance.total.totalBalance, totalBalance.total.totalBalance * btcCurrency.fiatRate);
+            }
+            return new Tuple<double, double>(0, 0);
         }
 
         private static void CreateTraders(NiceHashApi niceHashApi)

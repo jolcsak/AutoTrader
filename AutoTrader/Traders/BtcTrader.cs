@@ -63,15 +63,16 @@ namespace AutoTrader.Traders
             //    return;
             //}
 
-            var lastPrice = Store.LastPrices.GetLastPriceForTrader(this);
+            var lastPrices = NiceHashApi.GetLastPrices(TargetCurrency + BTC, 1);
 
-            if (lastPrice == null || lastPrice.Date == LastPriceDate)
+            if (lastPrices?.Count() == 0 || lastPrices?[0] == null)
             {
                 return;
             }
 
-            actualPrice = lastPrice.Price;
-            actualAmount = lastPrice.Amount;
+            var lastPrice = lastPrices[0];
+            actualPrice = lastPrice.price;
+            actualAmount = lastPrice.qty;
             LastPriceDate = lastPrice.Date;
 
             if (lastUpdate.AddHours(1) <= DateTime.Now)
@@ -91,7 +92,7 @@ namespace AutoTrader.Traders
             {
                 if (BotManager.IsBuy)
                 {
-                   // Buy(MinBtcTradeAmount, actualPrice, actualAmount);
+                    Buy(MinBtcTradeAmount, actualPrice, actualAmount);
                 }
             }
 
