@@ -62,8 +62,8 @@ namespace AutoTrader.Desktop
         {
             TradeSettings.SetCanSave(false);
 
+            canBuy.IsChecked = TradeSettings.CanBuy;
             minYield.Text = TradeSettings.MinSellYield.ToString();
-
             balanceVisible.IsChecked = TradeSettings.BalanceGraphVisible;
             pricesVisible.IsChecked = TradeSettings.PriceGraphVisible;
             smaVisible.IsChecked = TradeSettings.SmaGraphVisible;
@@ -83,11 +83,13 @@ namespace AutoTrader.Desktop
         private void CanBuy_Checked(object sender, RoutedEventArgs e)
         {
             TradeSettings.CanBuy = true;
+            Store.SaveSettings();
         }
 
         private void CanBuy_Unchecked(object sender, RoutedEventArgs e)
         {
             TradeSettings.CanBuy = false;
+            Store.SaveSettings();
         }
 
         private void MinYield_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)

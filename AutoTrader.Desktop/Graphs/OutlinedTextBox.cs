@@ -59,7 +59,6 @@ namespace AutoTrader.Desktop.Graphs
             //set the size of the custome control based on the size of the text
             MinWidth = formattedText.Width;
             MinHeight = formattedText.Height;
-
         }
 
         /// <summary>
@@ -92,11 +91,7 @@ namespace AutoTrader.Desktop.Graphs
         public Brush Fill
         {
             get => (Brush)GetValue(FillProperty);
-
-            set
-            {
-                SetValue(FillProperty, value);
-            }
+            set => SetValue(FillProperty, value);
         }
 
         /// <summary>
