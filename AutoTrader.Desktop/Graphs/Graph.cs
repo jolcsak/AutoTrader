@@ -68,7 +68,7 @@ namespace AutoTrader.Desktop
 
             Dispatcher?.Invoke(() =>
             {
-                int pointSize = 3;
+                int pointSize = 6;
                 int halfPointSize = pointSize / 2;
                 double priceHeight = maxValue - minValue;
                 double width = graph.ActualWidth;
@@ -91,16 +91,14 @@ namespace AutoTrader.Desktop
                 if (showPoints)
                 {
                     currentX = 0;
-                    int i = 0;
                     foreach (double value in drawValues)
                     {
                         double y = (value - minValue) * cHeight.Value;
-                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = pointFillBrush, Width = pointSize, Height = pointSize, ToolTip =  i + " " + value.ToString(toolTipFormat)};
+                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = pointFillBrush, Width = pointSize, Height = pointSize, ToolTip = value.ToString(toolTipFormat)};
                         Canvas.SetLeft(rect, currentX - halfPointSize);
                         Canvas.SetBottom(rect, y - halfPointSize);
                         graph.Children.Add(rect);
                         currentX += cWidth;
-                        i++;
                     }
                 }
             });

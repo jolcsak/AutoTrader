@@ -259,7 +259,7 @@ namespace AutoTrader.Desktop
                     if (TradeSettings.BalanceGraphVisible)
                     {
                         new Graph(graph, "Total fiat balance", botManager.FiatBalances, Colors.DimGray, showPoints: true, "N1", 3).Draw(0);
-                        new Graph(graph, "Total BTC balance", botManager.BtcBalances, Colors.DarkGray, showPoints: true, "N1", 3).Draw(0);
+                        new Graph(graph, "Total BTC balance", botManager.BtcBalances, Colors.DarkGray, showPoints: true, "N8", 3).Draw(0);
                     }
                     Dispatcher?.BeginInvoke(() => totalBalanceText.Content = botManager.FiatBalances.Last().ToString("N1") + " HUF");
                 }

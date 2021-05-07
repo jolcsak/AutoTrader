@@ -138,7 +138,7 @@ namespace AutoTrader.Api
             do
             {
                 hasValidResponse = true;
-                response = new RestClient(this.urlRoot).Execute(request, method);
+                response = new RestClient(urlRoot).Execute(request, method);
 
                 if (response == null)
                 {
