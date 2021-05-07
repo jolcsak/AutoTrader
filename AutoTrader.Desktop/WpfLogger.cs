@@ -242,7 +242,7 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.RsiVisible)
                 {
-                    new ValueGraph<RsiValue>(graph, "Relative Strength Index", botManager.Rsi, Colors.DarkViolet).Draw(botManager.PricesSkip - TradingBotManager.RSI_PERIOD);
+                    new ValueGraph<RsiValue>(graph, "Relative Strength Index", botManager.Rsi, Colors.Purple).Draw(botManager.PricesSkip - TradingBotManager.RSI_PERIOD);
                 }
 
                 if (TradeSettings.MacdVisible)
