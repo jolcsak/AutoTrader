@@ -124,6 +124,7 @@ namespace AutoTrader.Traders
             Trades = new List<TradeItem>();
             List<TradeItem> aoTrades = new List<TradeItem>();
             List<TradeItem> rsiTrades = new List<TradeItem>();
+            List<TradeItem> macdTrades = new List<TradeItem>();
 
             if (TradeSettings.SmaBotEnabled)
             {
@@ -135,13 +136,14 @@ namespace AutoTrader.Traders
             }
             if (TradeSettings.MacdBotEnabled)
             {
-                tasks.Add(Task.Factory.StartNew(() => rsiTrades = MacdBot.RefreshAll()));
+                tasks.Add(Task.Factory.StartNew(() => macdTrades = MacdBot.RefreshAll()));
             }
 
             Task.WaitAll(tasks.ToArray());
 
             Trades.AddRange(aoTrades);
             Trades.AddRange(rsiTrades);
+            Trades.AddRange(macdTrades);
             Trades = Trades.OrderBy(t => t.Date).ToList();
         }
 

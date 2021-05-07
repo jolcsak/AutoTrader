@@ -5,6 +5,8 @@ namespace AutoTrader.Traders.Bots
 {
     public class MacdBot : ITradingBot
     {
+        public static double Ratio { get; set; } = 1.05;
+
         protected TradingBotManager tradeManager { get; set; }
 
         public List<MacdLineValue> Line => tradeManager.MacdProvider.Result.Line;
@@ -14,8 +16,10 @@ namespace AutoTrader.Traders.Bots
         public bool IsBuy { get; }
         public bool IsSell { get; }
 
-        private bool isBuyMarker = false;
-        private bool isSellMarker = false;
+        private double previousTradePrice = 0;
+
+        private bool buyMarker = false;
+        private bool sellMarker = false;
 
         public MacdBot(TradingBotManager tradeManager)
         {
@@ -24,25 +28,31 @@ namespace AutoTrader.Traders.Bots
 
         public bool Buy(int i)
         {
-            //return Line[i - 1].Value < Signal[i - 1].Value && Line[i].Value > Signal[i].Value;
-            if (isBuyMarker && Histogram[i].Value < 0 && Histogram[i - 1].Value < Histogram[i].Value)
+            if (Histogram[i].Value > 0 && Histogram[i - 1].Value < 0)
             {
-                isBuyMarker = false;
+                buyMarker = Histogram[i].CandleStick.high * Ratio < previousTradePrice;
+            }
+            if (buyMarker && (Histogram[i].Value > Histogram[i - 1].Value * 1.015))
+            {
+                buyMarker = false;
+                previousTradePrice = Histogram[i].CandleStick.high;
                 return true;
             }
-            isBuyMarker = Histogram[i - 1].Value >= Histogram[i].Value;
             return false;
         }
 
         public bool Sell(int i)
         {
-            //return Line[i - 1].Value > Signal[i - 1].Value && Line[i].Value < Signal[i].Value;
-            if (isSellMarker && Histogram[i].Value > 0 && Histogram[i - 1].Value > Histogram[i].Value)
+            if (Histogram[i].Value < 0 && Histogram[i - 1].Value > 0 )
             {
-                isSellMarker = false;
+                sellMarker = Histogram[i].CandleStick.high > previousTradePrice * Ratio;
+            }
+            if (sellMarker && (Histogram[i].Value * 1.015 < Histogram[i - 1].Value))
+            {
+                sellMarker = false;
+                previousTradePrice = Histogram[i].CandleStick.high;
                 return true;
             }
-            isSellMarker = Histogram[i - 1].Value <= Histogram[i].Value;
             return false;
         }
 
