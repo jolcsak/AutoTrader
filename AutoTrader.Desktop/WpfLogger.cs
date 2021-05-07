@@ -196,7 +196,7 @@ namespace AutoTrader.Desktop
                    }
                    else
                    {
-                       currencyInst.Refresh(price, amount, trader.BotManager.MinPeriodPrice, trader.BotManager.MaxPeriodPrice, trader.Frequency, trader.Amplitude, trader.Order, trader.LastPriceDate);
+                       currencyInst.Refresh(price, amount, trader.Frequency, trader.Amplitude, trader.Order, trader.LastPriceDate);
                    }
                });
 

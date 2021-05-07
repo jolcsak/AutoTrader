@@ -18,7 +18,7 @@ namespace AutoTrader.Traders
 
         protected virtual ITradeLogger Logger => TradeLogManager.GetLogger(GetType());
 
-        public string TraderId => this.GetType().Name;
+        public string TraderId => GetType().Name;
 
         public virtual IList<TradeOrder> TradeOrders => Store.OrderBooks.GetOrdersForTrader(this);
 

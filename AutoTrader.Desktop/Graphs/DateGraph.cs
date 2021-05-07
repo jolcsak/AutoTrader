@@ -62,12 +62,6 @@ namespace AutoTrader.Desktop
 
                 foreach (DateTime value in drawValues)
                 {
-                    double x = currentX - halfPointSize;
-                    var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = pointFillBrush, Width = pointSize, Height = pointSize, ToolTip = value.ToString() };
-                    Canvas.SetLeft(rect, x);
-                    Canvas.SetBottom(rect, y);
-                    graph.Children.Add(rect);
-
                     if (previousDate.Day != value.Day)
                     {
                         if (previousX + previousTextWidth <= currentX)

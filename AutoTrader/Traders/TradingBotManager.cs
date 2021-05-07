@@ -59,8 +59,6 @@ namespace AutoTrader.Traders
         public List<TradeItem> Trades { get; private set; }
 
         public int PricesSkip { get; set; }
-        public double MaxPeriodPrice => PastPrices.Any() ? PastPrices.Select(pp => pp.close).Max() : 0;
-        public double MinPeriodPrice => PastPrices.Any() ? PastPrices.Select(pp => pp.close).Min() : 0;
 
         public ITradingBot AoBot { get; set; }
 
@@ -84,7 +82,6 @@ namespace AutoTrader.Traders
             AoBot = new AoBot(this);
             RsiBot = new RsiBot(this);
             MacdBot = new MacdBot(this);
-
         }
 
         public void Refresh()
