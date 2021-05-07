@@ -37,7 +37,7 @@ namespace AutoTrader.Indicators
                 }
                 else
                 {
-                    lossSum += (-1) * thisChange;
+                    lossSum += -thisChange;
                 }
             }
 
@@ -58,7 +58,7 @@ namespace AutoTrader.Indicators
                 else
                 {
                     averageGain = (averageGain * (Period - 1)) / Period;
-                    averageLoss = (averageLoss * (Period - 1) + (-1) * thisChange) / Period;
+                    averageLoss = (averageLoss * (Period - 1) - thisChange) / Period;
                 }
                 rs = averageGain / averageLoss;
                 rsi = 100 - (100 / (1 + rs));

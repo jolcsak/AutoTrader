@@ -16,28 +16,11 @@ namespace AutoTrader.Indicators
 
         public MacdResult Result { get; set; }
 
-        public MacdProvider(IList<CandleStick> data, bool percent)
-        {
-            Percent = percent;
-            Data = data.Select(d => d.Clone()).ToList();
-            Calculate();
-        }
-
         public MacdProvider(IList<CandleStick> data, int fast, int slow, int signal)
         {
             Fast = fast;
             Slow = slow;
             Signal = signal;
-            Data = data.Select(d => d.Clone()).ToList();
-            Calculate();
-        }
-
-        public MacdProvider(IList<CandleStick> data, int fast, int slow, int signal, bool percent)
-        {
-            Fast = fast;
-            Slow = slow;
-            Signal = signal;
-            Percent = percent;
             Data = data.Select(d => d.Clone()).ToList();
             Calculate();
         }
@@ -84,9 +67,10 @@ namespace AutoTrader.Indicators
             for (int i = 0; i < signalEmaValues.Count; i++)
             {
                 Result.Signal.Add(signalEmaValues[i]);
-                if (Result.Line[i] != null && Result.Signal[i] != null)
+                var line = Result.Line[i];
+                if (line != null && Result.Signal[i] != null)
                 {
-                    Result.Histogram.Add(new MacdHistogramValue(Result.Line[i].Value - Result.Signal[i].Value, Result.Line[i].CandleStick));
+                    Result.Histogram.Add(new MacdHistogramValue(line.Value - Result.Signal[i].Value, line.CandleStick));
                 }
                 else
                 {

@@ -121,7 +121,7 @@ namespace AutoTrader.Desktop
             {
                 Logger.SelectedCurrency = currentTrader.TargetCurrency;
                 Logger.SelectedTradeOrder = null;
-                CurrentTrader?.BotManager.Refresh();
+                //CurrentTrader?.BotManager.Refresh();
                 Logger.LogProjectedIncome(currentTrader);
                 Logger.RefreshGraph(currentTrader);
             }

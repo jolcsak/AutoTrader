@@ -41,7 +41,7 @@ namespace AutoTrader.Indicators
         /// <returns></returns>
         public IList<EmaValue> Calculate()
         {
-            var multiplier = !Wilder ? (2.0 / (double)(Period + 1)) : (1.0 / (double)Period);
+            var multiplier = !Wilder ? (2.0 / (Period + 1)) : (1.0 / Period);
 
             for (int i = 0; i < Data.Count; i++)
             {
