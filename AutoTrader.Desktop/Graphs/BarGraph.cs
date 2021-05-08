@@ -48,7 +48,7 @@ namespace AutoTrader.Desktop
 
         public void Draw(int skip = 0)
         {
-            var drawValues = values.Skip(skip);
+            var drawValues = values.Where(v => v != null);
             if (!drawValues.Any())
             {
                 return;

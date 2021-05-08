@@ -3,31 +3,19 @@ using System.Collections.Generic;
 
 namespace AutoTrader.Indicators
 {
-    public enum ColumnType
-    {
-        Open,
-        High,
-        Low,
-        Close,
-        Volume,
-        AdjClose
-    }
-
     public class EmaProvider
     {
         protected int Period = 10;
         protected bool Wilder = false;
-        protected ColumnType ColumnType { get; set; } = ColumnType.Close;
 
         protected IList<CandleStick> Data { get; set; }
 
         public IList<EmaValue> Ema { get; } = new List<EmaValue>();
 
-        public EmaProvider(IList<CandleStick> data, int period, bool wilder, ColumnType columnType = ColumnType.Close)
+        public EmaProvider(IList<CandleStick> data, int period, bool wilder)
         {
             Period = period;
             Wilder = wilder;
-            ColumnType = columnType;
             Data = data;
         }
 
@@ -47,27 +35,7 @@ namespace AutoTrader.Indicators
             {
                 if (i >= Period - 1)
                 {
-                    double value = 0.0;
-                    switch (ColumnType)
-                    {
-                        case ColumnType.Close:
-                            value = Data[i].close;
-                            break;
-                        case ColumnType.High:
-                            value = Data[i].high;
-                            break;
-                        case ColumnType.Low:
-                            value = Data[i].low;
-                            break;
-                        case ColumnType.Open:
-                            value = Data[i].open;
-                            break;
-                        case ColumnType.Volume:
-                            value = Data[i].volume;
-                            break;
-                        default:
-                            break;
-                    }
+                    double value = Data[i].temp_close;
 
                     if (Ema[i - 1] != null)
                     {
@@ -80,26 +48,7 @@ namespace AutoTrader.Indicators
                         double sum = 0;
                         for (int j = i; j >= i - (Period - 1); j--)
                         {
-                            switch (ColumnType)
-                            {
-                                 case ColumnType.Close:
-                                    sum += Data[j].close;
-                                    break;
-                                case ColumnType.High:
-                                    sum += Data[j].high;
-                                    break;
-                                case ColumnType.Low:
-                                    sum += Data[j].low;
-                                    break;
-                                case ColumnType.Open:
-                                    sum += Data[j].open;
-                                    break;
-                                case ColumnType.Volume:
-                                    sum += Data[j].volume;
-                                    break;
-                                default:
-                                    break;
-                            }
+                            sum += Data[j].temp_close;
                         }
                         var ema = sum / Period;
                         Ema.Add(new EmaValue(ema, Data[i]));

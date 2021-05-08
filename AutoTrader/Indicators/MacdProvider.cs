@@ -8,7 +8,11 @@ namespace AutoTrader.Indicators
     {
         protected int Fast = 12;
         protected int Slow = 26;
-        protected int Signal = 17;
+        protected int Signal = 15;
+
+        //protected int Fast = 26;
+        //protected int Slow = 52;
+        //protected int Signal = 41;
 
         protected bool Percent = false;
 
@@ -21,7 +25,7 @@ namespace AutoTrader.Indicators
             Fast = fast;
             Slow = slow;
             Signal = signal;
-            Data = data.Select(d => d.Clone()).ToList();
+            Data = data;
             Calculate();
         }
 
@@ -46,12 +50,12 @@ namespace AutoTrader.Indicators
                         // macd <- 100 * ( mavg.fast / mavg.slow - 1 )
                         Result.Line.Add(new MacdLineValue(100 * ((fastEmaValues[i].Value / slowEmaValues[i].Value) - 1), Data[i]));
                     }
-                    Data[i].close = Result.Line[i].Value;
+                    Data[i].temp_close = Result.Line[i].Value;
                 }
                 else
                 {
                     Result.Line.Add(null);
-                    Data[i].close = 0.0;
+                    Data[i].temp_close = 0.0;
                 }
             }
 

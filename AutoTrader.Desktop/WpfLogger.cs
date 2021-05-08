@@ -248,8 +248,8 @@ namespace AutoTrader.Desktop
                 if (TradeSettings.MacdVisible)
                 {
                     new BarGraph<MacdHistogramValue>(graph, "MACD Histogram", botManager.MacdProvider.Result.Histogram, Colors.Yellow, Colors.Blue).Draw(botManager.PricesSkip);
-                    new ValueGraph<EmaValue>(graph, "MACD Signal", botManager.MacdProvider.Result.Signal, Colors.DarkViolet).Draw(botManager.PricesSkip);
-                    new ValueGraph<MacdLineValue>(graph, "MACD Line", botManager.MacdProvider.Result.Line, Colors.Orange).Draw(botManager.PricesSkip);
+                    var ret = new ValueGraph<EmaValue>(graph, "MACD Signal", botManager.MacdProvider.Result.Signal, Colors.DarkViolet).Draw(botManager.PricesSkip);
+                    new ValueGraph<MacdLineValue>(graph, "MACD Line", botManager.MacdProvider.Result.Line, Colors.Orange).Draw(botManager.PricesSkip, ret.Item1, ret.Item2);
                 }
 
                 new DateGraph(graph, botManager.Dates).Draw(botManager.PricesSkip);

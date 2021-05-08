@@ -33,12 +33,15 @@ namespace AutoTrader.Desktop
         private static SolidColorBrush buyBrush = new SolidColorBrush { Color = Colors.IndianRed };
         private static SolidColorBrush sellBrush = new SolidColorBrush { Color = Colors.LightGreen };
 
+        private static RotateTransform rotate45 = new RotateTransform(45);
+
         static ValueGraph()
         {
             buyBrush.Freeze();
             sellBrush.Freeze();
             pointOutlineBrush.Freeze();
             pointFillBrush.Freeze();
+            rotate45.Freeze();
         }
 
         public ValueGraph(Canvas graph, string graphName, IList<T> values, Color lineColor, bool showPoints = false, string toolTipFormat = "N10", int lineWeight = 2)            
@@ -98,8 +101,6 @@ namespace AutoTrader.Desktop
                 graph.Children.Add(new Polyline { Stroke = lineBrush, StrokeThickness = lineWeight, Points = points, ToolTip = graphName });
 
                 currentX = 0;
-                int i = 0;
-                var rotate = new RotateTransform(45);
                 DateTime previousDate = drawValues.First().CandleStick.Date;
                 T lastValue = drawValues.Last();
                 foreach (T value in drawValues)
@@ -121,8 +122,8 @@ namespace AutoTrader.Desktop
                     if (tradeValue?.IsBuy == true || tradeValue?.IsSell == true || showPoints || tradeItem != null)
                     {
                         Brush currentBrush = pointFillBrush;
-                        string prefix = GetSellBuyPrefix(rotate, ref currentTransform, tradeValue, tradeItem, ref currentBrush);
-                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = currentBrush, Width = pointWidth, Height = pointWidth, ToolTip = prefix + " " + value.Value.ToString(toolTipFormat) };
+                        string prefix = GetSellBuyPrefix(rotate45, ref currentTransform, tradeValue, tradeItem, ref currentBrush);
+                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = currentBrush, Width = pointWidth, Height = pointWidth, ToolTip = prefix + " " + value.Value.ToString(toolTipFormat) + ", volume: " + value.CandleStick?.quote_volume ?? "-"};
                         rect.RenderTransformOrigin = new Point(0.5, 0.5);
                         Canvas.SetLeft(rect, currentX - halfPointSize);
                         Canvas.SetBottom(rect, y - halfPointSize);
@@ -133,7 +134,6 @@ namespace AutoTrader.Desktop
                         graph.Children.Add(rect);
                     }
                     currentX += cWidth;
-                    i++;
                     previousDate = currenDate;
                 }
             });
@@ -142,7 +142,7 @@ namespace AutoTrader.Desktop
 
         private static string GetSellBuyPrefix(RotateTransform rotate, ref RotateTransform currentTransform, TradeValueBase tradeValue, TradeItem tradeItem, ref Brush currentBrush)
         {
-            string prefix = "";
+            string prefix = string.Empty;
             if (tradeValue?.IsBuy == true || tradeItem?.Type == TradeType.Buy)
             {
                 currentBrush = buyBrush;
