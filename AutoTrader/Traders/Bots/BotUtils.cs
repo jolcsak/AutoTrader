@@ -18,6 +18,10 @@ namespace AutoTrader.Traders.Bots
         }
         public static int IsTrend<T>(this List<T> values, int i) where T : ValueBase
         {
+            if (i < 1 || values[i - 1] == null)
+            {
+                return 0;
+            }
             int sign = Math.Sign(values[i - 1].Value);
             int j = i;
             do

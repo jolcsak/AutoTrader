@@ -217,7 +217,7 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.AoGraphVisible)
                 {
-                    new BarGraph<AoValue>(graph, "Awesome Oscillator", botManager.Ao, Colors.Yellow, Colors.Blue).Draw();
+                    new BarGraph<AoValue>(graph, "Awesome Oscillator", botManager.Ao, Colors.Yellow, Colors.Blue, Colors.DimGray).Draw();
                 }
 
                 if (TradeSettings.TendencyGraphVisible)
@@ -247,9 +247,11 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.MacdVisible)
                 {
-                    new BarGraph<MacdHistogramValue>(graph, "MACD Histogram", botManager.MacdProvider.Result.Histogram, Colors.Yellow, Colors.Blue).Draw(botManager.PricesSkip);
-                    var ret = new ValueGraph<EmaValue>(graph, "MACD Signal", botManager.MacdProvider.Result.Signal, Colors.DarkViolet).Draw(botManager.PricesSkip);
-                    new ValueGraph<MacdLineValue>(graph, "MACD Line", botManager.MacdProvider.Result.Line, Colors.Orange).Draw(botManager.PricesSkip, ret.Item1, ret.Item2);
+                    //new BarGraph<MacdHistogramValue>(graph, "MACD Histogram", botManager.SlowMacdProvider.Result.Histogram, Colors.Yellow, Colors.Blue, Colors.DimGray).Draw(botManager.PricesSkip);
+                    var ret = new ValueGraph<EmaValue>(graph, "MACD Signal", botManager.SlowMacdProvider.Result.Signal, Colors.DarkViolet).Draw(botManager.PricesSkip);
+                    //new ValueGraph<MacdLineValue>(graph, "MACD Line", botManager.SlowMacdProvider.Result.Line, Colors.Orange).Draw(botManager.PricesSkip, ret.Item1, ret.Item2);
+
+                    new BarGraph<MacdHistogramValue>(graph, "Fast MACD Histogram", botManager.FastMacdProvider.Result.Histogram, Colors.Yellow, Colors.Blue, Colors.DarkViolet).Draw(botManager.PricesSkip);
                 }
 
                 new DateGraph(graph, botManager.Dates).Draw(botManager.PricesSkip);

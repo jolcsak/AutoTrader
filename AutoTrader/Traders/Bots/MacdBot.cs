@@ -11,9 +11,9 @@ namespace AutoTrader.Traders.Bots
 
         protected TradingBotManager tradeManager { get; set; }
 
-        public List<MacdLineValue> Line => tradeManager.MacdProvider.Result.Line;
-        public List<MacdHistogramValue> Histogram => tradeManager.MacdProvider.Result.Histogram;
-        public List<EmaValue> Signal => tradeManager.MacdProvider.Result.Signal;
+        public List<MacdLineValue> Line => tradeManager.SlowMacdProvider.Result.Line;
+        public List<MacdHistogramValue> Histogram => tradeManager.FastMacdProvider.Result.Histogram;
+        public List<EmaValue> Signal => tradeManager.SlowMacdProvider.Result.Signal;
 
         public bool IsBuy { get; }
         public bool IsSell { get; }
@@ -31,34 +31,34 @@ namespace AutoTrader.Traders.Bots
 
         public bool Buy(int i)
         {
-            bool buy = Histogram.IsSpike(i, 1.05) < 0 || Histogram.IsFlex(i) > 0 && Histogram.IsTrend(i) > 20;
-            if (buy)
-            {
-                double buyPrice = Histogram[i].CandleStick.close;
-                buy = buyPrice  * Ratio < previousTradePrice;
-                previousFlexPrice = buyPrice;
-                if (buy)
-                {
-                    previousTradePrice = previousFlexPrice;
-                }
-            }
-            return buy;
+            return Histogram.IsFlex(i) > 0 && Signal.IsTrend(i) > 1;
+            //if (buy)
+            //{
+            //    double buyPrice = Histogram[i].CandleStick.close;
+            //    buy = buyPrice  * Ratio < previousTradePrice;
+            //    previousFlexPrice = buyPrice;
+            //    if (buy)
+            //    {
+            //        previousTradePrice = previousFlexPrice;
+            //    }
+            //}
+            //return buy;
         }
 
         public bool Sell(int i)
         {
-            bool sell = Histogram.IsSpike(i, 1.05) > 0 || Histogram.IsFlex(i) < 0 && Histogram.IsTrend(i) > 10;
-            if (sell)
-            {
-                double sellPrice = Histogram[i].CandleStick.close;
-                sell = sellPrice > previousTradePrice * Ratio;
-                previousFlexPrice = sellPrice;
-                if (sell)
-                {
-                    previousTradePrice = previousFlexPrice;
-                }
-            }
-            return sell;
+            return Histogram.IsFlex(i) < 0 && Signal.IsTrend(i) > 1;
+            //if (sell)
+            //{
+            //    double sellPrice = Histogram[i].CandleStick.close;
+            //    sell = sellPrice > previousTradePrice * Ratio;
+            //    previousFlexPrice = sellPrice;
+            //    if (sell)
+            //    {
+            //        previousTradePrice = previousFlexPrice;
+            //    }
+            //}
+            //return sell;
         }
 
         public List<TradeItem> RefreshAll()

@@ -20,9 +20,14 @@ namespace AutoTrader.Traders
         private const int SMA_FAST_SMOOTHNESS = 5;
         private const int SMA_SLOW_SMOOTHNESS = 9;
 
-        private const int EMA_FAST = 13;
-        private const int EMA_SLOW = 21;
-        private const int MACD_SIGNAL = 5;
+        private const int SLOW_EMA_FAST = 100;
+        private const int SLOW_EMA_SLOW = 120;
+        private const int SLOW_MACD_SIGNAL = 5;
+
+        private const int FAST_EMA_FAST = 12;
+        private const int FAST_EMA_SLOW = 24;
+        private const int FAST_MACD_SIGNAL = 5;
+
 
         private ITrader trader;
 
@@ -32,7 +37,9 @@ namespace AutoTrader.Traders
         public RsiProvider RsiProvider { get; private set; }
         public AoProvider AoProvider { get; private set; }
 
-        public MacdProvider MacdProvider { get; private set; }
+        public MacdProvider SlowMacdProvider { get; private set; }
+
+        public MacdProvider FastMacdProvider { get; private set; }
 
         protected virtual ITradeLogger Logger => TradeLogManager.GetLogger(GetType());
         protected static Store Store => Store.Instance;
@@ -102,11 +109,17 @@ namespace AutoTrader.Traders
                 Task.Factory.StartNew(() => smaFastProvider = new SmaProvider(candleSticks, SMA_FAST_SMOOTHNESS)),
                 Task.Factory.StartNew(() => AoProvider = new AoProvider(candleSticks)),
                 Task.Factory.StartNew(() => RsiProvider = new RsiProvider(PastPrices, RSI_PERIOD)),
-                Task.Factory.StartNew(() => MacdProvider = new MacdProvider(PastPrices, EMA_FAST, EMA_SLOW, MACD_SIGNAL)),
+                Task.Factory.StartNew(() => SlowMacdProvider = new MacdProvider(PastPrices, SLOW_EMA_FAST, SLOW_EMA_SLOW, SLOW_MACD_SIGNAL)),
+                Task.Factory.StartNew(() => FastMacdProvider = new MacdProvider(PastPrices, FAST_EMA_FAST, FAST_EMA_SLOW, FAST_MACD_SIGNAL)),
             };
             Task.WaitAll(tasks.ToArray());
 
             PricesSkip = PastPrices.Count - Ao.Count;
+            int r = PastPrices.Count - SlowMacdProvider.Result.Histogram.Count(h => h != null);
+            if (r > PricesSkip)
+            {
+                PricesSkip = r;
+            }
 
             tasks.Clear();
 

@@ -30,10 +30,9 @@ namespace AutoTrader.Desktop
         {
             pointFillRedBrush.Freeze();
             pointFillGreenBrush.Freeze();
-            pointFillBrush.Freeze();
         }
 
-        public BarGraph(Canvas graph, string graphName, IList<T> values, Color buyColor, Color sellColor)
+        public BarGraph(Canvas graph, string graphName, IList<T> values, Color buyColor, Color sellColor, Color fillColor)
         {
             this.graph = graph;
             this.graphName = graphName;
@@ -41,9 +40,11 @@ namespace AutoTrader.Desktop
 
             buyFillColor = new SolidColorBrush { Color = buyColor };
             sellFillColor = new SolidColorBrush { Color = sellColor };
+            pointFillBrush = new SolidColorBrush { Color = fillColor };
 
             buyFillColor.Freeze();
             sellFillColor.Freeze();
+            pointFillBrush.Freeze();
         }
 
         public void Draw(int skip = 0)
