@@ -45,6 +45,10 @@ namespace AutoTrader.Traders.Bots
             if (i >= 2)
             {
                 int j = i + botManager.PricesSkip;
+                if (j >= SmaSlow.Count)
+                {
+                    return false;
+                }
                 Ao[i].Buy = SmaFast[j - 1].Value <= SmaSlow[j - 1].Value && SmaFast[j].Value >= SmaSlow[j].Value;                
                 double ratio = Ao[i].Value < 0 ? 1.15 : 1.05;
                 Ao[i].Buy &= SmaFast[j].CandleStick.close * ratio < lastPrice;
@@ -81,6 +85,10 @@ namespace AutoTrader.Traders.Bots
             {
 
                 int j = i + botManager.PricesSkip;
+                if (j >= SmaFast.Count)
+                {
+                    return false;
+                }
                 Ao[i].Sell = SmaFast[j - 1].Value >= SmaSlow[j - 1].Value && SmaFast[j].Value <= SmaSlow[j].Value;
                 //Ao[i].Sell |= graphCollection.SmaFast[j].CandleStick.close > lastPrice * 1.02;
                 double ratio = Ao[i].Value > 0 ? 1.15 : 1.05;

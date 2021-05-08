@@ -3,6 +3,7 @@ using System.Linq;
 using AutoTrader.Api;
 using AutoTrader.Db.Entities;
 using AutoTrader.Log;
+using AutoTrader.Traders.Bots;
 
 namespace AutoTrader.Traders
 {
@@ -12,12 +13,13 @@ namespace AutoTrader.Traders
 
         protected DateTime lastUpdate = DateTime.MinValue;
 
-        public static double MinBtcTradeAmount = 0.00022;
+        public static double MinBtcTradeAmount = 0.00024;
 
         protected double actualPrice;
         protected double actualAmount;
         protected double previousPrice = double.MaxValue;
         protected double changeRatio;
+        private double lastBotPrice  = double.MaxValue;
 
         public BtcTrader(string targetCurrency) : base()
         {
@@ -76,10 +78,29 @@ namespace AutoTrader.Traders
             actualAmount = actualOrder.Amount;
             LastPriceDate = DateTime.Now;
 
-            if (lastUpdate.AddHours(1) <= DateTime.Now)
+            if (lastBotPrice == double.MaxValue)
             {
-                BotManager.Refresh(actualOrder);
-                lastUpdate = DateTime.Now;
+                lastBotPrice = actualPrice;
+            }
+
+            if (previousPrice != actualPrice)
+            {
+                if (lastUpdate.AddMinutes(30) < DateTime.Now || actualPrice.IsSpike(lastBotPrice))
+                {
+                    BotManager.Refresh(actualOrder);
+                    lastUpdate = DateTime.Now;
+                    lastBotPrice = actualPrice;
+                }
+
+                if (TradeSettings.CanBuy && canBuy && btcBalance >= MinBtcTradeAmount)
+                {
+                    if (BotManager.IsBuy)
+                    {
+                        Buy(MinBtcTradeAmount, actualPrice, actualAmount);
+                    }
+                }
+
+                Sell(actualPrice);
             }
 
             if (previousPrice == double.MaxValue)
@@ -88,16 +109,6 @@ namespace AutoTrader.Traders
             }
 
             changeRatio = actualPrice / previousPrice;
-
-            if (TradeSettings.CanBuy && canBuy && btcBalance >= MinBtcTradeAmount)
-            {
-                if (BotManager.IsBuy)
-                {
-                    Buy(MinBtcTradeAmount, actualPrice, actualAmount);
-                }
-            }
-
-            Sell(actualPrice);
             previousPrice = actualPrice;
 
             SaveOrderBooksPrices();

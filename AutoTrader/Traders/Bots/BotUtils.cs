@@ -6,6 +6,8 @@ namespace AutoTrader.Traders.Bots
 {
     public static class BotUtils
     {
+        public const double SpikeRatio = 1.05;
+
         public static bool IsCross<T, T2>(this List<T> value1, List<T2> value2, int i) 
             where T: ValueBase
             where T2: ValueBase
@@ -37,7 +39,7 @@ namespace AutoTrader.Traders.Bots
             return i - j;
         }
 
-        public static int IsSpike<T>(this List<T> values, int i, double ratio = 1.05) where T : ValueBase
+        public static int IsSpike<T>(this List<T> values, int i, double ratio = SpikeRatio) where T : ValueBase
         {
             double a = Math.Abs(values[i].CandleStick.close);
             int j = i - 1;
@@ -52,6 +54,13 @@ namespace AutoTrader.Traders.Bots
                 j--;
             }
             return 0;
+        }
+
+
+        public static bool IsSpike(this double v1, double v2, double ratio = SpikeRatio)
+        {
+            double c = v1 > v2 ? v1 / v2 : v2 / v1;
+            return c >= ratio;
         }
     }
 }
