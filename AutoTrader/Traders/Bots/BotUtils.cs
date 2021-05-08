@@ -41,7 +41,7 @@ namespace AutoTrader.Traders.Bots
         {
             double a = Math.Abs(values[i].CandleStick.close);
             int j = i - 1;
-            while (j >= 0 && values[j] != null && i - j < 3)
+            while (j >= 0 && values[j] != null && i - j < 2)
             {
                 double b = Math.Abs(values[j].CandleStick.close);
                 double c = a > b ? a / b : b / a;

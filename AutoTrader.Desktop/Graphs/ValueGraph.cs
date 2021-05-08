@@ -123,7 +123,8 @@ namespace AutoTrader.Desktop
                     {
                         Brush currentBrush = pointFillBrush;
                         string prefix = GetSellBuyPrefix(rotate45, ref currentTransform, tradeValue, tradeItem, ref currentBrush);
-                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = currentBrush, Width = pointWidth, Height = pointWidth, ToolTip = prefix + " " + value.Value.ToString(toolTipFormat) + ", volume: " + value.CandleStick?.quote_volume ?? "-"};
+                        string toolTip = prefix + " " + value.Value.ToString(toolTipFormat) + ", volume: " + value.CandleStick.volume  + Environment.NewLine + value.CandleStick?.Date;
+                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = currentBrush, Width = pointWidth, Height = pointWidth, ToolTip = toolTip };
                         rect.RenderTransformOrigin = new Point(0.5, 0.5);
                         Canvas.SetLeft(rect, currentX - halfPointSize);
                         Canvas.SetBottom(rect, y - halfPointSize);

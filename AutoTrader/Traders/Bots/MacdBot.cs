@@ -17,12 +17,6 @@ namespace AutoTrader.Traders.Bots
         public bool IsBuy { get; }
         public bool IsSell { get; }
 
-        private double previousTradePrice = 0;
-        private double previousFlexPrice = 0;
-
-        private bool buyMarker = false;
-        private bool sellMarker = false;
-
         public MacdBot(TradingBotManager tradeManager)
         {
             this.tradeManager = tradeManager;
