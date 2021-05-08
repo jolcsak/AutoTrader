@@ -1,5 +1,4 @@
 ﻿using AutoTrader.Indicators;
-using System;
 using System.Collections.Generic;
 
 namespace AutoTrader.Traders.Bots
@@ -11,9 +10,9 @@ namespace AutoTrader.Traders.Bots
 
         protected TradingBotManager tradeManager { get; set; }
 
-        public List<MacdLineValue> Line => tradeManager.SlowMacdProvider.Result.Line;
-        public List<MacdHistogramValue> Histogram => tradeManager.FastMacdProvider.Result.Histogram;
-        public List<EmaValue> Signal => tradeManager.SlowMacdProvider.Result.Signal;
+        public List<MacdLineValue> Line => tradeManager.MacdProvider.Result.Line;
+        public List<MacdHistogramValue> Histogram => tradeManager.MacdProvider.Result.Histogram;
+        public List<EmaValue> Signal => tradeManager.MacdProvider.Result.Signal;
 
         public bool IsBuy { get; }
         public bool IsSell { get; }
@@ -31,23 +30,24 @@ namespace AutoTrader.Traders.Bots
 
         public bool Buy(int i)
         {
-            return Histogram.IsFlex(i) > 0 && Signal.IsTrend(i) > 1;
+            bool buy = Histogram.IsSpike(i) < 0;
+
             //if (buy)
             //{
             //    double buyPrice = Histogram[i].CandleStick.close;
-            //    buy = buyPrice  * Ratio < previousTradePrice;
+            //    buy = buyPrice * Ratio < previousTradePrice;
             //    previousFlexPrice = buyPrice;
             //    if (buy)
             //    {
             //        previousTradePrice = previousFlexPrice;
             //    }
             //}
-            //return buy;
+            return buy;
         }
 
         public bool Sell(int i)
         {
-            return Histogram.IsFlex(i) < 0 && Signal.IsTrend(i) > 1;
+            var sell = Histogram.IsSpike(i) > 0;
             //if (sell)
             //{
             //    double sellPrice = Histogram[i].CandleStick.close;
@@ -58,7 +58,7 @@ namespace AutoTrader.Traders.Bots
             //        previousTradePrice = previousFlexPrice;
             //    }
             //}
-            //return sell;
+            return sell;
         }
 
         public List<TradeItem> RefreshAll()

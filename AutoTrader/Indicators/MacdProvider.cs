@@ -10,10 +10,6 @@ namespace AutoTrader.Indicators
         protected int Slow = 26;
         protected int Signal = 15;
 
-        //protected int Fast = 26;
-        //protected int Slow = 52;
-        //protected int Signal = 41;
-
         protected bool Percent = false;
 
         protected IList<CandleStick> Data { get; set; }

@@ -61,6 +61,8 @@ namespace AutoTrader
 
             CreateTraders(niceHashApi);
 
+            bool first = true;
+
             do
             {
                 int i = 0;
@@ -68,7 +70,7 @@ namespace AutoTrader
                 {
                     try
                     {
-                        trader.Trade(i < BUYER_NUMBER);
+                        trader.Trade(i < BUYER_NUMBER && !first);
                         i++;
                     }
                     catch (Exception ex)
@@ -76,6 +78,7 @@ namespace AutoTrader
                         Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
                     }
                 }
+                first = false;
                 Logger.Info($"Waiting {TRADE_WAIT / 1000} seconds...");
                 Thread.Sleep(TRADE_WAIT);
             } while (true);

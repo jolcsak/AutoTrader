@@ -16,22 +16,28 @@ namespace AutoTrader.Traders.Bots
         {
             return values[i].Value * values[i - 1].Value < 0 ? Math.Sign(values[i].Value) : 0;
         }
-        public static int IsTrend<T>(this List<T> values, int i) where T : ValueBase
+        public static int IsPositiveTrend<T>(this List<T> values, int i) where T : ValueBase
         {
             if (i < 1 || values[i - 1] == null)
             {
                 return 0;
             }
-            int sign = Math.Sign(values[i - 1].Value);
+            int sign = Math.Sign(values[i].CandleStick.close - values[i - 1].CandleStick.close);
+            if (sign < 0)
+            {
+                return 0;
+            }
             int j = i;
+            double close;
             do
             {
+                close = values[j].CandleStick.close;
                 j--;
-            } while (j >= 0 && values[j] != null && Math.Sign(values[j].Value) == sign);
+            } while (j >= 0 && values[j] != null && Math.Sign(close - values[j].CandleStick.close) == sign);
             return i - j;
         }
 
-        public static int IsSpike<T>(this List<T> values, int i, double ratio = 1.2) where T : ValueBase
+        public static int IsSpike<T>(this List<T> values, int i, double ratio = 1.05) where T : ValueBase
         {
             double a = Math.Abs(values[i].CandleStick.close);
             int j = i - 1;
