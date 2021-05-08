@@ -22,7 +22,7 @@ namespace AutoTrader.Indicators
 
         public void Calculate()
         {
-            if (Data.Count < 1)
+            if (Data.Count < Period + 1)
             {
                 return;
             }

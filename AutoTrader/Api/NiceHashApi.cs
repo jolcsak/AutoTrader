@@ -74,7 +74,7 @@ namespace AutoTrader.Api
         public static DateTime UnixTimestampToDateTime(long unixTime)
         {           
             long unixTimeStampInTicks = unixTime * TimeSpan.TicksPerSecond;
-            return new DateTime(unixStartTicks + unixTimeStampInTicks, DateTimeKind.Utc);
+            return new DateTime(unixStartTicks + unixTimeStampInTicks, DateTimeKind.Utc).ToLocalTime();
         }
 
         public OrderTrade Order(string market, bool isBuy, double amount, double minSecQuantity = 0)

@@ -12,7 +12,7 @@ namespace AutoTrader.Traders
 
         protected DateTime lastUpdate = DateTime.MinValue;
 
-        public static double MinBtcTradeAmount = 0.00025;
+        public static double MinBtcTradeAmount = 0.00022;
 
         protected double actualPrice;
         protected double actualAmount;
@@ -63,21 +63,23 @@ namespace AutoTrader.Traders
             //    return;
             //}
 
-            var lastPrices = NiceHashApi.GetLastPrices(TargetCurrency + BTC, 1);
 
-            if (lastPrices?.Count() == 0 || lastPrices?[0] == null)
-            {
-                return;
-            }
+            var actualOrder = new ActualPrice { Currency = TargetCurrency, Price = orderBooks.sell[0][0], Amount = orderBooks.sell[0][1] };
 
-            var lastPrice = lastPrices[0];
-            actualPrice = lastPrice.price;
-            actualAmount = lastPrice.qty;
-            LastPriceDate = lastPrice.Date;
+            actualPrice = actualOrder.Price;
+            actualAmount = actualOrder.Amount;
+            LastPriceDate = DateTime.Now;
 
             if (lastUpdate.AddHours(1) <= DateTime.Now)
             {
-                BotManager.Refresh();
+                OrderBooks orderBooks = NiceHashApi.GetOrderBook(TargetCurrency, BTC);
+                if (orderBooks == null)
+                {
+                    Logger.Err("No orderbook returned!");
+                    return;
+                }
+
+                BotManager.Refresh(actualOrder);
                 lastUpdate = DateTime.Now;
             }
 

@@ -1,11 +1,12 @@
-﻿using System;
+﻿using AutoTrader.Traders;
+using System;
 
 namespace AutoTrader.Api.Objects
 {
     public class CandleStick
     {
         private double _close;
-        public int time { get; set; }
+        public long time { get; set; }
         public double open { get; set; }
         public double close {
             get => _close;
@@ -24,6 +25,21 @@ namespace AutoTrader.Api.Objects
         public double temp_close { get; set; }
 
         public DateTime Date => NiceHashApi.UnixTimestampToDateTime(time);
+
+        public CandleStick()
+        {
+        }
+
+        public CandleStick(ActualPrice price)
+        {
+            close = price.Price;
+            low = close;
+            high = close;
+            open = close;
+            volume = price.Amount;
+            quote_volume = volume;
+            time = (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        }
 
         public CandleStick Clone()
         {

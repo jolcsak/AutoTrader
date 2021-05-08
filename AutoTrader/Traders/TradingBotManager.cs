@@ -85,23 +85,33 @@ namespace AutoTrader.Traders
             MacdBot = new MacdBot(this);
         }
 
-        public void Refresh()
+        public void Refresh(ActualPrice actualPrice = null)
         {
-            var candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateTime.Now.AddMonths(-1), DateTime.Now, 60);
-
-            if (candleSticks == null)
+            CandleStick[] candleSticks;
+            if (PastPrices == null)
             {
-                return;
+                candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateTime.Now.AddMonths(-1), DateTime.Now, 60);
+
+                if (candleSticks == null)
+                {
+                    return;
+                }
+
+                PastPrices = candleSticks.ToList();
+                Dates = new List<DateTime>(candleSticks.Select(cs => cs.Date));
             }
 
-            PastPrices = candleSticks;
-            Dates = new List<DateTime>(candleSticks.Select(cs => cs.Date));
+            if (actualPrice != null)
+            {
+                PastPrices.Add(new CandleStick(actualPrice));
+                Dates.Add(DateTime.Now);
+            }
 
             var tasks = new List<Task>
             {
-                Task.Factory.StartNew(() => smaSlowProvider = new SmaProvider(candleSticks, SMA_SLOW_SMOOTHNESS)),
-                Task.Factory.StartNew(() => smaFastProvider = new SmaProvider(candleSticks, SMA_FAST_SMOOTHNESS)),
-                Task.Factory.StartNew(() => AoProvider = new AoProvider(candleSticks)),
+                Task.Factory.StartNew(() => smaSlowProvider = new SmaProvider(PastPrices, SMA_SLOW_SMOOTHNESS)),
+                Task.Factory.StartNew(() => smaFastProvider = new SmaProvider(PastPrices, SMA_FAST_SMOOTHNESS)),
+                Task.Factory.StartNew(() => AoProvider = new AoProvider(PastPrices)),
                 Task.Factory.StartNew(() => RsiProvider = new RsiProvider(PastPrices, RSI_PERIOD)),
                 Task.Factory.StartNew(() => MacdProvider = new MacdProvider(PastPrices, EMA_FAST, EMA_SLOW, MACD_SIGNAL)),
             };
@@ -190,12 +200,12 @@ namespace AutoTrader.Traders
             return money / startMoney;
         }
 
-        private static double Sell( IList<TradeOrder> tradeItems, TradeItem trade)
+        private double Sell( IList<TradeOrder> tradeItems, TradeItem trade)
         {
             double money = 0;
             foreach (var tradeItem in tradeItems)
             {
-                if (tradeItem.Type == TradeOrderType.OPEN && trade.Price > tradeItem.Price * 1.03)
+                if (tradeItem.Type == TradeOrderType.OPEN && trade.Price > tradeItem.Price * TradeSettings.MinSellYield)
                 {
                     tradeItem.SellPrice = trade.Price;
                     tradeItem.Type = TradeOrderType.CLOSED;
