@@ -63,6 +63,12 @@ namespace AutoTrader.Traders
             //    return;
             //}
 
+            OrderBooks orderBooks = NiceHashApi.GetOrderBook(TargetCurrency, BTC);
+            if (orderBooks == null)
+            {
+                Logger.Err("No orderbook returned!");
+                return;
+            }
 
             var actualOrder = new ActualPrice { Currency = TargetCurrency, Price = orderBooks.sell[0][0], Amount = orderBooks.sell[0][1] };
 
@@ -72,13 +78,6 @@ namespace AutoTrader.Traders
 
             if (lastUpdate.AddHours(1) <= DateTime.Now)
             {
-                OrderBooks orderBooks = NiceHashApi.GetOrderBook(TargetCurrency, BTC);
-                if (orderBooks == null)
-                {
-                    Logger.Err("No orderbook returned!");
-                    return;
-                }
-
                 BotManager.Refresh(actualOrder);
                 lastUpdate = DateTime.Now;
             }
