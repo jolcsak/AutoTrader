@@ -85,7 +85,7 @@ namespace AutoTrader.Traders
             MacdBot = new MacdBot(this);
         }
 
-        public void Refresh(ActualPrice actualPrice = null)
+        public void Refresh(ActualPrice actualPrice = null, bool add = false)
         {
             CandleStick[] candleSticks;
             if (PastPrices == null)
@@ -103,6 +103,14 @@ namespace AutoTrader.Traders
 
             if (actualPrice != null)
             {
+                if (!add)
+                {
+                    if (PastPrices.Count > 0)
+                    {
+                        PastPrices.RemoveAt(PastPrices.Count - 1);
+                    }
+                }
+
                 PastPrices.Add(new CandleStick(actualPrice));
                 Dates.Add(DateTime.Now);
             }

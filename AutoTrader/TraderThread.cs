@@ -18,7 +18,7 @@ namespace AutoTrader
     {
         private const string VERSION = "0.25";
         private const int COLLECTOR_WAIT = 1 * 60 * 1000;
-        private const int TRADE_WAIT = 20 * 1000;
+        private const int TRADE_WAIT = 5 * 1000;
         private const int BUYER_NUMBER = 12;
         private const string FIAT = "HUF";
         private const bool collectPrices = false;

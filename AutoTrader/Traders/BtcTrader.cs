@@ -85,14 +85,11 @@ namespace AutoTrader.Traders
 
             if (previousPrice != actualPrice)
             {
-                bool isSpike = actualPrice.IsSpike(lastBotPrice);
-                if (isSpike)
+                bool isNewPeriod = lastUpdate.AddMinutes(60) < DateTime.Now;
+                BotManager.Refresh(actualOrder, isNewPeriod);
+
+                if (isNewPeriod)
                 {
-                    Logger.Info($"{TargetCurrency} => Spike at {DateTime.Now} : prev={previousPrice},curr={actualPrice}");
-                }
-                if (lastUpdate.AddMinutes(30) < DateTime.Now || isSpike)
-                {
-                    BotManager.Refresh(actualOrder);
                     lastUpdate = DateTime.Now;
                     lastBotPrice = actualPrice;
                 }
