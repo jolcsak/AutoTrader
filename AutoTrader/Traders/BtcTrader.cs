@@ -85,7 +85,12 @@ namespace AutoTrader.Traders
 
             if (previousPrice != actualPrice)
             {
-                if (lastUpdate.AddMinutes(30) < DateTime.Now || actualPrice.IsSpike(lastBotPrice))
+                bool isSpike = actualPrice.IsSpike(lastBotPrice);
+                if (isSpike)
+                {
+                    Logger.Info($"{TargetCurrency} => Spike at {DateTime.Now} : prev={previousPrice},curr={actualPrice}");
+                }
+                if (lastUpdate.AddMinutes(30) < DateTime.Now || isSpike)
                 {
                     BotManager.Refresh(actualOrder);
                     lastUpdate = DateTime.Now;
@@ -96,6 +101,7 @@ namespace AutoTrader.Traders
                 {
                     if (BotManager.IsBuy)
                     {
+                        Logger.Info($"{TargetCurrency}: Buy at {DateTime.Now} : prev={previousPrice},curr={actualPrice}");
                         Buy(MinBtcTradeAmount, actualPrice, actualAmount);
                     }
                 }
@@ -122,12 +128,23 @@ namespace AutoTrader.Traders
         {
             if (BotManager.IsSell)
             {
-                Logger.Info($"Time to sell at price {actualPrice}");
+                Logger.Info($"{TargetCurrency}: Time to sell at price {actualPrice}");
                 foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))
                 {
+                    Logger.Info($"{TargetCurrency}: Buy price: {tradeOrder.Price}, Actual Price: {actualPrice},  Yield: {actualPrice / tradeOrder.Price:N6}");
                     if (actualPrice >= (tradeOrder.Price * TradeSettings.MinSellYield))
                     {
-                        Sell(actualPrice, tradeOrder);
+                        if (Sell(actualPrice, tradeOrder))
+                        {
+                            Logger.Info("Sold.");
+                        }
+                        {
+                            Logger.Err("Sell failed!");
+                        }
+                    }
+                    else
+                    {
+                        Logger.Info("Yield too low.");
                     }
                 }
             }
