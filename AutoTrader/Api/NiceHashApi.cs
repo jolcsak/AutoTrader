@@ -80,7 +80,7 @@ namespace AutoTrader.Api
         public OrderTrade Order(string market, bool isBuy, double amount, double minSecQuantity = 0)
         {
             string side = isBuy ? "buy" : "sell";
-            string amountStr = amount.ToString("N8", CultureInfo.InvariantCulture);
+            string amountStr = amount.ToString("F8", CultureInfo.InvariantCulture);
             string url = $"/exchange/api/v2/order?market={market}&side={side}&type=market&quantity={amountStr}";
             if (isBuy)
             {
