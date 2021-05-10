@@ -67,9 +67,9 @@ namespace AutoTrader.Traders
 
         public ITradingBot MacdBot { get; set; }
 
-        public bool IsBuy => Trades.LastOrDefault(t => t.Date.AddHours(1) >= DateTime.Now)?.Type  == TradeType.Buy;
+        public TradeItem IsBuy => Trades.LastOrDefault(t => t.Date.AddHours(1) >= DateTime.Now && t.Type == TradeType.Buy);
 
-        public bool IsSell => Trades.LastOrDefault(t => t.Date.AddHours(1) >= DateTime.Now)?.Type == TradeType.Sell;
+        public TradeItem IsSell => Trades.LastOrDefault(t => t.Date.AddHours(1) >= DateTime.Now && t.Type == TradeType.Sell);
 
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 

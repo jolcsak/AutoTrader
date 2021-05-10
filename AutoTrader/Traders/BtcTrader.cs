@@ -96,9 +96,11 @@ namespace AutoTrader.Traders
 
                 if (TradeSettings.CanBuy && canBuy && btcBalance >= MinBtcTradeAmount)
                 {
-                    if (BotManager.IsBuy)
+                    TradeItem buyItem = BotManager.IsBuy;
+                    if (buyItem != null)
                     {
                         Logger.Info($"{TargetCurrency}: Buy at {DateTime.Now} : prev={previousPrice},curr={actualPrice}");
+                        Logger.Info(buyItem.ToString());
                         Buy(MinBtcTradeAmount, actualPrice, actualAmount);
                     }
                 }
@@ -123,9 +125,11 @@ namespace AutoTrader.Traders
 
         private bool Sell(double actualPrice)
         {
-            if (BotManager.IsSell)
+            TradeItem sellItem = BotManager.IsSell;
+            if (sellItem != null)
             {
                 Logger.Info($"{TargetCurrency}: Time to sell at price {actualPrice}");
+                Logger.Info(sellItem.ToString());
                 foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))
                 {
                     Logger.Info($"{TargetCurrency}: Buy price: {tradeOrder.Price}, Actual Price: {actualPrice},  Yield: {actualPrice / tradeOrder.Price:N6}");

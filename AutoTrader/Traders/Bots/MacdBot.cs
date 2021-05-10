@@ -5,6 +5,7 @@ namespace AutoTrader.Traders.Bots
 {
     public class MacdBot : ITradingBot
     {
+        public string Name => nameof(RsiBot);
         public static double Ratio { get; set; } = 1.03;
         public static double SmallRatio { get; set; } = 1.01;
 
@@ -70,7 +71,7 @@ namespace AutoTrader.Traders.Bots
                     }
                     if (isBuy || isSell)
                     {
-                        tradeItems.Add(new TradeItem(Histogram[i].CandleStick.Date, Histogram[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell));
+                        tradeItems.Add(new TradeItem(Histogram[i].CandleStick.Date, Histogram[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell, Name));
                     }
                 }
             }

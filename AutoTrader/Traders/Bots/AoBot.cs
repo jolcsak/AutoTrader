@@ -6,6 +6,8 @@ namespace AutoTrader.Traders.Bots
 {
     public class AoBot : ITradingBot
     {
+        public string Name => nameof(RsiBot);
+
         public static double Ratio { get; set; } = 1;
 
         protected TradingBotManager botManager;
@@ -138,7 +140,7 @@ namespace AutoTrader.Traders.Bots
 
                     if (isBuy || isSell)
                     {
-                        tradeItems.Add(new TradeItem(Ao[i].CandleStick.Date, Ao[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell));
+                        tradeItems.Add(new TradeItem(Ao[i].CandleStick.Date, Ao[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell, Name));
                     }
                 }
             }

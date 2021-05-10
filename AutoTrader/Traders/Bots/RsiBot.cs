@@ -6,6 +6,7 @@ namespace AutoTrader.Traders.Bots
 {
     public class RsiBot : ITradingBot
     {
+
         private const double OVERBOUGHT = 70;
         private const double OVERSOLD = 30;
 
@@ -17,6 +18,8 @@ namespace AutoTrader.Traders.Bots
         {
             this.botManager = botManager;
         }
+
+        public string Name  => nameof(RsiBot);
 
         public bool IsBuy => Rsi.Count > 0 && Rsi[Rsi.Count - 1].IsBuy;
         public bool IsSell => Rsi.Count > 0 && Rsi[Rsi.Count - 1].IsSell;
@@ -52,7 +55,7 @@ namespace AutoTrader.Traders.Bots
                 }
                 if (isBuy || isSell)
                 {                    
-                    tradeItems.Add(new TradeItem(Rsi[i].CandleStick.Date, Rsi[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell));
+                    tradeItems.Add(new TradeItem(Rsi[i].CandleStick.Date, Rsi[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell, Name));
                 }
             }
             return tradeItems;
