@@ -7,6 +7,7 @@ using AutoTrader.Api.Objects;
 using AutoTrader.Db;
 using AutoTrader.Db.Entities;
 using AutoTrader.Indicators;
+using AutoTrader.Indicators.Values;
 using AutoTrader.Log;
 using AutoTrader.Traders.Bots;
 using MathNet.Filtering;
@@ -44,7 +45,7 @@ namespace AutoTrader.Traders
         public IList<SmaValue> SmaSlow => smaSlowProvider.Sma;
         public IList<SmaValue> SmaFast => smaFastProvider.Sma;
 
-        public IList<AoValue> Ao => AoProvider.Ao;
+        public IList<AoHistValue> Ao => AoProvider.Ao;
 
         public IList<RsiValue> Rsi => RsiProvider.Rsi;
 
@@ -94,7 +95,7 @@ namespace AutoTrader.Traders
                     return;
                 }
 
-                DateProvider.MinDate = candleSticks.Min(cs => cs.Date);   
+                DateProvider.MinDate = candleSticks.Min(cs => cs.Date);
                 PastPrices = candleSticks.ToList();
                 Dates = new List<DateTime>(candleSticks.Select(cs => cs.Date));
             }
@@ -124,6 +125,16 @@ namespace AutoTrader.Traders
                 Task.Factory.StartNew(() => MacdProvider = new MacdProvider(PastPrices, EMA_FAST, EMA_SLOW, MACD_SIGNAL)),
             };
             Task.WaitAll(tasks.ToArray());
+
+
+            DateTime firstAoDate = AoProvider.Ao?.FirstOrDefault()?.CandleStick.Date ?? DateTime.MaxValue;
+            DateTime firstMacdDate = MacdProvider.Result.Histogram.FirstOrDefault()?.CandleStick.Date ?? DateTime.MaxValue;
+            DateTime firstDate = firstAoDate <= firstMacdDate ? firstAoDate : firstMacdDate;
+
+            if (firstDate != DateTime.MaxValue)
+            {
+                DateProvider.MinDate = firstDate;
+            }
 
             tasks.Clear();
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using AutoTrader.Indicators;
+using AutoTrader.Indicators.Values;
 using AutoTrader.Log;
 
 namespace AutoTrader.Traders.Bots
@@ -11,7 +12,7 @@ namespace AutoTrader.Traders.Bots
         public static double Ratio { get; set; } = 1;
 
         protected TradingBotManager botManager;
-        protected IList<AoValue> Ao => botManager.Ao;
+        protected IList<AoHistValue> Ao => botManager.Ao;
 
         protected IList<SmaValue> SmaSlow => botManager.SmaSlow;
 

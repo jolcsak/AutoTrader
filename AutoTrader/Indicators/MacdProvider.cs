@@ -63,6 +63,7 @@ namespace AutoTrader.Indicators
                 signalEmaValues.Insert(0, null);
             }
 
+            double previousValue = -1;
             // Fill Signal and MACD Histogram lists
             for (int i = 0; i < signalEmaValues.Count; i++)
             {
@@ -70,7 +71,9 @@ namespace AutoTrader.Indicators
                 var line = Result.Line[i];
                 if (line != null && Result.Signal[i] != null)
                 {
-                    Result.Histogram.Add(new MacdHistogramValue(line.Value - Result.Signal[i].Value, line.CandleStick));
+                    double value = line.Value - Result.Signal[i].Value;
+                    Result.Histogram.Add(new HistValue { Value = value, Color = previousValue > value ? AoColor.Red : AoColor.Green, CandleStick = line.CandleStick });
+                    previousValue = value;
                 }
                 else
                 {

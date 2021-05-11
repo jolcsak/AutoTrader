@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using AutoTrader.Db.Entities;
 using AutoTrader.Indicators;
+using AutoTrader.Indicators.Values;
 using AutoTrader.Log;
 using AutoTrader.Traders;
 
@@ -219,7 +220,7 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.AoGraphVisible)
                 {
-                    new BarGraph<AoValue>(graph, dateProvider, "Awesome Oscillator", botManager.Ao, Colors.Yellow, Colors.Blue, Colors.DimGray).Draw();
+                    new BarGraph<AoHistValue>(graph, dateProvider, "Awesome Oscillator", botManager.Ao).Draw();
                 }
 
                 if (TradeSettings.TendencyGraphVisible)
@@ -249,7 +250,7 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.MacdVisible)
                 {
-                    new BarGraph<MacdHistogramValue>(graph, dateProvider, "MACD Histogram", botManager.MacdProvider.Result.Histogram, Colors.Yellow, Colors.Blue, Colors.DimGray).Draw();
+                    new BarGraph<HistValue>(graph, dateProvider, "MACD Histogram", botManager.MacdProvider.Result.Histogram).Draw();
                     var ret = new ValueGraph<EmaValue>(graph, dateProvider, "MACD Signal", botManager.MacdProvider.Result.Signal, Colors.DarkViolet).Draw();
                     new ValueGraph<MacdLineValue>(graph, dateProvider, "MACD Line", botManager.MacdProvider.Result.Line, Colors.Orange).Draw(ret.Item1, ret.Item2);
                 }

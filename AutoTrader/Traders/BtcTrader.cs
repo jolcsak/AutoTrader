@@ -60,11 +60,6 @@ namespace AutoTrader.Traders
         {
             double btcBalance = RefreshBalance();
 
-            //if (btcBalance == 0)
-            //{
-            //    return;
-            //}
-
             OrderBooks orderBooks = NiceHashApi.GetOrderBook(TargetCurrency, BTC);
             if (orderBooks == null)
             {

@@ -12,7 +12,7 @@ namespace AutoTrader.Traders.Bots
         protected TradingBotManager tradeManager { get; set; }
 
         public List<MacdLineValue> Line => tradeManager.MacdProvider.Result.Line;
-        public List<MacdHistogramValue> Histogram => tradeManager.MacdProvider.Result.Histogram;
+        public List<HistValue> Histogram => tradeManager.MacdProvider.Result.Histogram;
         public List<EmaValue> Signal => tradeManager.MacdProvider.Result.Signal;
 
         public bool IsBuy { get; }

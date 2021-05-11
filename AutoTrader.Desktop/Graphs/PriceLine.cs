@@ -60,9 +60,10 @@ namespace AutoTrader.Desktop
             {
                 double cHeight = graph.ActualHeight / (maxValue - minValue);
                 double y = graph.ActualHeight - (value - minValue) * cHeight;
-                graph.Children.Add(new Line { Stroke = lineBrush, StrokeThickness = lineWeight, X1 = 0, Y1 = y, X2 = graph.ActualWidth, Y2 = y, ToolTip = graphName + ":" + value.ToString(toolTipFormat) });
-                graph.Children.Add(new Line { Stroke = outlineBrush, StrokeThickness = 1, X1 = 0, Y1 = y-1, X2 = graph.ActualWidth, Y2 = y-1, ToolTip = graphName + ":" + value.ToString(toolTipFormat) });
-                graph.Children.Add(new Line { Stroke = outlineBrush, StrokeThickness = 1, X1 = 0, Y1 = y + 1, X2 = graph.ActualWidth, Y2 = y + 1, ToolTip = graphName + ":" + value.ToString(toolTipFormat) });
+                string toolTip = graphName + ":" + value.ToString(toolTipFormat);
+                graph.Children.Add(new Line { Stroke = lineBrush, StrokeThickness = lineWeight, X1 = 0, Y1 = y, X2 = graph.ActualWidth, Y2 = y, ToolTip = toolTip });
+                graph.Children.Add(new Line { Stroke = outlineBrush, StrokeThickness = 1, X1 = 0, Y1 = y-1, X2 = graph.ActualWidth, Y2 = y-1, ToolTip = toolTip });
+                graph.Children.Add(new Line { Stroke = outlineBrush, StrokeThickness = 1, X1 = 0, Y1 = y + 1, X2 = graph.ActualWidth, Y2 = y + 1, ToolTip = toolTip });
             });
         }
     }

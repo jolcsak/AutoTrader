@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoTrader.Api.Objects;
+using AutoTrader.Indicators.Values;
 
 namespace AutoTrader.Indicators
 {
@@ -12,9 +13,9 @@ namespace AutoTrader.Indicators
         public SmaProvider SlowSmaProvider { get; set; }
         public SmaProvider FastSmaProvider { get; set; }
 
-        public IList<AoValue> Ao { get; } = new List<AoValue>();
+        public IList<AoHistValue> Ao { get; } = new List<AoHistValue>();
 
-        public AoValue Current => Ao.Any() ? Ao.Last() : null;
+        public HistValue Current => Ao.Any() ? Ao.Last() : null;
 
         public double Frequency
         {
@@ -77,7 +78,7 @@ namespace AutoTrader.Indicators
                 var ma = fastMa - slowMa;
                 if (fastMa > -1 && slowMa > -1)
                 {
-                    Ao.Add(new AoValue { Value = ma, Color = previousMa > ma ? AoColor.Red : AoColor.Green, SmaIndex = i, CandleStick = SlowSmaProvider.Sma[i].CandleStick });
+                    Ao.Add(new AoHistValue { Value = ma, Color = previousMa > ma ? AoColor.Red : AoColor.Green, SmaIndex = i, CandleStick = SlowSmaProvider.Sma[i].CandleStick });
                 }
                 previousMa = ma;
             }
