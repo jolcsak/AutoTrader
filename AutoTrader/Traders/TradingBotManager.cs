@@ -67,14 +67,12 @@ namespace AutoTrader.Traders
 
         public ITradingBot MacdBot { get; set; }
 
-        public TradeItem IsBuy => Trades.LastOrDefault(t => t.Date.AddHours(1) >= DateTime.Now && t.Type == TradeType.Buy);
-
-        public TradeItem IsSell => Trades.LastOrDefault(t => t.Date.AddHours(1) >= DateTime.Now && t.Type == TradeType.Sell);
-
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 
         public double ProjectedIncome => GetProjectedIncome();
 
+        public DateProvider DateProvider { get; private set; }
+        public TradeItem LastTrade { get; set; }
 
         public TradingBotManager(ITrader trader)
         {
@@ -88,6 +86,7 @@ namespace AutoTrader.Traders
         public void Refresh(ActualPrice actualPrice = null, bool add = false)
         {
             CandleStick[] candleSticks;
+            CandleStick lastCandleStick = null;
             if (PastPrices == null)
             {
                 candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateTime.Now.AddMonths(-1), DateTime.Now, 60);
@@ -111,7 +110,8 @@ namespace AutoTrader.Traders
                     }
                 }
 
-                PastPrices.Add(new CandleStick(actualPrice));
+                lastCandleStick = new CandleStick(actualPrice);
+                PastPrices.Add(lastCandleStick);
                 Dates.Add(DateTime.Now);
             }
 
@@ -174,6 +174,11 @@ namespace AutoTrader.Traders
             Trades.AddRange(rsiTrades);
             Trades.AddRange(macdTrades);
             Trades = Trades.OrderBy(t => t.Date).ToList();
+
+            if (lastCandleStick != null && Trades.Any())
+            {
+                LastTrade = Trades.FirstOrDefault(t => t.Date.Equals(lastCandleStick.Date));
+            }
         }
 
         private double GetProjectedIncome()

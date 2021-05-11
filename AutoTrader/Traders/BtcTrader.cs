@@ -13,7 +13,7 @@ namespace AutoTrader.Traders
 
         protected DateTime lastUpdate = DateTime.MinValue;
 
-        public static double MinBtcTradeAmount = 0.00024;
+        public static double MinBtcTradeAmount = 0.00025;
 
         protected double actualPrice;
         protected double actualAmount;
@@ -83,9 +83,10 @@ namespace AutoTrader.Traders
                 lastBotPrice = actualPrice;
             }
 
-            if (previousPrice != actualPrice)
+            bool isNewPeriod = lastUpdate.AddMinutes(60) < DateTime.Now;
+
+            if (previousPrice != actualPrice || isNewPeriod)
             {
-                bool isNewPeriod = lastUpdate.AddMinutes(60) < DateTime.Now;
                 BotManager.Refresh(actualOrder, isNewPeriod);
 
                 if (isNewPeriod)
@@ -96,11 +97,10 @@ namespace AutoTrader.Traders
 
                 if (TradeSettings.CanBuy && canBuy && btcBalance >= MinBtcTradeAmount)
                 {
-                    TradeItem buyItem = BotManager.IsBuy;
-                    if (buyItem != null)
+                    if (BotManager.LastTrade?.Type == TradeType.Buy)
                     {
                         Logger.Info($"{TargetCurrency}: Buy at {DateTime.Now} : prev={previousPrice},curr={actualPrice}");
-                        Logger.Info(buyItem.ToString());
+                        Logger.Info(BotManager.LastTrade.ToString());
                         Buy(MinBtcTradeAmount, actualPrice, actualAmount);
                     }
                 }
@@ -118,18 +118,17 @@ namespace AutoTrader.Traders
 
             SaveOrderBooksPrices();
 
-            Logger.Info($"Change: {changeRatio}, Cur: {actualPrice} x {actualAmount}");
+            //Logger.Info($"Change: {changeRatio}, Cur: {actualPrice} x {actualAmount}");
             Logger.LogTradeOrders(AllTradeOrders);
             Logger.LogCurrency(this, actualPrice, actualAmount);
         }
 
         private bool Sell(double actualPrice)
         {
-            TradeItem sellItem = BotManager.IsSell;
-            if (sellItem != null)
+            if (BotManager.LastTrade?.Type == TradeType.Sell)
             {
                 Logger.Info($"{TargetCurrency}: Time to sell at price {actualPrice}");
-                Logger.Info(sellItem.ToString());
+                Logger.Info(BotManager.LastTrade.ToString());
                 foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))
                 {
                     Logger.Info($"{TargetCurrency}: Buy price: {tradeOrder.Price}, Actual Price: {actualPrice},  Yield: {actualPrice / tradeOrder.Price:N6}");
