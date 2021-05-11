@@ -1,6 +1,7 @@
 ﻿using AutoTrader.Db.Entities;
 using AutoTrader.Desktop.Graphs;
 using AutoTrader.Indicators;
+using AutoTrader.Traders;
 using AutoTrader.Traders.Bots;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,8 @@ namespace AutoTrader.Desktop
 
         private static RotateTransform rotate45 = new RotateTransform(45);
 
+        private DateProvider dateProvider;
+
         static ValueGraph()
         {
             buyBrush.Freeze();
@@ -44,20 +47,21 @@ namespace AutoTrader.Desktop
             rotate45.Freeze();
         }
 
-        public ValueGraph(Canvas graph, string graphName, IList<T> values, Color lineColor, bool showPoints = false, string toolTipFormat = "N10", int lineWeight = 2)            
+        public ValueGraph(Canvas graph, DateProvider dateProvider, string graphName, IList<T> values, Color lineColor, bool showPoints = false, string toolTipFormat = "N10", int lineWeight = 2)            
         {
             this.graph = graph;
-            this.values = values;
+            this.values = values.ToList();
             this.graphName = graphName;
             this.toolTipFormat = toolTipFormat;
             this.lineWeight = lineWeight;
-            this.showPoints = showPoints; 
+            this.showPoints = showPoints;
+            this.dateProvider = dateProvider;
 
             lineBrush = new SolidColorBrush { Color = lineColor };
             lineBrush.Freeze();
         }
 
-        public Tuple<double?, double> Draw(int skip, double? fixedCheight = null, double fixedMinValue = 0, IList<TradeItem> trades = null, IList<TradeOrder> tradeOrders = null)
+        public Tuple<double?, double> Draw(double? fixedCheight = null, double fixedMinValue = 0, IList<TradeItem> trades = null, IList<TradeOrder> tradeOrders = null)
         {
             double? cHeight = null;
             if (!values.Any() || values.Any(v => v != null && double.IsNaN(v.Value)))
@@ -65,7 +69,7 @@ namespace AutoTrader.Desktop
                 return new Tuple<double?, double> (cHeight, 0);
             }
 
-            var drawValues = values.Skip(skip);
+            var drawValues = values.Where(v => v != null && v.Value != -1);
             if (!drawValues.Any())
             {
                 return new Tuple<double?, double>(cHeight, 0);
@@ -83,28 +87,29 @@ namespace AutoTrader.Desktop
                 int pointWidth = lineWeight * 3;
                 int halfPointSize = pointWidth / 2;
                 double priceHeight = maxValue - minValue;
-                double width = graph.ActualWidth;
                 double height = graph.ActualHeight;
-                double priceWidth = values.Count - 1 - skip;
-                double cWidth = width / priceWidth;
+                double priceWidth = values.Count - 1;
                 cHeight = fixedCheight.HasValue ? fixedCheight.Value : height / priceHeight;
                 minValue = fixedCheight.HasValue ? fixedMinValue : minValue;
-                double currentX = 0;
 
                 var points = new PointCollection();
                 foreach (T value in drawValues)
                 {
                     double y = (value.Value - minValue) * cHeight.Value;
+                    double currentX = dateProvider.GetPosition(value.CandleStick.Date);
                     points.Add(new Point(currentX, height - y));
-                    currentX += cWidth;
                 }
                 graph.Children.Add(new Polyline { Stroke = lineBrush, StrokeThickness = lineWeight, Points = points, ToolTip = graphName });
 
-                currentX = 0;
                 DateTime previousDate = drawValues.First().CandleStick.Date;
                 T lastValue = drawValues.Last();
                 foreach (T value in drawValues)
                 {
+                    if (value == null || value.Value == -1)
+                    {
+                        continue;
+                    }
+                    double currentX = dateProvider.GetPosition(value.CandleStick.Date);
                     double y = (value.Value - minValue) * cHeight.Value;
 
                     DateTime currenDate = value.CandleStick.Date;
@@ -134,7 +139,6 @@ namespace AutoTrader.Desktop
                         }
                         graph.Children.Add(rect);
                     }
-                    currentX += cWidth;
                     previousDate = currenDate;
                 }
             });

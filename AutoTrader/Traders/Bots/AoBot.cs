@@ -46,7 +46,7 @@ namespace AutoTrader.Traders.Bots
         {
             if (i >= 2)
             {
-                int j = i + botManager.PricesSkip;
+                int j = Ao[i].SmaIndex;
                 if (j >= SmaSlow.Count)
                 {
                     return false;
@@ -86,7 +86,7 @@ namespace AutoTrader.Traders.Bots
             if (i >= 2)
             {
 
-                int j = i + botManager.PricesSkip;
+                int j = Ao[i].SmaIndex;
                 if (j >= SmaFast.Count)
                 {
                     return false;

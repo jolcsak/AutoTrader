@@ -214,10 +214,12 @@ namespace AutoTrader.Desktop
                 Dispatcher?.Invoke(() => graph.Children.Clear());
 
                 TradingBotManager botManager = trader.BotManager;
+                DateProvider dateProvider = botManager.DateProvider;
+                dateProvider.Width = graph.ActualWidth;
 
                 if (TradeSettings.AoGraphVisible)
                 {
-                    new BarGraph<AoValue>(graph, "Awesome Oscillator", botManager.Ao, Colors.Yellow, Colors.Blue, Colors.DimGray).Draw();
+                    new BarGraph<AoValue>(graph, dateProvider, "Awesome Oscillator", botManager.Ao, Colors.Yellow, Colors.Blue, Colors.DimGray).Draw();
                 }
 
                 if (TradeSettings.TendencyGraphVisible)
@@ -231,35 +233,35 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.PriceGraphVisible)
                 {
-                    new ValueGraph<ValueBase>(graph, "Prices", botManager.PastPrices.Select(p => new ValueBase { Value = p.close, CandleStick = p }).ToList(), Colors.DarkGray, showPoints: false).
-                        Draw(botManager.PricesSkip, null, 0, TradeSettings.TradesVisible ? botManager.Trades : null, TradeSettings.TradesVisible ? trader.TradeOrders : null);
+                    new ValueGraph<ValueBase>(graph, dateProvider, "Prices", botManager.PastPrices.Select(p => new ValueBase { Value = p.close, CandleStick = p }).ToList(), Colors.DarkGray, showPoints: false).
+                        Draw(null, 0, TradeSettings.TradesVisible ? botManager.Trades : null, TradeSettings.TradesVisible ? trader.TradeOrders : null);
                 }
                 if (TradeSettings.SmaGraphVisible)
                 {
-                    var ret = new ValueGraph<SmaValue>(graph, "Fast Simple Moving Average", botManager.SmaFast, Colors.Blue, showPoints: false).Draw(botManager.PricesSkip);
-                    new ValueGraph<SmaValue>(graph, "Slow Simple Moving Average", botManager.SmaSlow, Colors.LightBlue, showPoints: false).Draw(botManager.PricesSkip, ret.Item1, ret.Item2);
+                    var ret = new ValueGraph<SmaValue>(graph, dateProvider, "Fast Simple Moving Average", botManager.SmaFast, Colors.Blue, showPoints: false).Draw();
+                    new ValueGraph<SmaValue>(graph, dateProvider, "Slow Simple Moving Average", botManager.SmaSlow, Colors.LightBlue, showPoints: false).Draw(ret.Item1, ret.Item2);
                 }
 
                 if (TradeSettings.RsiVisible)
                 {
-                    new ValueGraph<RsiValue>(graph, "Relative Strength Index", botManager.Rsi, Colors.Purple).Draw(botManager.PricesSkip - TradingBotManager.RSI_PERIOD);
+                    new ValueGraph<RsiValue>(graph, dateProvider, "Relative Strength Index", botManager.Rsi, Colors.Purple).Draw();
                 }
 
                 if (TradeSettings.MacdVisible)
                 {
-                    new BarGraph<MacdHistogramValue>(graph, "MACD Histogram", botManager.MacdProvider.Result.Histogram, Colors.Yellow, Colors.Blue, Colors.DimGray).Draw(botManager.PricesSkip);
-                    var ret = new ValueGraph<EmaValue>(graph, "MACD Signal", botManager.MacdProvider.Result.Signal, Colors.DarkViolet).Draw(botManager.PricesSkip);
-                    new ValueGraph<MacdLineValue>(graph, "MACD Line", botManager.MacdProvider.Result.Line, Colors.Orange).Draw(botManager.PricesSkip, ret.Item1, ret.Item2);
+                    new BarGraph<MacdHistogramValue>(graph, dateProvider, "MACD Histogram", botManager.MacdProvider.Result.Histogram, Colors.Yellow, Colors.Blue, Colors.DimGray).Draw();
+                    var ret = new ValueGraph<EmaValue>(graph, dateProvider, "MACD Signal", botManager.MacdProvider.Result.Signal, Colors.DarkViolet).Draw();
+                    new ValueGraph<MacdLineValue>(graph, dateProvider, "MACD Line", botManager.MacdProvider.Result.Line, Colors.Orange).Draw(ret.Item1, ret.Item2);
                 }
 
-                new DateGraph(graph, botManager.Dates).Draw(botManager.PricesSkip);
+                new DateGraph(graph, dateProvider, botManager.Dates).Draw();
 
                 if (botManager.FiatBalances.Count > 0)
                 {
                     if (TradeSettings.BalanceGraphVisible)
                     {
-                        new Graph(graph, "Total fiat balance", botManager.FiatBalances, Colors.Olive, showPoints: true, "N1", 3).Draw(0);
-                        new Graph(graph, "Total BTC balance", botManager.BtcBalances, Colors.DarkGray, showPoints: true, "N8", 3).Draw(0);
+                        new Graph(graph, "Total FIAT balance", botManager.FiatBalances, Colors.Olive, showPoints: true, "N1", 3).Draw();
+                        //new Graph(graph, "Total BTC balance", botManager.BtcBalances, Colors.DarkGray, showPoints: true, "N8", 3).Draw();
                     }
                     Dispatcher?.BeginInvoke(() => totalBalanceText.Content = botManager.FiatBalances.Last().ToString("N1") + " HUF");
                 }
@@ -270,7 +272,7 @@ namespace AutoTrader.Desktop
 
                 if (SelectedTradeOrder != null)
                 {
-                    new PriceLine(graph, "Selected price", botManager.PastPrices.Select(pp => pp.close), SelectedTradeOrder.Price, Colors.Brown).Draw(botManager.PricesSkip);
+                    new PriceLine(graph, "Selected price", botManager.PastPrices.Select(pp => pp.close), SelectedTradeOrder.Price, Colors.Brown).Draw();
                 }
             }
         }

@@ -42,21 +42,15 @@ namespace AutoTrader.Desktop
             lineBrush.Freeze();
         }
 
-        public void Draw(int skip)
+        public void Draw()
         {
             if (!values.Any() || values.Any(v => double.IsNaN(v)))
             {
                 return;
             }
 
-            var drawValues = values.Skip(skip);
-            if (!drawValues.Any())
-            {
-                return;
-            }
-
-            double maxValue = drawValues.Max();
-            double minValue = drawValues.Min();
+            double maxValue = values.Max();
+            double minValue = values.Min();
             if (maxValue == minValue)
             {
                 return;

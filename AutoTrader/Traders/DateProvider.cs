@@ -4,12 +4,39 @@ namespace AutoTrader.Traders
 {
     public class DateProvider
     {
-        public DateTime MinDate { get; private set; }
-        public DateTime MaxDate { get; private set; }
+        private DateTime minDate;
+        private DateTime maxDate;
 
-        public DateProvider() : this(DateTime.Now.AddMonths(-1), DateTime.Now)
+        private double cWidth;
+        private double canvasWidth;
+
+        public DateTime MinDate 
         {
+            get => minDate;
+            set
+            {
+                minDate = value;
+                cWidth = canvasWidth / (MaxDate.Ticks - MinDate.Ticks);
+            }
         }
+        public DateTime MaxDate
+        {
+            get => maxDate;
+            set
+            {
+                maxDate = value;
+                cWidth = canvasWidth / (MaxDate.Ticks - MinDate.Ticks);
+            }
+        }
+
+        public double Width
+        {
+            set
+            {
+                canvasWidth = value;
+                cWidth = canvasWidth / (MaxDate.Ticks - MinDate.Ticks);
+            }
+        }        
 
         public DateProvider(DateTime minDate, DateTime maxDate)
         {
@@ -25,10 +52,8 @@ namespace AutoTrader.Traders
             }
         }
 
-        public double GetPosition(double canvasWidth, DateTime date)
+        public double GetPosition(DateTime date)
         {
-            double dateWidth = MaxDate.Ticks - MinDate.Ticks;
-            double cWidth = canvasWidth / dateWidth;
             return cWidth * (date.Ticks - MinDate.Ticks);
         }
     }

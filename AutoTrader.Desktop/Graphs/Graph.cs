@@ -45,7 +45,7 @@ namespace AutoTrader.Desktop
             lineBrush.Freeze();
         }
 
-        public Tuple<double?, double> Draw(int skip, double? fixedCheight = null, double fixedMinValue = 0)
+        public Tuple<double?, double> Draw(double? fixedCheight = null, double fixedMinValue = 0)
         {
             double? cHeight = null;
             if (!values.Any() || values.Any(v => double.IsNaN(v)))
@@ -53,7 +53,7 @@ namespace AutoTrader.Desktop
                 return new Tuple<double?, double> (cHeight, 0);
             }
 
-            var drawValues = values.Skip(skip);
+            var drawValues = values.ToList();
             if (!drawValues.Any())
             {
                 return new Tuple<double?, double>(cHeight, 0);
@@ -73,7 +73,7 @@ namespace AutoTrader.Desktop
                 double priceHeight = maxValue - minValue;
                 double width = graph.ActualWidth;
                 double height = graph.ActualHeight;
-                double priceWidth = values.Count() - 1 - skip;
+                double priceWidth = values.Count() - 1;
                 double cWidth = width / priceWidth;
                 cHeight = fixedCheight.HasValue ? fixedCheight.Value : height / priceHeight;
                 minValue = fixedCheight.HasValue ? fixedMinValue : minValue;

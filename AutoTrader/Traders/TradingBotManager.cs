@@ -24,7 +24,6 @@ namespace AutoTrader.Traders
         private const int EMA_SLOW = 24;
         private const int MACD_SIGNAL = 19;
 
-
         private ITrader trader;
 
         protected SmaProvider smaSlowProvider;
@@ -59,8 +58,6 @@ namespace AutoTrader.Traders
 
         public List<TradeItem> Trades { get; private set; }
 
-        public int PricesSkip { get; set; }
-
         public ITradingBot AoBot { get; set; }
 
         public ITradingBot RsiBot { get; set; }
@@ -89,13 +86,15 @@ namespace AutoTrader.Traders
             CandleStick lastCandleStick = null;
             if (PastPrices == null)
             {
-                candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateTime.Now.AddMonths(-1), DateTime.Now, 60);
+                DateProvider = new DateProvider(DateTime.Now.AddMonths(-1), DateTime.Now);
+                candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateProvider.MinDate, DateProvider.MaxDate, 60);
 
-                if (candleSticks == null)
+                if (candleSticks == null || candleSticks.Length == 0)
                 {
                     return;
                 }
 
+                DateProvider.MinDate = candleSticks.Min(cs => cs.Date);   
                 PastPrices = candleSticks.ToList();
                 Dates = new List<DateTime>(candleSticks.Select(cs => cs.Date));
             }
@@ -112,7 +111,8 @@ namespace AutoTrader.Traders
 
                 lastCandleStick = new CandleStick(actualPrice);
                 PastPrices.Add(lastCandleStick);
-                Dates.Add(DateTime.Now);
+                DateProvider.MaxDate = DateTime.Now;
+                Dates.Add(DateProvider.MaxDate);
             }
 
             var tasks = new List<Task>
@@ -124,13 +124,6 @@ namespace AutoTrader.Traders
                 Task.Factory.StartNew(() => MacdProvider = new MacdProvider(PastPrices, EMA_FAST, EMA_SLOW, MACD_SIGNAL)),
             };
             Task.WaitAll(tasks.ToArray());
-
-            PricesSkip = PastPrices.Count - Ao.Count;
-            int r = PastPrices.Count - MacdProvider.Result.Histogram.Count(h => h != null);
-            if (r > PricesSkip)
-            {
-                PricesSkip = r;
-            }
 
             tasks.Clear();
 

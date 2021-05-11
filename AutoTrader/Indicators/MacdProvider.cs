@@ -21,7 +21,7 @@ namespace AutoTrader.Indicators
             Fast = fast;
             Slow = slow;
             Signal = signal;
-            Data = data;
+            Data = data.Select(d =>d.Clone()).ToList();
             Calculate();
         }
 

@@ -1,4 +1,5 @@
 ﻿using AutoTrader.Indicators;
+using AutoTrader.Traders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,17 +27,20 @@ namespace AutoTrader.Desktop
         private static SolidColorBrush pointFillBrush = new SolidColorBrush { Color = Colors.DimGray };
         protected Dispatcher Dispatcher => Application.Current?.Dispatcher;
 
+        private DateProvider dateProvider;
+
         static BarGraph()
         {
             pointFillRedBrush.Freeze();
             pointFillGreenBrush.Freeze();
         }
 
-        public BarGraph(Canvas graph, string graphName, IList<T> values, Color buyColor, Color sellColor, Color fillColor)
+        public BarGraph(Canvas graph, DateProvider dateProvider, string graphName, IList<T> values, Color buyColor, Color sellColor, Color fillColor)
         {
             this.graph = graph;
             this.graphName = graphName;
-            this.values = values;
+            this.values = values.ToList();
+            this.dateProvider = dateProvider;
 
             buyFillColor = new SolidColorBrush { Color = buyColor };
             sellFillColor = new SolidColorBrush { Color = sellColor };
@@ -67,18 +71,17 @@ namespace AutoTrader.Desktop
                     return;
                 }
 
-                double width = graph.ActualWidth;
                 double height = graph.ActualHeight;
                 double zeroY = height / 2;
                 double priceHeight = maxValue - minValue;
                 double priceWidth = drawValues.Count() - 1;
-                double cWidth = width / priceWidth;                
+                double cWidth = graph.ActualWidth / priceWidth;                
                 double cHeight = Math.Abs(minValue) > Math.Abs(maxValue) ? zeroY / Math.Abs(minValue) : zeroY / Math.Abs(maxValue);
                 double rectWidth = cWidth < 1 ? 1 : cWidth;
-                double currentX = 0;
                 int i = 0;    
                 foreach (T value in drawValues)
                 {
+                    double currentX = dateProvider.GetPosition(value.CandleStick.Date);
                     SetAttributes(buyFillColor, sellFillColor, pointFillRedBrush, pointFillGreenBrush, value, out var fill, out var toolTip);
 
                     double y = value.Value * cHeight;
@@ -102,7 +105,6 @@ namespace AutoTrader.Desktop
                         }
                         graph.Children.Add(rect);
                     }
-                    currentX += cWidth;
                     i++;
                 }
             });

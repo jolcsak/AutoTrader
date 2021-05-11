@@ -317,52 +317,41 @@ namespace AutoTrader.Desktop
         private void SmaBotEnabled_Checked(object sender, RoutedEventArgs e)
         {
             TradeSettings.SmaBotEnabled = true;
-            Store.SaveSettings();
-            CurrentTrader?.BotManager.Refresh();
-            Logger.RefreshGraph(CurrentTrader);
-            Logger.LogProjectedIncome(CurrentTrader);
+            RefreshAllTraders();
         }
 
         private void SmaBotEnabled_Unchecked(object sender, RoutedEventArgs e)
         {
             TradeSettings.SmaBotEnabled = false;
-            Store.SaveSettings();
-            CurrentTrader?.BotManager.Refresh();
-            Logger.RefreshGraph(CurrentTrader);
-            Logger.LogProjectedIncome(CurrentTrader);
+            RefreshAllTraders();
         }
 
         private void RsiBotEnabled_Checked(object sender, RoutedEventArgs e)
         {
             TradeSettings.RsiBotEnabled = true;
-            Store.SaveSettings();
-            CurrentTrader?.BotManager.Refresh();
-            Logger.RefreshGraph(CurrentTrader);
-            Logger.LogProjectedIncome(CurrentTrader);
+            RefreshAllTraders();
         }
 
         private void RsiBotEnabled_Unchecked(object sender, RoutedEventArgs e)
         {
             TradeSettings.RsiBotEnabled = false;
-            Store.SaveSettings();
-            CurrentTrader?.BotManager.Refresh();
-            Logger.RefreshGraph(CurrentTrader);
-            Logger.LogProjectedIncome(CurrentTrader);
+            RefreshAllTraders();
         }
 
         private void MacdBotEnabled_Checked(object sender, RoutedEventArgs e)
         {
             TradeSettings.MacdBotEnabled = true;
-            Store.SaveSettings();
-            CurrentTrader?.BotManager.Refresh();
-            Logger.RefreshGraph(CurrentTrader);
-            Logger.LogProjectedIncome(CurrentTrader);
-
+            RefreshAllTraders();
         }
 
         private void MacdBotEnabled_Unchecked(object sender, RoutedEventArgs e)
         {
             TradeSettings.MacdBotEnabled = false;
+            RefreshAllTraders();
+        }
+
+        private void RefreshAllTraders()
+        {
             Store.SaveSettings();
             CurrentTrader?.BotManager.Refresh();
             Logger.RefreshGraph(CurrentTrader);

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using AutoTrader.Desktop.Graphs;
+using AutoTrader.Traders;
 
 namespace AutoTrader.Desktop
 {
@@ -14,7 +14,7 @@ namespace AutoTrader.Desktop
     {
         private Canvas graph;
 
-        private int pointSize = 2;
+        private DateProvider dateProvider;
 
         protected Dispatcher Dispatcher => Application.Current != null ? Application.Current.Dispatcher : null;
         
@@ -29,13 +29,14 @@ namespace AutoTrader.Desktop
             pointFillBrush.Freeze();
         }
 
-        public DateGraph(Canvas graph, IList<DateTime> values)
+        public DateGraph(Canvas graph, DateProvider dateProvider, IList<DateTime> values)
         {
             this.graph = graph;
             this.values = values;
+            this.dateProvider = dateProvider;
         }
 
-        public void Draw(int skip)
+        public void Draw()
         {
             if (!values.Any())
             {
@@ -43,27 +44,16 @@ namespace AutoTrader.Desktop
             }
             Dispatcher?.BeginInvoke(() =>
             {
-                var drawValues = values.Skip(skip);
-                if (drawValues.Count() == 0)
-                {
-                    return;
-                }
-
-                int halfPointSize = pointSize / 2;
-                double priceWidth = values.Count - 1 - skip;
-                double cWidth = graph.ActualWidth / priceWidth;
-                double currentX = 0;
-
-                currentX = 0;
                 DateTime previousDate = DateTime.MinValue;
-                double y = graph.ActualHeight / 2 - halfPointSize;
+                double y = graph.ActualHeight / 2;
                 double previousTextWidth = 0;
                 double previousX = 0;
 
-                foreach (DateTime value in drawValues)
+                foreach (DateTime value in values)
                 {
                     if (previousDate.Day != value.Day)
                     {
+                        double currentX = dateProvider.GetPosition(value);
                         if (previousX + previousTextWidth <= currentX)
                         {
                             OutlinedText textBlock = new OutlinedText { Text = value.ToString("MM.dd"), Stroke = pointOutlineBrush, Fill = pointFillBrush, StrokeThickness = 1, FontSize = 14, Bold = true };
@@ -76,7 +66,6 @@ namespace AutoTrader.Desktop
                         }
                         previousDate = value;
                     }
-                    currentX += cWidth;
                 }                
             });
         }
