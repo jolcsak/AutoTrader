@@ -95,7 +95,7 @@ namespace AutoTrader.Traders
                     return;
                 }
 
-                DateProvider.MinDate = candleSticks.Min(cs => cs.Date);
+                DateProvider.MinDate = candleSticks.First().Date;
                 PastPrices = candleSticks.ToList();
                 Dates = new List<DateTime>(candleSticks.Select(cs => cs.Date));
             }
