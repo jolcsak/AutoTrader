@@ -49,7 +49,7 @@ namespace AutoTrader.Traders
 
         public IList<RsiValue> Rsi => RsiProvider.Rsi;
 
-        public IList<double> Tendency { get; private set; }
+        public IList<TrendValue> Trend { get; private set; }
 
         public IList<DateTime> Dates { get; set; }  
 
@@ -138,16 +138,7 @@ namespace AutoTrader.Traders
 
             tasks.Clear();
 
-            double amplitude = AoProvider.Amplitude;
-            if (!double.IsNaN(amplitude))
-            {
-                var filter = OnlineFilter.CreateLowpass(ImpulseResponse.Finite, 50, amplitude);
-                tasks.Add(Task.Factory.StartNew(() => Tendency = filter.ProcessSamples(PastPrices.Select(pp => pp.close).ToArray())));
-            }
-            else
-            {
-                Tendency = Array.Empty<double>();
-            }
+            SetTrend();
 
             var storedBalances = Store.TotalBalances.GetTotalBalances(trader).ToList();
 
@@ -185,6 +176,25 @@ namespace AutoTrader.Traders
             }
         }
 
+        private void SetTrend()
+        {
+            double amplitude = AoProvider.Amplitude;
+            if (!double.IsNaN(amplitude))
+            {
+                var filter = OnlineFilter.CreateLowpass(ImpulseResponse.Finite, 20, amplitude / 2);
+                double[] trendValues = filter.ProcessSamples(PastPrices.Select(pp => pp.close).ToArray());
+                Trend = new List<TrendValue>();
+                for (int i = 0; i < PastPrices.Count; i++)
+                {
+                    Trend.Add(new TrendValue(trendValues[i], PastPrices[i]));
+                }
+            }
+            else
+            {
+                Trend = Array.Empty<TrendValue>();
+            }
+        }
+
         private double GetProjectedIncome()
         {
             if (Trades == null  || !Trades.Any()) {
@@ -201,9 +211,8 @@ namespace AutoTrader.Traders
                 {
                     if (money >= amount * trade.Price)
                     {
-                        double transactionMoney = amount * trade.Price;
-                        money -= transactionMoney;
-                        tradeItems.Add(new TradeOrder("", trade.Price, amount, amount, "CUR", 0, "TRADER"));
+                        money -= amount * trade.Price;
+                        tradeItems.Add(new TradeOrder(string.Empty, trade.Price, amount, amount, "CUR", 0, "TRADER"));
                     }
                 }
                 else if (trade.Type == TradeType.Sell)

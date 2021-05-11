@@ -225,7 +225,7 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.TendencyGraphVisible)
                 {
-                    new Graph(graph, "Tendency", botManager.Tendency, Colors.Orange, showPoints: false).Draw(84);
+                    new ValueGraph<TrendValue>(graph, dateProvider,  "Trend", botManager.Trend, Colors.Orange, showPoints: false).Draw();
                 }
 
                 if (TradeSettings.AiPredicitionVisible)

@@ -21,7 +21,7 @@ namespace AutoTrader.Traders.Bots
         protected SmaProvider SlowSmaProvider => botManager.AoProvider.SlowSmaProvider;
         protected SmaProvider FastSmaProvider => botManager.AoProvider.FastSmaProvider;
 
-        protected IList<double> Tendency => botManager.Tendency;
+        protected IList<TrendValue> Trend => botManager.Trend;
 
         public bool IsBuy => Ao.Count > 0 && Ao[Ao.Count - 1].Buy;
 
