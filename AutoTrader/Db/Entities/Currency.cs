@@ -9,10 +9,6 @@ namespace AutoTrader.Db.Entities
         public string Name { get; set; }
         public double Price { get; set; }
         public double Amount { get; set; }
-        public double MinPeriodPrice { get; set; }
-        public double MaxPeriodPrice { get; set; }
-        public double Frequency { get; set; }
-        public double Amplitude { get; set; }
         public double Order { get; set; }
         public DateTime LastUpdate { get; set; }
 
@@ -26,7 +22,7 @@ namespace AutoTrader.Db.Entities
             }
         }
 
-        public void Refresh(double price, double amount, double frequency, double amplitude, double order, DateTime lastUpdate)
+        public void Refresh(double price, double amount, double order, DateTime lastUpdate)
         {
             previousPrice = Price;
             if (price != Price)
@@ -39,16 +35,6 @@ namespace AutoTrader.Db.Entities
             {
                 Amount = amount;
                 NotifyPropertyChanged(nameof(Amount));
-            }
-            if (frequency != Frequency)
-            {
-                Frequency = frequency;
-                NotifyPropertyChanged(nameof(Frequency));
-            }
-            if (amplitude != Amplitude)
-            {
-                Amplitude = amplitude;
-                NotifyPropertyChanged(nameof(Amplitude));
             }
             if (order != Order)
             {

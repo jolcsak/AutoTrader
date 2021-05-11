@@ -10,10 +10,6 @@ namespace AutoTrader.Traders
 
         string TargetCurrency { get; }
 
-        double Frequency { get; }
-
-        double Amplitude { get; }
-
         double Order { get; }
         DateTime LastPriceDate { get; }
 

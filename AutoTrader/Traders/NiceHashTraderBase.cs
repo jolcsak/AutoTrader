@@ -25,8 +25,6 @@ namespace AutoTrader.Traders
         public virtual IList<TradeOrder> AllTradeOrders => Store.OrderBooks.GetAllOrders(this);
 
         public TradingBotManager BotManager { get; }
-        public double Frequency => 0; //BotManager.AoProvider.Frequency;
-        public double Amplitude => 0; //BotManager.AoProvider.Amplitude;
         public double Order => BotManager.ProjectedIncome;
         public DateTime LastPriceDate { get; set; } = DateTime.MinValue;
 

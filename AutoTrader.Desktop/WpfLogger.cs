@@ -192,12 +192,12 @@ namespace AutoTrader.Desktop
                {
                    if (currencyInst == null)
                    {
-                       currencyInst = new Currency { Name = currency, Price = price, Amount = amount, Frequency = trader.Frequency, Amplitude = trader.Amplitude, Order = trader.Order, LastUpdate = trader.LastPriceDate };
+                       currencyInst = new Currency { Name = currency, Price = price, Amount = amount, Order = trader.Order, LastUpdate = trader.LastPriceDate };
                        currencyList.Add(currencyInst);
                    }
                    else
                    {
-                       currencyInst.Refresh(price, amount, trader.Frequency, trader.Amplitude, trader.Order, trader.LastPriceDate);
+                       currencyInst.Refresh(price, amount, trader.Order, trader.LastPriceDate);
                    }
                });
 
