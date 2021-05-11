@@ -104,12 +104,12 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Binding="{Binding BuyDate}" Header="BuyDate" />
                                     <DataGridTextColumn Binding="{Binding Currency}" Header="Currency" />
-                                    <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N8}}" Header="Price" />
+                                    <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N8}}" Header="Buy Price" />
+                                    <DataGridTextColumn Binding="{Binding ActualPrice, StringFormat={}{0:N8}}" Header="Actual Price" FontWeight="DemiBold"/>
+                                    <DataGridTextColumn Binding="{Binding ActualYield, StringFormat={}{0:N2}%}" Header="Actual Yield" FontWeight="DemiBold"/>
                                     <DataGridTextColumn Binding="{Binding Amount}" Header="BTC Amount" />
                                     <DataGridTextColumn Binding="{Binding TargetAmount}" Header="Target Amount" />
                                     <DataGridTextColumn Binding="{Binding Fee, StringFormat={}{0:N8}}" Header="Fee" />
-                                    <DataGridTextColumn Binding="{Binding ActualPrice, StringFormat={}{0:N8}}" Header="Actual Price" />
-                                    <DataGridTextColumn Binding="{Binding ActualYield, StringFormat={}{0:N2}%}" Header="Actual Yield" />
                                     <DataGridTemplateColumn>
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
