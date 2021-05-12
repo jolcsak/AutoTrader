@@ -14,9 +14,7 @@ namespace AutoTrader.Traders
         protected DateTime lastUpdate = DateTime.MinValue;
 
         public static double MinBtcTradeAmount = 0.00025;
-
-        protected double changeRatio;
-        
+      
         public BtcTrader(string targetCurrency) : base()
         {
             TargetCurrency = targetCurrency;
@@ -69,7 +67,7 @@ namespace AutoTrader.Traders
 
             bool isNewPeriod = lastUpdate.AddMinutes(60) < DateTime.Now;
 
-            if (PreviousPrice.BuyPrice != ActualPrice.BuyPrice|| isNewPeriod)
+            if (PreviousPrice?.BuyPrice != ActualPrice?.BuyPrice|| isNewPeriod)
             {
                 BotManager.Refresh(ActualPrice, isNewPeriod);
 
@@ -96,7 +94,6 @@ namespace AutoTrader.Traders
                 PreviousPrice = ActualPrice;
             }
 
-            changeRatio = ActualPrice.SellPrice / PreviousPrice.SellPrice;
             PreviousPrice = ActualPrice;
 
             SaveOrderBooksPrices();

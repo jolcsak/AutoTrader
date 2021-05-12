@@ -37,8 +37,8 @@ namespace AutoTrader.Db.Entities
 
         public void Refresh(ActualPrice actualPrice, double order, DateTime lastUpdate)
         {
-            previousBuyPrice = actualPrice.BuyPrice;
-            previousSellPrice = actualPrice.SellPrice;
+            previousBuyPrice = BuyPrice;
+            previousSellPrice = SellPrice;
 
             if (actualPrice.BuyPrice != BuyPrice)
             {
