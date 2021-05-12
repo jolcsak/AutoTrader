@@ -92,7 +92,12 @@ namespace AutoTrader.Traders
                 tradeOrder.SellPrice = actualPrice;
                 tradeOrder.SellDate = DateTime.Now;
                 Store.OrderBooks.SaveOrUpdate(tradeOrder);
+                Logger.Info($"Sold at price {actualPrice}, amount: {tradeOrder.TargetAmount}, buy price: {tradeOrder.Price}, sell price: {actualPrice}, yield: {actualPrice / tradeOrder.Price * 100}%");
                 return true;
+            }
+            else
+            {
+                Logger.Err("Sell failed!");
             }
             return false;
         }

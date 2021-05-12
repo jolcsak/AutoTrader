@@ -122,24 +122,27 @@ namespace AutoTrader.Traders
         {
             if (BotManager.LastTrade?.Type == TradeType.Sell)
             {
-                Logger.Info($"{TargetCurrency}: Time to sell at price {actualPrice}");
-                Logger.Info(BotManager.LastTrade.ToString());
-                foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))
+                if (TradeOrders.Any())
                 {
-                    Logger.Info($"{TargetCurrency}: Buy price: {tradeOrder.Price}, Actual Price: {actualPrice},  Yield: {actualPrice / tradeOrder.Price:N6}");
-                    if (actualPrice >= (tradeOrder.Price * TradeSettings.MinSellYield))
+                    Logger.Info($"{TargetCurrency}: Time to sell at price {actualPrice}");
+                    Logger.Info(BotManager.LastTrade.ToString());
+                    foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))
                     {
-                        if (Sell(actualPrice, tradeOrder))
+                        Logger.Info($"{TargetCurrency}: Buy price: {tradeOrder.Price}, Actual Price: {actualPrice},  Yield: {actualPrice / tradeOrder.Price:N6}");
+                        if (actualPrice >= (tradeOrder.Price * TradeSettings.MinSellYield))
                         {
-                            Logger.Info("Sold.");
+                            if (Sell(actualPrice, tradeOrder))
+                            {
+                                Logger.Info("Sold.");
+                            }
+                            {
+                                Logger.Err("Sell failed!");
+                            }
                         }
+                        else
                         {
-                            Logger.Err("Sell failed!");
+                            Logger.Info("Yield too low.");
                         }
-                    }
-                    else
-                    {
-                        Logger.Info("Yield too low.");
                     }
                 }
             }
