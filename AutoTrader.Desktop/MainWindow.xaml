@@ -3,10 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AutoTrader.Desktop"
+        xmlns:local="clr-namespace:AutoTrader.Desktop" xmlns:l="clr-namespace:AutoTrader.Desktop.Grid"
         mc:Ignorable="d"
         Title="NiceHash AutoTrader v0.1" Height="941" Width="1520" SizeChanged="Window_SizeChanged" Closed="Window_Closed">
-
+    <Window.Resources>
+        <l:TradeOrderValueConverter x:Key="tradeOrderValueConverter"/>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="257*"/>
@@ -56,7 +58,8 @@
                 </Grid.ColumnDefinitions>
                 <DockPanel Grid.Column="0" DockPanel.Dock="Left" LastChildFill="True" Margin="5,5,5,5">
                     <Label Content="Currencies" HorizontalAlignment="Left" VerticalAlignment="Top" Height="31" Width="86" DockPanel.Dock="Top" FontWeight="SemiBold"/>
-                    <DataGrid x:Name="currencies" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" SelectedCellsChanged="currencies_SelectedCellsChanged" ScrollViewer.IsDeferredScrollingEnabled="True" CanUserDeleteRows="False" SelectedIndex="0">
+                    <DataGrid x:Name="currencies" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" SelectedCellsChanged="currencies_SelectedCellsChanged" 
+                              ScrollViewer.IsDeferredScrollingEnabled="True" CanUserDeleteRows="False" SelectedIndex="0">
                         <DataGrid.Resources>
                             <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkGray"/>
                         </DataGrid.Resources>
@@ -97,10 +100,18 @@
                                 <Button Content="Sell All" FontWeight="SemiBold" Grid.Column="1" Margin="0,2,0,2" Click="SellAll_Click" HorizontalAlignment="Right" Padding="4,0,4,0"/>
                                 <Button Content="Sell All Profitable" FontWeight="SemiBold" Grid.Column="2" Margin="12,2,0,2" Click="SellAllProfitable_Click" HorizontalAlignment="Left" Padding="4,0,4,0"/>
                             </Grid>
-                            <DataGrid x:Name="openedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" ScrollViewer.IsDeferredScrollingEnabled="True" SelectedCellsChanged="openedOrders_SelectedCellsChanged" CanUserDeleteRows="False">
+                            <DataGrid x:Name="openedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" ScrollViewer.IsDeferredScrollingEnabled="True" 
+                                      SelectedCellsChanged="openedOrders_SelectedCellsChanged" CanUserDeleteRows="False">
                                 <DataGrid.Resources>
                                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkGray"/>
                                 </DataGrid.Resources>
+                                <!--<DataGrid.RowStyle>
+                                    <Style TargetType="DataGridRow">
+                                        <Setter Property="Background" Value="">
+                                            <Setter.Value Converter="{StaticResource tradeOrderValueConverter}"/>
+                                        </Setter>
+                                    </Style>
+                                </DataGrid.RowStyle>-->
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Binding="{Binding BuyDate}" Header="BuyDate" />
                                     <DataGridTextColumn Binding="{Binding Currency}" Header="Currency" />

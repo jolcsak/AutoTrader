@@ -12,7 +12,9 @@ namespace AutoTrader.Api
 {
     class NiceHashConnectApi
     {
-        private const int DEFAULT_RETRY_TIME = 30 * 1000;
+        private const int DEFAULT_TOO_MANY_REQUESTS_RETRY_TIME = 30 * 1000;
+        private const int DEFAULT_BAD_GATEWAY_RETRY_TIME = 5 * 1000;
+        private const int RETRY_COUNT = 10;
 
         private string urlRoot;
         private string orgId;
@@ -135,6 +137,7 @@ namespace AutoTrader.Api
         {
             IRestResponse response;
             bool hasValidResponse;
+            int retry = RETRY_COUNT;
             do
             {
                 hasValidResponse = true;
@@ -153,8 +156,13 @@ namespace AutoTrader.Api
                     {
                         hasValidResponse = HandleTooManyRequests(response);
                     }
+                    if (response.StatusCode == HttpStatusCode.BadGateway)
+                    {
+                        hasValidResponse = HandleBadGateway(response);
+                    }
                 }
-            } while (!hasValidResponse);
+                retry--;
+            } while (!hasValidResponse && retry >= 0);
 
             return response.Content;
         }
@@ -175,17 +183,23 @@ namespace AutoTrader.Api
                 else
                 {
                     Logger.Err($"retry_after ({timeWindow}) in header not a valid number!");
-                    Logger.Info($"Waiting the default {DEFAULT_RETRY_TIME} seconds before retry...");
-                    Thread.Sleep(DEFAULT_RETRY_TIME);
+                    Logger.Info($"Waiting the default {DEFAULT_TOO_MANY_REQUESTS_RETRY_TIME} seconds before retry...");
+                    Thread.Sleep(DEFAULT_TOO_MANY_REQUESTS_RETRY_TIME);
                 }
             }
             else
             {
                 Logger.Err($"retry_after not found in header!");
-                Logger.Info($"Waiting the default {DEFAULT_RETRY_TIME} seconds before retry...");
-                Thread.Sleep(DEFAULT_RETRY_TIME);
+                Logger.Info($"Waiting the default {DEFAULT_TOO_MANY_REQUESTS_RETRY_TIME} seconds before retry...");
+                Thread.Sleep(DEFAULT_TOO_MANY_REQUESTS_RETRY_TIME);
             }
 
+            return false;
+        }
+
+        private bool HandleBadGateway(IRestResponse response)
+        {
+            Thread.Sleep(DEFAULT_BAD_GATEWAY_RETRY_TIME);
             return false;
         }
 
