@@ -69,6 +69,8 @@ namespace AutoTrader.Traders
 
             var actualOrder = new ActualPrice { Currency = TargetCurrency, Price = orderBooks.sell[0][0], Amount = orderBooks.sell[0][1] };
 
+//            var r = NiceHashApi.GetOrder("LBABTC", "3a0593ca-b8ae-467d-a456-7b1959e62378");
+
             actualPrice = actualOrder.Price;
             actualAmount = actualOrder.Amount;
             LastPriceDate = DateTime.Now;

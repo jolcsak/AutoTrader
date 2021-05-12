@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using AutoTrader.Api.Objects;
 using AutoTrader.Config;
@@ -93,7 +94,33 @@ namespace AutoTrader.Api
         public GetOrderTrade GetOrder(string market, string orderId)
         {
             var trades = Get<GetOrderTrade[]>($"/exchange/api/v2/info/orderTrades?market={market}&orderId={orderId}", true, ServerTime);
-            return trades.Length > 0 ? trades[0] : null;
+            if (trades.Length > 1)
+            {
+                double sumNumberWeighting = 0;
+                double sumSecQty = 0;
+                double sumQty = 0;
+                double sumFee = 0;
+                foreach (GetOrderTrade trade in trades)
+                {
+                    sumNumberWeighting += trade.price * trade.qty;
+                    sumQty += trade.qty;
+                    sumSecQty += trade.sndQty;
+                    sumFee += trade.fee;
+                }
+                return new GetOrderTrade
+                {
+                    orderId = orderId,
+                    price = sumNumberWeighting / sumQty,
+                    qty = sumQty,
+                    sndQty = sumSecQty,
+                    fee = sumFee,
+                    dir = trades[0].dir,
+                    isMaker = trades[0].isMaker,
+                    time = trades.Last().time,
+                    id = trades.Last().id
+                };
+            }
+            return trades.Length == 1 ? trades[0] : null;
         }
 
         private T Get<T>(string url, bool auth = false, string time = null)
