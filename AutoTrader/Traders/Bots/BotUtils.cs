@@ -6,7 +6,7 @@ namespace AutoTrader.Traders.Bots
 {
     public static class BotUtils
     {
-        public const double SpikeRatio = 1.05;
+        public const double SpikeRatio = 1.07;
 
         public static bool IsCross<T, T2>(this List<T> value1, List<T2> value2, int i) 
             where T: ValueBase
