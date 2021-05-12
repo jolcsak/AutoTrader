@@ -183,7 +183,7 @@ namespace AutoTrader.Desktop
             Dispatcher?.BeginInvoke(() => balanceText.Content = $"{balance:N8}");
         }
 
-        public void LogCurrency(ITrader trader, double price, double amount)
+        public void LogCurrency(ITrader trader, ActualPrice actualPrice)
         {
             string currency = trader.TargetCurrency;
 
@@ -192,12 +192,12 @@ namespace AutoTrader.Desktop
                {
                    if (currencyInst == null)
                    {
-                       currencyInst = new Currency { Name = currency, Price = price, Amount = amount, Order = trader.Order, LastUpdate = trader.LastPriceDate };
+                       currencyInst = new Currency { Name = currency, BuyPrice = actualPrice.BuyPrice, BuyAmount = actualPrice.BuyAmount, SellPrice = actualPrice.SellPrice, SellAmount = actualPrice.SellAmount, Order = trader.Order, LastUpdate = trader.LastPriceDate };
                        currencyList.Add(currencyInst);
                    }
                    else
                    {
-                       currencyInst.Refresh(price, amount, trader.Order, trader.LastPriceDate);
+                       currencyInst.Refresh(actualPrice, trader.Order, trader.LastPriceDate);
                    }
                });
 

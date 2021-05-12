@@ -13,6 +13,10 @@ namespace AutoTrader.Traders
         double Order { get; }
         DateTime LastPriceDate { get; }
 
+        public ActualPrice ActualPrice { get; set; }
+
+        public ActualPrice PreviousPrice { get; set; }
+
         public IList<TradeOrder> TradeOrders { get; }
 
         public IList<TradeOrder> AllTradeOrders { get; }
@@ -25,7 +29,7 @@ namespace AutoTrader.Traders
 
         IList<Price> GetAllPastPrices();
 
-        bool Buy(double amount, double actualPrice, double actualAmount);
+        bool Buy(double amount, ActualPrice actualPrice);
 
         bool Sell(double actualPrice, TradeOrder tradeOrder);
 

@@ -1,46 +1,77 @@
-﻿using System;
+﻿using AutoTrader.Traders;
+using System;
 using System.ComponentModel;
 
 namespace AutoTrader.Db.Entities
 {
     public class Currency : INotifyPropertyChanged
     {
-        private double? previousPrice;
+        private double? previousBuyPrice;
+        private double? previousSellPrice;
         public string Name { get; set; }
-        public double Price { get; set; }
-        public double Amount { get; set; }
+        public double BuyPrice { get; set; }
+        public double BuyAmount { get; set; }
+        public double SellPrice { get; set; }
+        public double SellAmount { get; set; }
         public double Order { get; set; }
         public DateTime LastUpdate { get; set; }
 
-        public string Change
+        public string BuyChange
         {
             get
             {
-                return previousPrice.HasValue
-                    ? previousPrice == Price ? string.Empty : (((previousPrice / Price) * 100) - 100).Value.ToString("N3") + "%"
+                return previousBuyPrice.HasValue
+                    ? previousBuyPrice == BuyPrice ? string.Empty : (((previousBuyPrice / BuyPrice) * 100) - 100).Value.ToString("N3") + "%"
+                    : string.Empty;
+            }
+        }
+        public string SellChange
+        {
+            get
+            {
+                return previousSellPrice.HasValue
+                    ? previousSellPrice == SellPrice ? string.Empty : (((previousSellPrice / SellPrice) * 100) - 100).Value.ToString("N3") + "%"
                     : string.Empty;
             }
         }
 
-        public void Refresh(double price, double amount, double order, DateTime lastUpdate)
+        public void Refresh(ActualPrice actualPrice, double order, DateTime lastUpdate)
         {
-            previousPrice = Price;
-            if (price != Price)
+            previousBuyPrice = actualPrice.BuyPrice;
+            previousSellPrice = actualPrice.SellPrice;
+
+            if (actualPrice.BuyPrice != BuyPrice)
             {
-                Price = price;
-                NotifyPropertyChanged(nameof(Price));
-                NotifyPropertyChanged(nameof(Change));
+                BuyPrice = actualPrice.BuyPrice;
+                NotifyPropertyChanged(nameof(BuyPrice));
+                NotifyPropertyChanged(nameof(BuyChange));
             }
-            if (amount != Amount)
+
+            if (actualPrice.BuyAmount != BuyAmount)
             {
-                Amount = amount;
-                NotifyPropertyChanged(nameof(Amount));
+                BuyAmount = actualPrice.BuyAmount;
+                NotifyPropertyChanged(nameof(BuyAmount));
             }
+
+            if (actualPrice.SellPrice != SellPrice)
+            {
+                SellPrice = actualPrice.SellPrice;
+                NotifyPropertyChanged(nameof(SellPrice));
+                NotifyPropertyChanged(nameof(SellChange));
+            }
+            if (actualPrice.SellAmount != SellAmount)
+            {
+                SellAmount = actualPrice.SellAmount;
+                NotifyPropertyChanged(nameof(SellAmount));
+            }
+
+
             if (order != Order)
             {
                 Order = order;
                 NotifyPropertyChanged(nameof(Order));
             }
+
             if (lastUpdate != LastUpdate)
             {
                 LastUpdate = lastUpdate;

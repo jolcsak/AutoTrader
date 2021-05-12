@@ -3,7 +3,10 @@
     public class ActualPrice
     {
         public string Currency { get; set; }
-        public double Price { get; set; }
-        public double Amount { get; set; }
-}
+        public double SellPrice { get; set; }
+        public double BuyPrice { get; set; }
+        public double SellAmount { get; set; }
+        public double BuyAmount { get; set; }
+
+    }
 }

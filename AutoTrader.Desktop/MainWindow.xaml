@@ -65,9 +65,12 @@
                         </DataGrid.Resources>
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding Name}" Header="Name" />
-                            <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N10}}" Header="Price" />
-                            <DataGridTextColumn Binding="{Binding Amount}" Header="Amount" />
-                            <DataGridTextColumn Binding="{Binding Change}" Header="Change" FontWeight="ExtraBold"/>
+                            <DataGridTextColumn Binding="{Binding BuyPrice, StringFormat={}{0:N10}}" Header="Buy Price" />
+                            <DataGridTextColumn Binding="{Binding BuyAmount}" Header="Buy Amount" />
+                            <DataGridTextColumn Binding="{Binding BuyChange}" Header="Buy Change" FontWeight="ExtraBold"/>
+                            <DataGridTextColumn Binding="{Binding SellPrice, StringFormat={}{0:N10}}" Header="Sell Price" />
+                            <DataGridTextColumn Binding="{Binding SellAmount}" Header="Sell Amount" />
+                            <DataGridTextColumn Binding="{Binding SellChange}" Header="Sell Change" FontWeight="ExtraBold"/>
                             <DataGridTextColumn Binding="{Binding Order, StringFormat={}{0:N4}}" Header="Order" />
                             <DataGridTextColumn Binding="{Binding LastUpdate}" Header="Last Update" FontStyle="Italic"/>
                             <DataGridTemplateColumn>

@@ -24,11 +24,16 @@ namespace AutoTrader.Traders
 
         public virtual IList<TradeOrder> AllTradeOrders => Store.OrderBooks.GetAllOrders(this);
 
+        public ActualPrice ActualPrice { get; set; }
+
+        public ActualPrice PreviousPrice { get; set; } = null;
+
         public TradingBotManager BotManager { get; }
         public double Order => BotManager.ProjectedIncome;
         public DateTime LastPriceDate { get; set; } = DateTime.MinValue;
 
         protected TradeSetting TradeSettings => TradeSetting.Instance;
+
 
         public NiceHashTraderBase()
         {
@@ -49,19 +54,20 @@ namespace AutoTrader.Traders
             Store.OrderBooks.Save(new TradeOrder(orderId, price, amount, targetAmount, currency, fee, TraderId));
         }
 
-        public bool Buy(double amount, double actualPrice, double actualAmount)
+        public bool Buy(double amount, ActualPrice actualPrice)
         {
-            Logger.Info($"Time to buy at price {actualPrice}, amount: {amount}");
-
-            if (actualAmount > amount)
+            Logger.Info($"Try to buy {TargetCurrency}");
+            if (actualPrice.SellAmount > amount)
             {
                 var orderResponse = NiceHashApi.Order(TargetCurrency + "BTC", isBuy: true, amount);
                 if (orderResponse.state == "FULL")
                 {
+                    Logger.Info($"{TargetCurrency} successfully bought");
                     var r = NiceHashApi.GetOrder(TargetCurrency + "BTC", orderResponse.orderId);
                     if (r != null)
                     {
-                        StoreTradeOrder(orderResponse.orderId, actualPrice, amount, r.qty, r.fee, TargetCurrency);
+                        Logger.Info($"{TargetCurrency} : Price={r.price}, Amount={amount}, Qty={r.qty}, SecQty={r.sndQty}");
+                        StoreTradeOrder(orderResponse.orderId, r.price, amount, r.qty, r.fee, TargetCurrency);
                         return true;
                     }
                     else
@@ -77,7 +83,7 @@ namespace AutoTrader.Traders
             }
             else
             {
-                Logger.Warn($"Buy cancelled because actualAmount: {actualAmount} < amount: {amount}!");
+                Logger.Warn($"Buy cancelled because actualAmount: {actualPrice.SellAmount} < amount: {amount}!");
                 return false;
             }
         }   

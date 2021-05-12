@@ -15,12 +15,8 @@ namespace AutoTrader.Traders
 
         public static double MinBtcTradeAmount = 0.00025;
 
-        protected double actualPrice;
-        protected double actualAmount;
-        protected double previousPrice = double.MaxValue;
         protected double changeRatio;
-        private double lastBotPrice  = double.MaxValue;
-
+        
         public BtcTrader(string targetCurrency) : base()
         {
             TargetCurrency = targetCurrency;
@@ -37,21 +33,21 @@ namespace AutoTrader.Traders
                 return null;
             }
 
-            var actualOrder = new ActualPrice { Currency = TargetCurrency, Price = orderBooks.sell[0][0], Amount = orderBooks.sell[0][1] };
+            var actualOrder = new ActualPrice { Currency = TargetCurrency, BuyPrice = orderBooks.buy[0][0], BuyAmount = orderBooks.buy[0][1], SellPrice = orderBooks.sell[0][0], SellAmount = orderBooks.sell[0][1] };
 
             LastPrice lastPrice = Store.LastPrices.GetLastPriceForTrader(this) ?? new LastPrice { Currency = TargetCurrency };
-            bool isChanged = lastPrice.Price != actualOrder.Price || lastPrice.Amount != actualOrder.Amount;
+            bool isChanged = lastPrice.Price != actualOrder.BuyPrice || lastPrice.Amount != actualOrder.BuyAmount;
             if (isChanged)
             {
-                lastPrice.Price = actualOrder.Price;
-                lastPrice.Amount = actualOrder.Amount;
+                lastPrice.Price = actualOrder.BuyPrice;
+                lastPrice.Amount = actualOrder.BuyAmount;
                 lastPrice.Date = DateTime.Now;
 
-                Store.Prices.Save(new Price(DateTime.Now, TargetCurrency, actualOrder.Price));
+                Store.Prices.Save(new Price(DateTime.Now, TargetCurrency, actualOrder.BuyPrice));
                 Store.LastPrices.SaveOrUpdate(lastPrice);
             }
 
-            Logger.Info($"{TargetCurrency} price: {actualOrder.Price}, amount: {actualOrder.Amount}" + (isChanged ? " - CHANGED" : ""));
+            Logger.Info($"{TargetCurrency} price: {actualOrder.BuyPrice}, amount: {actualOrder.BuyAmount}" + (isChanged ? " - CHANGED" : ""));
 
             return actualOrder;
         }
@@ -67,60 +63,49 @@ namespace AutoTrader.Traders
                 return;
             }
 
-            var actualOrder = new ActualPrice { Currency = TargetCurrency, Price = orderBooks.buy[0][0], Amount = orderBooks.buy[0][1] };
+            ActualPrice = new ActualPrice { Currency = TargetCurrency, BuyPrice = orderBooks.buy[0][0], BuyAmount = orderBooks.buy[0][1], SellPrice = orderBooks.sell[0][0], SellAmount = orderBooks.sell[0][1] };
 
-//            var r = NiceHashApi.GetOrder("LBABTC", "3a0593ca-b8ae-467d-a456-7b1959e62378");
-
-            actualPrice = actualOrder.Price;
-            actualAmount = actualOrder.Amount;
             LastPriceDate = DateTime.Now;
-
-            if (lastBotPrice == double.MaxValue)
-            {
-                lastBotPrice = actualPrice;
-            }
 
             bool isNewPeriod = lastUpdate.AddMinutes(60) < DateTime.Now;
 
-            if (previousPrice != actualPrice || isNewPeriod)
+            if (PreviousPrice.BuyPrice != ActualPrice.BuyPrice|| isNewPeriod)
             {
-                BotManager.Refresh(actualOrder, isNewPeriod);
+                BotManager.Refresh(ActualPrice, isNewPeriod);
 
                 if (isNewPeriod)
                 {
                     lastUpdate = DateTime.Now;
-                    lastBotPrice = actualPrice;
                 }
 
                 if (TradeSettings.CanBuy && canBuy && btcBalance >= MinBtcTradeAmount)
                 {
                     if (BotManager.LastTrade?.Type == TradeType.Buy)
                     {
-                        Logger.Info($"{TargetCurrency}: Buy at {DateTime.Now} : prev={previousPrice},curr={actualPrice}");
+                        Logger.Info($"{TargetCurrency}: Buy at {DateTime.Now} : prev={PreviousPrice},curr={ActualPrice}");
                         Logger.Info(BotManager.LastTrade.ToString());
-                        Buy(MinBtcTradeAmount, actualPrice, actualAmount);
+                        Buy(MinBtcTradeAmount, ActualPrice);
                     }
                 }
 
-                Sell(actualPrice);
+                Sell(ActualPrice);
             }
 
-            if (previousPrice == double.MaxValue)
+            if (PreviousPrice == null)
             {
-                previousPrice = actualPrice;
+                PreviousPrice = ActualPrice;
             }
 
-            changeRatio = actualPrice / previousPrice;
-            previousPrice = actualPrice;
+            changeRatio = ActualPrice.SellPrice / PreviousPrice.SellPrice;
+            PreviousPrice = ActualPrice;
 
             SaveOrderBooksPrices();
 
-            //Logger.Info($"Change: {changeRatio}, Cur: {actualPrice} x {actualAmount}");
             Logger.LogTradeOrders(AllTradeOrders);
-            Logger.LogCurrency(this, actualPrice, actualAmount);
+            Logger.LogCurrency(this, ActualPrice);
         }
 
-        private bool Sell(double actualPrice)
+        private bool Sell(ActualPrice actualPrice)
         {
             if (BotManager.LastTrade?.Type == TradeType.Sell)
             {
@@ -130,10 +115,10 @@ namespace AutoTrader.Traders
                     Logger.Info(BotManager.LastTrade.ToString());
                     foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))
                     {
-                        Logger.Info($"{TargetCurrency}: Buy price: {tradeOrder.Price}, Actual Price: {actualPrice},  Yield: {actualPrice / tradeOrder.Price:N6}");
-                        if (actualPrice >= (tradeOrder.Price * TradeSettings.MinSellYield))
+                        Logger.Info($"{TargetCurrency}: Buy price: {tradeOrder.Price}, Actual Price: {actualPrice},  Yield: {actualPrice.BuyPrice / tradeOrder.Price:N8}");
+                        if (actualPrice.BuyPrice >= (tradeOrder.Price * TradeSettings.MinSellYield))
                         {
-                            if (Sell(actualPrice, tradeOrder))
+                            if (Sell(actualPrice.BuyPrice, tradeOrder))
                             {
                                 Logger.Info("Sold.");
                             }
@@ -158,9 +143,9 @@ namespace AutoTrader.Traders
 
         private void SaveOrderBooksPrices()
         {
-            foreach (TradeOrder tradeOrder in TradeOrders.Where(to => to.Type == TradeOrderType.OPEN && to.ActualPrice != actualPrice))
+            foreach (TradeOrder tradeOrder in TradeOrders.Where(to => to.Type == TradeOrderType.OPEN && to.ActualPrice != ActualPrice.BuyPrice))
             {
-                tradeOrder.ActualPrice = actualPrice;
+                tradeOrder.ActualPrice = ActualPrice.BuyPrice;
                 Store.OrderBooks.SaveOrUpdate(tradeOrder);
             }
         }

@@ -32,11 +32,11 @@ namespace AutoTrader.Api.Objects
 
         public CandleStick(ActualPrice price)
         {
-            close = price.Price;
+            close = price.BuyPrice;
             low = close;
             high = close;
             open = close;
-            volume = price.Amount;
+            volume = price.BuyAmount;
             quote_volume = volume;
             time = (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
         }

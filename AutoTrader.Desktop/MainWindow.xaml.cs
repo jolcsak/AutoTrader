@@ -360,18 +360,20 @@ namespace AutoTrader.Desktop
 
         private void Buy(object sender, RoutedEventArgs e)
         {
-            if (CurrentTrader != null)
+            ITrader currencyTrader = traderThread.GetTrader(selectedCurrency.Name);
+
+            if (currencyTrader != null)
             {
-                double btcBalance = CurrentTrader.RefreshBalance();
+                double btcBalance = currencyTrader.RefreshBalance();
 
                 var currency = (sender as Button).DataContext as Currency;
                 if (btcBalance >= BtcTrader.MinBtcTradeAmount)
                 {
-                    if (CurrentTrader.Buy(BtcTrader.MinBtcTradeAmount, currency.Price, currency.Amount))
+                    if (currencyTrader.Buy(BtcTrader.MinBtcTradeAmount, currencyTrader.ActualPrice))
                     {
-                        CurrentTrader.RefreshBalance();
+                        currencyTrader.RefreshBalance();
                         Logger.LogTradeOrders(CurrentTrader.AllTradeOrders);
-                        MessageBox.Show($"{BtcTrader.MinBtcTradeAmount} {currency.Name} bought at price {currency.Price:N8}.", "Sell", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show($"{BtcTrader.MinBtcTradeAmount} {currency.Name} bought at price {currencyTrader.ActualPrice.BuyPrice:N8}.", "Sell", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     else
                     {
