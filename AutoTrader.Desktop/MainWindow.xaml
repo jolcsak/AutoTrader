@@ -53,7 +53,7 @@
             <Grid Margin="4,4,4,4">
                 <!-- Define Columns -->
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="680"/>
+                    <ColumnDefinition Width="780"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <DockPanel Grid.Column="0" DockPanel.Dock="Left" LastChildFill="True" Margin="5,5,5,5">
