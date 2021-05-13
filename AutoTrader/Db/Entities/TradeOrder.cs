@@ -19,6 +19,8 @@ namespace AutoTrader.Db.Entities
         public TradeOrderType Type { get; set; }
         public double ActualPrice { get; set; }
 
+        public double SellBtcAmount { get; set; }
+
         public TradePeriod Period {get; set;}
         public double ActualYield => ActualPrice > 0 ? ((ActualPrice / Price) * 100) - 100 : 0;
 

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:l="clr-namespace:AutoTrader.Desktop.Grid"
         mc:Ignorable="d"
-        Title="NiceHash AutoTrader v0.1" Height="941" Width="1750" SizeChanged="Window_SizeChanged" Closed="Window_Closed">
+        Title="NiceHash AutoTrader v0.1" Height="941" Width="1800" SizeChanged="Window_SizeChanged" Closed="Window_Closed">
     <Window.Resources>
         <l:TradeOrderValueConverter x:Key="tradeOrderValueConverter"/>
     </Window.Resources>
@@ -128,8 +128,8 @@
                                     <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N8}}" Header="Buy Price" />
                                     <DataGridTextColumn Binding="{Binding ActualPrice, StringFormat={}{0:N8}}" Header="Actual Price" FontWeight="DemiBold"/>
                                     <DataGridTextColumn Binding="{Binding ActualYield, StringFormat={}{0:N2}%}" Header="Actual Yield" FontWeight="DemiBold"/>
-                                    <DataGridTextColumn Binding="{Binding Amount}" Header="BTC Amount" />
-                                    <DataGridTextColumn Binding="{Binding TargetAmount}" Header="Target Amount" />
+                                    <DataGridTextColumn Binding="{Binding Amount}" Header="BTC" />
+                                    <DataGridTextColumn Binding="{Binding TargetAmount}" Header="Amount" />
                                     <DataGridTextColumn Binding="{Binding Fee, StringFormat={}{0:N8}}" Header="Fee" />
                                     <DataGridTextColumn Binding="{Binding Period}" Header="Period" />
                                     <DataGridTemplateColumn>
@@ -153,10 +153,11 @@
                                     <DataGridTextColumn Binding="{Binding SellDate}" Header="Sell Date" />
                                     <DataGridTextColumn Binding="{Binding Currency}" Header="Currency" />
                                     <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N8}}" Header="Price" />
-                                    <DataGridTextColumn Binding="{Binding Amount}" Header="BTC Amount" />
-                                    <DataGridTextColumn Binding="{Binding TargetAmount}" Header="Target Amount" />
+                                    <DataGridTextColumn Binding="{Binding Amount}" Header="Buy BTC" FontWeight="Bold" />
+                                    <DataGridTextColumn Binding="{Binding TargetAmount}" Header="Amount" />
                                     <DataGridTextColumn Binding="{Binding Fee, StringFormat={}{0:N8}}" Header="Fee" />
                                     <DataGridTextColumn Binding="{Binding SellPrice, StringFormat={}{0:N8}}" Header="Sell Price" />
+                                    <DataGridTextColumn Binding="{Binding SellBtcAmount, StringFormat={}{0:N8}}" Header="Sell BTC" FontWeight="Bold" />
                                     <DataGridTextColumn Binding="{Binding Yield, StringFormat={}{0:N2}%}" Header="Yield" />
                                     <DataGridTextColumn Binding="{Binding Period}" Header="Period" />
                                 </DataGrid.Columns>

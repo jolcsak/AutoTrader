@@ -96,6 +96,7 @@ namespace AutoTrader.Traders
             if (orderResponse.state == "FULL")
             {
                 tradeOrder.Type = TradeOrderType.CLOSED;
+                tradeOrder.SellBtcAmount = orderResponse.executedSndQty;
                 tradeOrder.SellPrice = actualPrice;
                 tradeOrder.SellDate = DateTime.Now;
                 Store.OrderBooks.SaveOrUpdate(tradeOrder);
