@@ -261,7 +261,7 @@ namespace AutoTrader.Desktop
                 {
                     if (TradeSettings.BalanceGraphVisible)
                     {
-                        new Graph(graph, "Total FIAT balance", botManager.FiatBalances, Colors.Olive, showPoints: true, "N1", 3).Draw();
+                        new Graph(graph, "Total FIAT balance", botManager.FiatBalances, Colors.Olive, showPoints: false, "N0", 3).Draw();
                         //new Graph(graph, "Total BTC balance", botManager.BtcBalances, Colors.DarkGray, showPoints: true, "N8", 3).Draw();
                     }
                     Dispatcher?.BeginInvoke(() => totalBalanceText.Content = botManager.FiatBalances.Last().ToString("N1") + " HUF");

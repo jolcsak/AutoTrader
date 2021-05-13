@@ -140,7 +140,7 @@ namespace AutoTrader.Traders
 
             SetTrend();
 
-            var storedBalances = Store.TotalBalances.GetTotalBalances(trader).ToList();
+            var storedBalances = Store.TotalBalances.GetTotalBalances(trader).Where(tb => tb.FiatBalance > 1).ToList();
 
             FiatBalances = storedBalances.Select(b => b.FiatBalance).ToList();
             BtcBalances = storedBalances.Select(b => b.BtcBalance).ToList();
