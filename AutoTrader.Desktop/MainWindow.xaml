@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:l="clr-namespace:AutoTrader.Desktop.Grid"
         mc:Ignorable="d"
-        Title="NiceHash AutoTrader v0.1" Height="941" Width="1800" SizeChanged="Window_SizeChanged" Closed="Window_Closed">
+        Title="NiceHash AutoTrader v0.1" Height="941" Width="1810" SizeChanged="Window_SizeChanged" Closed="Window_Closed">
     <Window.Resources>
         <l:TradeOrderValueConverter x:Key="tradeOrderValueConverter"/>
     </Window.Resources>
@@ -53,7 +53,7 @@
             <Grid Margin="4,4,4,4">
                 <!-- Define Columns -->
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="890"/>
+                    <ColumnDefinition Width="910"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <DockPanel Grid.Column="0" DockPanel.Dock="Left" LastChildFill="True" Margin="5,5,5,5">
