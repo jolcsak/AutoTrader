@@ -82,7 +82,7 @@ namespace AutoTrader.Traders
                     {
                         Logger.Info($"{TargetCurrency}: Buy at {DateTime.Now} : prev={PreviousPrice},curr={ActualPrice}");
                         Logger.Info(BotManager.LastTrade.ToString());
-                        Buy(MinBtcTradeAmount, ActualPrice);
+                        Buy(MinBtcTradeAmount, ActualPrice, BotManager.LastTrade.Period);
                     }
                 }
 

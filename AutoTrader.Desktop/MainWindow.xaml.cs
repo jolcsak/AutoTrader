@@ -358,7 +358,17 @@ namespace AutoTrader.Desktop
             Logger.LogProjectedIncome(CurrentTrader);
         }
 
-        private void Buy(object sender, RoutedEventArgs e)
+        private void BuyLong(object sender, RoutedEventArgs e)
+        {
+            Buy(sender, TradePeriod.Long);
+        }
+
+        private void BuyShort(object sender, RoutedEventArgs e)
+        {
+            Buy(sender, TradePeriod.Short);
+        }
+
+        private void Buy(object sender, TradePeriod period)
         {
             ITrader currencyTrader = traderThread.GetTrader(selectedCurrency.Content.ToString());
 
@@ -369,7 +379,7 @@ namespace AutoTrader.Desktop
                 var currency = (sender as Button).DataContext as Currency;
                 if (btcBalance >= BtcTrader.MinBtcTradeAmount)
                 {
-                    if (currencyTrader.Buy(BtcTrader.MinBtcTradeAmount, currencyTrader.ActualPrice))
+                    if (currencyTrader.Buy(BtcTrader.MinBtcTradeAmount, currencyTrader.ActualPrice, period))
                     {
                         currencyTrader.RefreshBalance();
                         Logger.LogTradeOrders(CurrentTrader.AllTradeOrders);

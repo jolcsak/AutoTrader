@@ -3,9 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AutoTrader.Desktop" xmlns:l="clr-namespace:AutoTrader.Desktop.Grid"
+        xmlns:l="clr-namespace:AutoTrader.Desktop.Grid"
         mc:Ignorable="d"
-        Title="NiceHash AutoTrader v0.1" Height="941" Width="1520" SizeChanged="Window_SizeChanged" Closed="Window_Closed">
+        Title="NiceHash AutoTrader v0.1" Height="941" Width="1750" SizeChanged="Window_SizeChanged" Closed="Window_Closed">
     <Window.Resources>
         <l:TradeOrderValueConverter x:Key="tradeOrderValueConverter"/>
     </Window.Resources>
@@ -53,7 +53,7 @@
             <Grid Margin="4,4,4,4">
                 <!-- Define Columns -->
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="820"/>
+                    <ColumnDefinition Width="890"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <DockPanel Grid.Column="0" DockPanel.Dock="Left" LastChildFill="True" Margin="5,5,5,5">
@@ -76,10 +76,17 @@
                             <DataGridTemplateColumn>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Click="Buy">Buy</Button>
+                                        <Button Click="BuyLong">Buy Long</Button>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
+                            <DataGridTemplateColumn>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Click="BuyShort">Buy Short</Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>                            
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
@@ -124,6 +131,7 @@
                                     <DataGridTextColumn Binding="{Binding Amount}" Header="BTC Amount" />
                                     <DataGridTextColumn Binding="{Binding TargetAmount}" Header="Target Amount" />
                                     <DataGridTextColumn Binding="{Binding Fee, StringFormat={}{0:N8}}" Header="Fee" />
+                                    <DataGridTextColumn Binding="{Binding Period}" Header="Period" />
                                     <DataGridTemplateColumn>
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
@@ -150,6 +158,7 @@
                                     <DataGridTextColumn Binding="{Binding Fee, StringFormat={}{0:N8}}" Header="Fee" />
                                     <DataGridTextColumn Binding="{Binding SellPrice, StringFormat={}{0:N8}}" Header="Sell Price" />
                                     <DataGridTextColumn Binding="{Binding Yield, StringFormat={}{0:N2}%}" Header="Yield" />
+                                    <DataGridTextColumn Binding="{Binding Period}" Header="Period" />
                                 </DataGrid.Columns>
                             </DataGrid>
                         </DockPanel>

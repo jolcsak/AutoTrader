@@ -1,4 +1,5 @@
 ﻿using AutoTrader.Db.Entities;
+using AutoTrader.Traders.Bots;
 using System;
 using System.Collections.Generic;
 
@@ -29,7 +30,7 @@ namespace AutoTrader.Traders
 
         IList<Price> GetAllPastPrices();
 
-        bool Buy(double amount, ActualPrice actualPrice);
+        bool Buy(double amount, ActualPrice actualPrice, TradePeriod period);
 
         bool Sell(double actualPrice, TradeOrder tradeOrder);
 

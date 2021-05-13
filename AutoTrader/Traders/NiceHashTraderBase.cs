@@ -55,7 +55,7 @@ namespace AutoTrader.Traders
             Store.OrderBooks.Save(new TradeOrder(orderId, price, amount, targetAmount, currency, fee, TraderId, period));
         }
 
-        public bool Buy(double amount, ActualPrice actualPrice)
+        public bool Buy(double amount, ActualPrice actualPrice, TradePeriod period)
         {
             Logger.Info($"Try to buy {TargetCurrency}");
             if (actualPrice.SellAmount > amount)
@@ -68,7 +68,7 @@ namespace AutoTrader.Traders
                     if (r != null)
                     {
                         Logger.Info($"{TargetCurrency} : Price={r.price}, Amount={amount}, Qty={r.qty}, SecQty={r.sndQty}");
-                        StoreTradeOrder(orderResponse.orderId, r.price, amount, r.qty, r.fee, TargetCurrency, TradePeriod.Long);
+                        StoreTradeOrder(orderResponse.orderId, r.price, amount, r.qty, r.fee, TargetCurrency, period);
                         return true;
                     }
                     else
