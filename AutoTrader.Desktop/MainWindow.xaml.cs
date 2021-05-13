@@ -360,7 +360,7 @@ namespace AutoTrader.Desktop
 
         private void Buy(object sender, RoutedEventArgs e)
         {
-            ITrader currencyTrader = traderThread.GetTrader(selectedCurrency.Name);
+            ITrader currencyTrader = traderThread.GetTrader(selectedCurrency.Content.ToString());
 
             if (currencyTrader != null)
             {

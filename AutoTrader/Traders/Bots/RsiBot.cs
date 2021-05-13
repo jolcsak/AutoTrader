@@ -55,7 +55,7 @@ namespace AutoTrader.Traders.Bots
                 }
                 if (isBuy || isSell)
                 {                    
-                    tradeItems.Add(new TradeItem(Rsi[i].CandleStick.Date, Rsi[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell, Name));
+                    tradeItems.Add(new TradeItem(Rsi[i].CandleStick.Date, Rsi[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell, Name, TradePeriod.Long));
                 }
             }
             return tradeItems;

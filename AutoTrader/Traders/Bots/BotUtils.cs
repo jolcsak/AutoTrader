@@ -39,9 +39,26 @@ namespace AutoTrader.Traders.Bots
             return i - j;
         }
 
-        public static int IsSpike<T>(this List<T> values, int i, double ratio = SpikeRatio) where T : ValueBase
+        public static int IsSellSpike<T>(this List<T> values, int i, double ratio = SpikeRatio) where T : ValueBase
         {
             double a = Math.Abs(values[i].CandleStick.close);
+            int j = i - 1;
+            while (j >= 0 && values[j] != null && i - j < 2)
+            {
+                double b = Math.Abs(values[j].CandleStick.close);
+                double c = a > b ? a / b : b / a;
+                if (c >= ratio)
+                {
+                    return Math.Sign(values[i].CandleStick.close - values[j].CandleStick.close);
+                }
+                j--;
+            }
+            return 0;
+        }
+
+        public static int IsBuySpike<T>(this List<T> values, int i, double ratio = SpikeRatio) where T : ValueBase
+        {
+            double a = Math.Abs(values[i].CandleStick.open);
             int j = i - 1;
             while (j >= 0 && values[j] != null && i - j < 2)
             {

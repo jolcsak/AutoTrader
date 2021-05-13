@@ -104,17 +104,18 @@ namespace AutoTrader.Traders
 
         private bool Sell(ActualPrice actualPrice)
         {
-            if (BotManager.LastTrade?.Type == TradeType.Sell)
+            if (TradeOrders.Any())
             {
-                if (TradeOrders.Any())
+                foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))
                 {
-                    Logger.Info($"{TargetCurrency}: Time to sell at price {actualPrice}");
-                    Logger.Info(BotManager.LastTrade.ToString());
-                    foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))
+                    if (actualPrice.BuyPrice >= (tradeOrder.Price * TradeSettings.MinSellYield))
                     {
-                        Logger.Info($"{TargetCurrency}: Buy price: {tradeOrder.Price}, Actual Price: {actualPrice},  Yield: {actualPrice.BuyPrice / tradeOrder.Price:N8}");
-                        if (actualPrice.BuyPrice >= (tradeOrder.Price * TradeSettings.MinSellYield))
+                        if (tradeOrder.Period == TradePeriod.Short || (tradeOrder.Period == TradePeriod.Long && BotManager.LastTrade?.Type == TradeType.Sell))
                         {
+                            Logger.Info($"{TargetCurrency}: Time to sell at price {actualPrice}");
+                            Logger.Info(tradeOrder.ToString());
+                            Logger.Info(BotManager.LastTrade.ToString());
+
                             if (Sell(actualPrice.BuyPrice, tradeOrder))
                             {
                                 Logger.Info("Sold.");
@@ -123,10 +124,10 @@ namespace AutoTrader.Traders
                                 Logger.Err("Sell failed!");
                             }
                         }
-                        else
-                        {
-                            Logger.Info("Yield too low.");
-                        }
+                    }
+                    else
+                    {
+                        Logger.Info("Yield too low.");
                     }
                 }
             }

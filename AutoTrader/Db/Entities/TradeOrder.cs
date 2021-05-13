@@ -1,4 +1,5 @@
-﻿using RethinkDb.Driver.Extras.Dao;
+﻿using AutoTrader.Traders.Bots;
+using RethinkDb.Driver.Extras.Dao;
 using System;
 using System.ComponentModel;
 
@@ -17,8 +18,9 @@ namespace AutoTrader.Db.Entities
         public DateTime SellDate { get; set; }
         public TradeOrderType Type { get; set; }
         public double ActualPrice { get; set; }
-        public double ActualYield => ActualPrice > 0 ? ((ActualPrice / Price) * 100) - 100 : 0;
 
+        public TradePeriod Period {get; set;}
+        public double ActualYield => ActualPrice > 0 ? ((ActualPrice / Price) * 100) - 100 : 0;
 
         public double Yield => Price > 0 ? ((SellPrice / Price) * 100) - 100 : 0;
 
@@ -28,7 +30,7 @@ namespace AutoTrader.Db.Entities
         {
         }
 
-        public TradeOrder(string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader, TradeOrderType orderType) : base()
+        public TradeOrder(string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader, TradeOrderType orderType, TradePeriod period) : base()
         {
             OrderId = orderId;
             BuyDate = DateTime.Now;
@@ -40,9 +42,10 @@ namespace AutoTrader.Db.Entities
             Trader = trader;
             Type = orderType;
             ActualPrice = price;
+            Period = period;
         }
 
-        public TradeOrder(string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader) : this(orderId, price, amount, targetAmount, currency, fee, trader, TradeOrderType.OPEN)
+        public TradeOrder(string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader, TradePeriod period) : this(orderId, price, amount, targetAmount, currency, fee, trader, TradeOrderType.OPEN, period)
         {
         }
 
@@ -64,6 +67,11 @@ namespace AutoTrader.Db.Entities
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propName));
             }
+        }
+
+        public override string ToString()
+        {
+            return $"TradeOrder: OrderId={OrderId}, Currency={Currency}, Buy Price={Price}, Buy Amount={Amount}, TargetAmount={TargetAmount}, Price={Price}, SellPrice={SellPrice}, Type={Type}, Period={Period}";
         }
     }
 

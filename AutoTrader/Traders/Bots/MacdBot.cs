@@ -25,7 +25,7 @@ namespace AutoTrader.Traders.Bots
 
         public bool Buy(int i)
         {
-            bool buy = Histogram.IsSpike(i) < 0;
+            bool buy = Histogram.IsSellSpike(i) < 0;
 
             //if (buy)
             //{
@@ -42,7 +42,7 @@ namespace AutoTrader.Traders.Bots
 
         public bool Sell(int i)
         {
-            var sell = Histogram.IsSpike(i) > 0;
+            var sell = Histogram.IsBuySpike(i) > 0;
             //if (sell)
             //{
             //    double sellPrice = Histogram[i].CandleStick.close;
@@ -71,7 +71,7 @@ namespace AutoTrader.Traders.Bots
                     }
                     if (isBuy || isSell)
                     {
-                        tradeItems.Add(new TradeItem(Histogram[i].CandleStick.Date, Histogram[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell, Name));
+                        tradeItems.Add(new TradeItem(Histogram[i].CandleStick.Date, Histogram[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell, Name, TradePeriod.Short));
                     }
                 }
             }

@@ -5,6 +5,7 @@ using AutoTrader.Api;
 using AutoTrader.Db;
 using AutoTrader.Db.Entities;
 using AutoTrader.Log;
+using AutoTrader.Traders.Bots;
 
 namespace AutoTrader.Traders
 {
@@ -49,9 +50,9 @@ namespace AutoTrader.Traders
             return null;
         }
 
-        public void StoreTradeOrder(string orderId, double price, double amount, double targetAmount, double fee, string currency)
+        public void StoreTradeOrder(string orderId, double price, double amount, double targetAmount, double fee, string currency, TradePeriod period)
         {
-            Store.OrderBooks.Save(new TradeOrder(orderId, price, amount, targetAmount, currency, fee, TraderId));
+            Store.OrderBooks.Save(new TradeOrder(orderId, price, amount, targetAmount, currency, fee, TraderId, period));
         }
 
         public bool Buy(double amount, ActualPrice actualPrice)
@@ -67,7 +68,7 @@ namespace AutoTrader.Traders
                     if (r != null)
                     {
                         Logger.Info($"{TargetCurrency} : Price={r.price}, Amount={amount}, Qty={r.qty}, SecQty={r.sndQty}");
-                        StoreTradeOrder(orderResponse.orderId, r.price, amount, r.qty, r.fee, TargetCurrency);
+                        StoreTradeOrder(orderResponse.orderId, r.price, amount, r.qty, r.fee, TargetCurrency, TradePeriod.Long);
                         return true;
                     }
                     else

@@ -212,7 +212,7 @@ namespace AutoTrader.Traders
                     if (money >= amount * trade.Price)
                     {
                         money -= amount * trade.Price;
-                        tradeItems.Add(new TradeOrder(string.Empty, trade.Price, amount, amount, "CUR", 0, "TRADER"));
+                        tradeItems.Add(new TradeOrder(string.Empty, trade.Price, amount, amount, "CUR", 0, "TRADER", trade.Period));
                     }
                 }
                 else if (trade.Type == TradeType.Sell)

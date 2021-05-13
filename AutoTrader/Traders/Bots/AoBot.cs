@@ -141,7 +141,7 @@ namespace AutoTrader.Traders.Bots
 
                     if (isBuy || isSell)
                     {
-                        tradeItems.Add(new TradeItem(Ao[i].CandleStick.Date, Ao[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell, Name));
+                        tradeItems.Add(new TradeItem(Ao[i].CandleStick.Date, Ao[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell, Name, TradePeriod.Long));
                     }
                 }
             }
