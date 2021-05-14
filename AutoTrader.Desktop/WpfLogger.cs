@@ -245,6 +245,7 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.RsiVisible)
                 {
+                    new RsiSections(graph).Draw();
                     new ValueGraph<RsiValue>(graph, dateProvider, "Relative Strength Index", botManager.Rsi, Colors.Purple).Draw();
                 }
 

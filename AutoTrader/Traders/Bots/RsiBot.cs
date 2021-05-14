@@ -7,8 +7,8 @@ namespace AutoTrader.Traders.Bots
     public class RsiBot : ITradingBot
     {
 
-        private const double OVERBOUGHT = 70;
-        private const double OVERSOLD = 30;
+        public const double OVERBOUGHT = 70;
+        public const double OVERSOLD = 30;
 
         protected TradingBotManager botManager;
 

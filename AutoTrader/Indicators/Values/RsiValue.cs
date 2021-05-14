@@ -1,5 +1,4 @@
-﻿
-using AutoTrader.Api.Objects;
+﻿using AutoTrader.Api.Objects;
 
 namespace AutoTrader.Indicators
 {
