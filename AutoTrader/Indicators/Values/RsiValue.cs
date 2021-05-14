@@ -8,13 +8,7 @@ namespace AutoTrader.Indicators
         {
             Value = value;
             CandleStick = candleStick;
-        }
-
-        public RsiValue(double value, bool isBuy, bool isSell)
-        {
-            Value = value;
-            IsBuy = isBuy;
-            IsSell = isSell;
+            ShowTrade = false;
         }
     }
 }

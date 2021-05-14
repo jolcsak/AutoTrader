@@ -124,7 +124,7 @@ namespace AutoTrader.Desktop
 
                     DrawTradeOrder(height, currentX, y, tradeOrder);
 
-                    if (tradeValue?.IsBuy == true || tradeValue?.IsSell == true || showPoints || tradeItem != null)
+                    if ((tradeValue?.ShowTrade == true && (tradeValue?.IsBuy == true || tradeValue?.IsSell == true)) || showPoints || tradeItem != null)
                     {
                         Brush currentBrush = pointFillBrush;
                         string prefix = GetSellBuyPrefix(rotate45, ref currentTransform, tradeValue, tradeItem, ref currentBrush);
