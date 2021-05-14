@@ -31,7 +31,7 @@ namespace AutoTrader.Traders
                 return null;
             }
 
-            var actualOrder = new ActualPrice { Currency = TargetCurrency, BuyPrice = orderBooks.buy[0][0], BuyAmount = orderBooks.buy[0][1], SellPrice = orderBooks.sell[0][0], SellAmount = orderBooks.sell[0][1] };
+            var actualOrder = new ActualPrice(TargetCurrency, orderBooks);
 
             LastPrice lastPrice = Store.LastPrices.GetLastPriceForTrader(this) ?? new LastPrice { Currency = TargetCurrency };
             bool isChanged = lastPrice.Price != actualOrder.BuyPrice || lastPrice.Amount != actualOrder.BuyAmount;
@@ -52,8 +52,6 @@ namespace AutoTrader.Traders
 
         public override void Trade(bool canBuy)
         {
-            double btcBalance = RefreshBalance();
-
             OrderBooks orderBooks = NiceHashApi.GetOrderBook(TargetCurrency, BTC);
             if (orderBooks == null)
             {
@@ -61,14 +59,16 @@ namespace AutoTrader.Traders
                 return;
             }
 
-            ActualPrice = new ActualPrice { Currency = TargetCurrency, BuyPrice = orderBooks.buy[0][0], BuyAmount = orderBooks.buy[0][1], SellPrice = orderBooks.sell[0][0], SellAmount = orderBooks.sell[0][1] };
+            ActualPrice = new ActualPrice(TargetCurrency, orderBooks);
 
             LastPriceDate = DateTime.Now;
 
-            bool isNewPeriod = lastUpdate.AddMinutes(60) < DateTime.Now;
+            bool isNewPeriod = lastUpdate.AddMinutes(60) < LastPriceDate;
 
             if (PreviousPrice?.BuyPrice != ActualPrice?.BuyPrice|| isNewPeriod)
             {
+                double btcBalance = RefreshBalance();
+
                 BotManager.Refresh(ActualPrice, isNewPeriod);
 
                 if (isNewPeriod)
@@ -87,16 +87,11 @@ namespace AutoTrader.Traders
                 }
 
                 Sell(ActualPrice);
-            }
 
-            if (PreviousPrice == null)
-            {
-                PreviousPrice = ActualPrice;
+                SaveOrderBooksPrices();
             }
 
             PreviousPrice = ActualPrice;
-
-            SaveOrderBooksPrices();
 
             Logger.LogTradeOrders(AllTradeOrders);
             Logger.LogCurrency(this, ActualPrice);
