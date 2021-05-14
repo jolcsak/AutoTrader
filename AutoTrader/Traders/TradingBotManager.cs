@@ -126,7 +126,6 @@ namespace AutoTrader.Traders
             };
             Task.WaitAll(tasks.ToArray());
 
-
             DateTime firstAoDate = AoProvider.Ao?.FirstOrDefault()?.CandleStick.Date ?? DateTime.MaxValue;
             DateTime firstMacdDate = MacdProvider.Result.Histogram.FirstOrDefault()?.CandleStick.Date ?? DateTime.MaxValue;
             DateTime firstDate = firstAoDate <= firstMacdDate ? firstAoDate : firstMacdDate;
