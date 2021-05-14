@@ -83,12 +83,10 @@ namespace AutoTrader.Traders
 
         public void Refresh(ActualPrice actualPrice = null, bool add = false)
         {
-            CandleStick[] candleSticks;
-            CandleStick lastCandleStick = null;
             if (PastPrices == null)
             {
                 DateProvider = new DateProvider(DateTime.Now.AddMonths(-1), DateTime.Now);
-                candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateProvider.MinDate, DateProvider.MaxDate, 60);
+                CandleStick[] candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateProvider.MinDate, DateProvider.MaxDate, 60);
 
                 if (candleSticks == null || candleSticks.Length == 0)
                 {
@@ -100,21 +98,7 @@ namespace AutoTrader.Traders
                 Dates = new List<DateTime>(candleSticks.Select(cs => cs.Date));
             }
 
-            if (actualPrice != null)
-            {
-                if (!add)
-                {
-                    if (PastPrices.Count > 0)
-                    {
-                        PastPrices.RemoveAt(PastPrices.Count - 1);
-                    }
-                }
-
-                lastCandleStick = new CandleStick(actualPrice);
-                PastPrices.Add(lastCandleStick);
-                DateProvider.MaxDate = DateTime.Now;
-                Dates.Add(DateProvider.MaxDate);
-            }
+            CandleStick lastCandleStick = actualPrice != null ? RefreshWithActualPrice(actualPrice, add) : null;
 
             var tasks = new List<Task>
             {
@@ -175,6 +159,22 @@ namespace AutoTrader.Traders
             }
         }
 
+        private CandleStick RefreshWithActualPrice(ActualPrice actualPrice, bool add)
+        {
+            if (!add && PastPrices.Count > 0)
+            {
+                PastPrices.RemoveAt(PastPrices.Count - 1);
+            }
+
+            CandleStick lastCandleStick = new CandleStick(actualPrice);
+            PastPrices.Add(lastCandleStick);
+
+            DateProvider.MaxDate = lastCandleStick.Date;
+            Dates.Add(DateProvider.MaxDate);
+
+            return lastCandleStick;
+        }
+
         private void SetTrend()
         {
             double amplitude = AoProvider.Amplitude;
@@ -208,10 +208,11 @@ namespace AutoTrader.Traders
             {
                 if (trade.Type == TradeType.Buy)
                 {
-                    if (money >= amount * trade.Price)
+                    double sum = amount * trade.Price;
+                    if (money >= sum)
                     {
-                        money -= amount * trade.Price;
-                        tradeItems.Add(new TradeOrder(string.Empty, trade.Price, amount, amount, "CUR", 0, "TRADER", trade.Period));
+                        money -= sum;
+                        tradeItems.Add(new TradeOrder(string.Empty, trade.Price, amount, amount, string.Empty, 0, string.Empty, trade.Period));
                     }
                 }
                 else if (trade.Type == TradeType.Sell)

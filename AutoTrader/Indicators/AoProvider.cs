@@ -17,31 +17,15 @@ namespace AutoTrader.Indicators
 
         public HistValue Current => Ao.Any() ? Ao.Last() : null;
 
-        public double Frequency
-        {
-            get
-            {
-                int frequency = 0;
-                for (int i = 1; i < Ao.Count; i++)
-                {
-                    if (i > 0 && Math.Sign(Ao[i].Value * Ao[i - 1].Value) < 0)
-                    {
-                        frequency++;
-                    }
-                    i++;
-                }
-                return frequency > 0 ?  (double)frequency / Ao.Count : 0;
-            }
-        }
-
         public double Amplitude
         {
             get
             {
                 if (Ao.Count > 0)
                 {
-                    double max = Math.Abs(Ao.Select(ao => ao.Value).Max());
-                    double min = Math.Abs(Ao.Select(ao => ao.Value).Min());
+                    IEnumerable<double> aoList = Ao.Select(ao => ao.Value).ToList();
+                    double max = Math.Abs(aoList.Max());
+                    double min = Math.Abs(aoList.Min());
                     List<double> amplitudes = new List<double>();
                     for(int i = 1; i < Ao.Count; i++)
                     {

@@ -9,6 +9,7 @@ namespace AutoTrader.Traders
 
         private double cWidth;
         private double canvasWidth;
+        private long minDateTicks;
 
         public DateTime MinDate 
         {
@@ -16,7 +17,8 @@ namespace AutoTrader.Traders
             set
             {
                 minDate = value;
-                cWidth = canvasWidth / (MaxDate.Ticks - MinDate.Ticks);
+                minDateTicks = MinDate.Ticks;
+                cWidth = canvasWidth / (MaxDate.Ticks - minDateTicks);
             }
         }
         public DateTime MaxDate
@@ -25,7 +27,7 @@ namespace AutoTrader.Traders
             set
             {
                 maxDate = value;
-                cWidth = canvasWidth / (MaxDate.Ticks - MinDate.Ticks);
+                cWidth = canvasWidth / (MaxDate.Ticks - minDateTicks);
             }
         }
 
@@ -34,7 +36,7 @@ namespace AutoTrader.Traders
             set
             {
                 canvasWidth = value;
-                cWidth = canvasWidth / (MaxDate.Ticks - MinDate.Ticks);
+                cWidth = canvasWidth / (MaxDate.Ticks - minDateTicks);
             }
         }        
 
@@ -54,7 +56,7 @@ namespace AutoTrader.Traders
 
         public double GetPosition(DateTime date)
         {
-            return cWidth * (date.Ticks - MinDate.Ticks);
+            return cWidth * (date.Ticks - minDateTicks);
         }
     }
 }

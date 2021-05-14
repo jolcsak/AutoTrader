@@ -37,7 +37,7 @@ namespace AutoTrader.Indicators
                 }
                 else
                 {
-                    lossSum += -thisChange;
+                    lossSum -= thisChange;
                 }
             }
 

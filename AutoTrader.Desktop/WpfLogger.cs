@@ -234,7 +234,7 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.PriceGraphVisible)
                 {
-                    new ValueGraph<ValueBase>(graph, dateProvider, "Prices", botManager.PastPrices.Select(p => new ValueBase { Value = p.close, CandleStick = p }).ToList(), Colors.DarkGray, showPoints: false).
+                    new ValueGraph<ValueBase>(graph, dateProvider, "Prices", botManager.PastPrices.Select(p => new ValueBase { Value = p.close, CandleStick = p }).ToList(), Colors.DarkGray, showPoints: true).
                         Draw(null, 0, TradeSettings.TradesVisible ? botManager.Trades : null, TradeSettings.TradesVisible ? trader.TradeOrders : null);
                 }
                 if (TradeSettings.SmaGraphVisible)

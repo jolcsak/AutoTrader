@@ -1,5 +1,5 @@
-﻿using AutoTrader.Api.Objects;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using AutoTrader.Api.Objects;
 
 namespace AutoTrader.Indicators
 {
