@@ -38,7 +38,7 @@ namespace AutoTrader.Api
         {
             ServerTime = Get<ServerTime>("/api/v2/time").serverTime;
         }
-        
+
         public double GetBalance(string currency)
         {
             var balance = Get<Balance>($"/main/api/v2/accounting/account2/{currency}", true, ServerTime);
@@ -49,7 +49,7 @@ namespace AutoTrader.Api
         {
             return Get<Symbols>("/exchange/api/v2/info/status");
         }
-            
+
         public TotalBalance GetTotalBalance(string fiat = "EUR")
         {
             return Get<TotalBalance>($"/main/api/v2/accounting/accounts2?fiat={fiat}", true, ServerTime);
@@ -73,7 +73,7 @@ namespace AutoTrader.Api
         }
 
         public static DateTime UnixTimestampToDateTime(long unixTime)
-        {           
+        {
             long unixTimeStampInTicks = unixTime * TimeSpan.TicksPerSecond;
             return new DateTime(unixStartTicks + unixTimeStampInTicks, DateTimeKind.Utc).ToLocalTime();
         }

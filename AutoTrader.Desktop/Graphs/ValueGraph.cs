@@ -170,14 +170,14 @@ namespace AutoTrader.Desktop
                 Brush currentBrush = pointFillBrush;
                 string operation = string.Empty;
                 string prefix = string.Empty;
-                if (tradeOrder.Type == TradeOrderType.OPEN)
+                if (tradeOrder.State == TradeOrderState.OPEN)
                 {
                     operation = "Buy";
                     prefix = "B";
                     currentBrush = buyBrush;
                 }
                 else
-                if (tradeOrder.Type == TradeOrderType.CLOSED)
+                if (tradeOrder.State == TradeOrderState.CLOSED)
                 {
                     operation = "Sell";
                     prefix = "S";

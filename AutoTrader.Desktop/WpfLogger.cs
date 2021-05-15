@@ -153,7 +153,7 @@ namespace AutoTrader.Desktop
         {
             Dispatcher?.BeginInvoke(() =>
                {
-                   foreach (var newOpenedOrder in traderOrders.Where(o => o.Type == TradeOrderType.OPEN))
+                   foreach (var newOpenedOrder in traderOrders.Where(o => o.State == TradeOrderState.OPEN))
                    {
                        var existingOrder = openedOrdersData.FirstOrDefault(i => i.Id.Equals(newOpenedOrder.Id));
                        if (existingOrder == null)
@@ -166,7 +166,7 @@ namespace AutoTrader.Desktop
                        }
                    }
 
-                   foreach (var newClosedOrder in traderOrders.Where(o => o.Type == TradeOrderType.CLOSED && !closedOrdersData.Any(i => i.Id.Equals(o.Id))))
+                   foreach (var newClosedOrder in traderOrders.Where(o => o.State == TradeOrderState.CLOSED && !closedOrdersData.Any(i => i.Id.Equals(o.Id))))
                    {
                        var existingOpenedOrdersData = openedOrdersData.FirstOrDefault(oe => oe.Id == newClosedOrder.Id);
                        if (existingOpenedOrdersData != null)

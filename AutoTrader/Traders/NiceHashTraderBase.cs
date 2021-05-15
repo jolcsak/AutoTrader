@@ -50,9 +50,9 @@ namespace AutoTrader.Traders
             return null;
         }
 
-        public void StoreTradeOrder(string orderId, double price, double amount, double targetAmount, double fee, string currency, TradePeriod period)
+        public void StoreTradeOrder(TradeOrderType type, string orderId, double price, double amount, double targetAmount, double fee, string currency, TradePeriod period)
         {
-            Store.OrderBooks.Save(new TradeOrder(orderId, price, amount, targetAmount, currency, fee, TraderId, period));
+            Store.OrderBooks.Save(new TradeOrder(type, orderId, price, amount, targetAmount, currency, fee, TraderId, period));
         }
 
         public bool Buy(double amount, ActualPrice actualPrice, TradePeriod period)
@@ -68,7 +68,7 @@ namespace AutoTrader.Traders
                     if (r != null)
                     {
                         Logger.Info($"{TargetCurrency} : Price={r.price}, Amount={amount}, Qty={r.qty}, SecQty={r.sndQty}");
-                        StoreTradeOrder(orderResponse.orderId, r.price, amount, r.qty, r.fee, TargetCurrency, period);
+                        StoreTradeOrder(TradeOrderType.MARKET, orderResponse.orderId, r.price, amount, r.qty, r.fee, TargetCurrency, period);
                         return true;
                     }
                     else
@@ -95,7 +95,7 @@ namespace AutoTrader.Traders
             OrderTrade orderResponse = NiceHashApi.Order(tradeOrder.Currency + "BTC", isBuy: false, tradeOrder.TargetAmount - tradeOrder.Fee, tradeOrder.Amount);
             if (orderResponse.state == "FULL")
             {
-                tradeOrder.Type = TradeOrderType.CLOSED;
+                tradeOrder.State = TradeOrderState.CLOSED;
                 tradeOrder.SellBtcAmount = orderResponse.executedSndQty;
                 tradeOrder.SellPrice = actualPrice;
                 tradeOrder.SellDate = DateTime.Now;
@@ -113,7 +113,7 @@ namespace AutoTrader.Traders
         public void SellAll(bool onlyProfitable)
         {
             double yield = (TradeSettings.MinSellYield - 1) * 100;
-            foreach (TradeOrder tradeOrder in AllTradeOrders.Where(to => to.Type == TradeOrderType.OPEN))
+            foreach (TradeOrder tradeOrder in AllTradeOrders.Where(to => to.State == TradeOrderState.OPEN))
             {
                 if (!onlyProfitable || tradeOrder.ActualYield > yield)
                 {

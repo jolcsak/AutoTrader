@@ -101,7 +101,7 @@ namespace AutoTrader.Traders
         {
             if (TradeOrders.Any())
             {
-                foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.Type == TradeOrderType.OPEN))
+                foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.State == TradeOrderState.OPEN))
                 {
                     if (actualPrice.BuyPrice >= (tradeOrder.Price * TradeSettings.MinSellYield))
                     {
@@ -136,7 +136,7 @@ namespace AutoTrader.Traders
 
         private void SaveOrderBooksPrices()
         {
-            foreach (TradeOrder tradeOrder in TradeOrders.Where(to => to.Type == TradeOrderType.OPEN && to.ActualPrice != ActualPrice.BuyPrice))
+            foreach (TradeOrder tradeOrder in TradeOrders.Where(to => to.State == TradeOrderState.OPEN && to.ActualPrice != ActualPrice.BuyPrice))
             {
                 tradeOrder.ActualPrice = ActualPrice.BuyPrice;
                 Store.OrderBooks.SaveOrUpdate(tradeOrder);

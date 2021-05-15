@@ -125,6 +125,7 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Binding="{Binding BuyDate}" Header="BuyDate" />
                                     <DataGridTextColumn Binding="{Binding Currency}" Header="Currency" />
+                                    <DataGridTextColumn Binding="{Binding Type}" Header="Type" />
                                     <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N8}}" Header="Buy Price" />
                                     <DataGridTextColumn Binding="{Binding ActualPrice, StringFormat={}{0:N8}}" Header="Actual Price" FontWeight="DemiBold"/>
                                     <DataGridTextColumn Binding="{Binding ActualYield, StringFormat={}{0:N2}%}" Header="Actual Yield" FontWeight="DemiBold"/>
@@ -160,6 +161,7 @@
                                     <DataGridTextColumn Binding="{Binding BuyDate}" Header="Buy Date" />
                                     <DataGridTextColumn Binding="{Binding SellDate}" Header="Sell Date" />
                                     <DataGridTextColumn Binding="{Binding Currency}" Header="Currency" />
+                                    <DataGridTextColumn Binding="{Binding Type}" Header="Type" />
                                     <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N8}}" Header="Price" />
                                     <DataGridTextColumn Binding="{Binding Amount}" Header="Buy BTC" FontWeight="Bold" />
                                     <DataGridTextColumn Binding="{Binding TargetAmount}" Header="Amount" />

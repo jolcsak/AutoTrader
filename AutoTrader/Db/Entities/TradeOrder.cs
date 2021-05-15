@@ -17,6 +17,7 @@ namespace AutoTrader.Db.Entities
         public DateTime BuyDate { get; set; }
         public DateTime SellDate { get; set; }
         public TradeOrderType Type { get; set; }
+        public TradeOrderState State { get; set; }
         public double ActualPrice { get; set; }
 
         public double SellBtcAmount { get; set; }
@@ -32,8 +33,9 @@ namespace AutoTrader.Db.Entities
         {
         }
 
-        public TradeOrder(string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader, TradeOrderType orderType, TradePeriod period) : base()
+        protected TradeOrder(TradeOrderType type, string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader, TradeOrderState state, TradePeriod period) : base()
         {
+            Type = type;
             OrderId = orderId;
             BuyDate = DateTime.Now;
             Price = price;
@@ -42,12 +44,12 @@ namespace AutoTrader.Db.Entities
             Currency = currency;
             Fee = fee;
             Trader = trader;
-            Type = orderType;
+            State = state;
             ActualPrice = price;
             Period = period;
         }
 
-        public TradeOrder(string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader, TradePeriod period) : this(orderId, price, amount, targetAmount, currency, fee, trader, TradeOrderType.OPEN, period)
+        public TradeOrder(TradeOrderType type, string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader, TradePeriod period) : this(type, orderId, price, amount, targetAmount, currency, fee, trader, TradeOrderState.OPEN, period)
         {
         }
 
@@ -73,15 +75,19 @@ namespace AutoTrader.Db.Entities
 
         public override string ToString()
         {
-            return $"TradeOrder: OrderId={OrderId}, Currency={Currency}, Buy Price={Price}, Buy Amount={Amount}, TargetAmount={TargetAmount}, Price={Price}, SellPrice={SellPrice}, Type={Type}, Period={Period}";
+            return $"TradeOrder: OrderId={OrderId}, Currency={Currency}, Buy Price={Price}, Buy Amount={Amount}, TargetAmount={TargetAmount}, Price={Price}, SellPrice={SellPrice}, Type={State}, Period={Period}";
         }
+    }
+
+    public enum TradeOrderState
+    {
+        OPEN = 0,
+        CLOSED = 1
     }
 
     public enum TradeOrderType
     {
-        OPEN = 0,
-        CLOSED = 1,
-        BUY = 2,
-        SELL = 3
+        MARKET = 0,
+        LIMIT = 1
     }
 }

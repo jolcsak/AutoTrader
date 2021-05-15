@@ -212,7 +212,7 @@ namespace AutoTrader.Traders
                     if (money >= sum)
                     {
                         money -= sum;
-                        tradeItems.Add(new TradeOrder(string.Empty, trade.Price, amount, amount, string.Empty, 0, string.Empty, trade.Period));
+                        tradeItems.Add(new TradeOrder(TradeOrderType.MARKET, string.Empty, trade.Price, amount, amount, string.Empty, 0, string.Empty, trade.Period));
                     }
                 }
                 else if (trade.Type == TradeType.Sell)
@@ -231,10 +231,10 @@ namespace AutoTrader.Traders
             double money = 0;
             foreach (var tradeItem in tradeItems)
             {
-                if (tradeItem.Type == TradeOrderType.OPEN && trade.Price > tradeItem.Price * TradeSettings.MinSellYield)
+                if (tradeItem.State == TradeOrderState.OPEN && trade.Price > tradeItem.Price * TradeSettings.MinSellYield)
                 {
                     tradeItem.SellPrice = trade.Price;
-                    tradeItem.Type = TradeOrderType.CLOSED;
+                    tradeItem.State = TradeOrderState.CLOSED;
                     money += tradeItem.Amount * trade.Price;
                 }
             }
