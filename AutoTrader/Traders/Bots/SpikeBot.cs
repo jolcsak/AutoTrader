@@ -10,6 +10,9 @@ namespace AutoTrader.Traders.Bots
 
         public IList<CandleStick> Prices => tradeManager.PastPrices;
 
+        private int lastBuy = -1;
+        private int lastSell = -1;
+
         public bool IsBuy { get; }
         public bool IsSell { get; }
 
@@ -20,12 +23,30 @@ namespace AutoTrader.Traders.Bots
 
         public bool Buy(int i)
         {
-            return Prices.IsSpike(i) < 0;
+            bool isBuy = Prices.IsSpike(i) < 0;
+            if (isBuy)
+            {
+                if (i - lastBuy > 3)
+                {
+                    lastBuy = i;
+                    return true;
+                }
+            }
+            return false;
         }
 
         public bool Sell(int i)
         {
-            return Prices.IsSpike(i) > 0;
+            bool isSell = Prices.IsSpike(i) > 0;
+            if (isSell)
+            {
+                if (i - lastSell > 3)
+                {
+                    lastSell = i;
+                    return true;
+                }
+            }
+            return false;
         }
 
         public List<TradeItem> RefreshAll()

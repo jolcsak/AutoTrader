@@ -6,8 +6,8 @@ namespace AutoTrader.Indicators
 {
     public class MacdProvider
     {
-        protected int Fast = 50;
-        protected int Slow = 200;
+        protected int Fast = 12;
+        protected int Slow = 26;
         protected int Signal = 9;
 
         protected bool Percent = false;
