@@ -51,6 +51,8 @@ namespace AutoTrader.Traders.Bots
 
         public List<TradeItem> RefreshAll()
         {
+            lastSell = -1;
+            lastBuy = -1;
             List<TradeItem> tradeItems = new List<TradeItem>();
             for (int i = 0; i < Prices.Count; i++)
             {
