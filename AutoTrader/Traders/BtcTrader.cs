@@ -107,26 +107,38 @@ namespace AutoTrader.Traders
                     {
                         if (tradeOrder.Period == TradePeriod.Short || (tradeOrder.Period == TradePeriod.Long && BotManager.LastTrade?.Type == TradeType.Sell))
                         {
-                            Logger.Info($"{TargetCurrency}: Time to sell at price {actualPrice}");
-                            Logger.Info(tradeOrder.ToString());
-                            Logger.Info(BotManager.LastTrade.ToString());
-
-                            if (Sell(actualPrice.BuyPrice, tradeOrder))
-                            {
-                                Logger.Info("Sold.");
-                            }
-                            {
-                                Logger.Err("Sell failed!");
-                            }
+                            Logger.Info($"{TargetCurrency}: Profit sell at price {actualPrice}, yield: {tradeOrder.ActualYield}");
+                            Sell(actualPrice, tradeOrder);
                         }
                     }
                     else
                     {
-                        Logger.Info("Yield too low.");
+                        if (tradeOrder.Period == TradePeriod.Short && (tradeOrder.ActualYield < -2 || tradeOrder.BuyDate.AddHours(6) < DateTime.Now))
+                        {
+                            Logger.Warn($"{TargetCurrency}: Loss sell at price {actualPrice}, yield: {tradeOrder.ActualYield:N2}");
+                            Sell(actualPrice, tradeOrder);
+                        }
                     }
                 }
             }
             return true;
+        }
+
+        private void Sell(ActualPrice actualPrice, TradeOrder tradeOrder)
+        {
+            Logger.Info(tradeOrder.ToString());
+            if (BotManager.LastTrade != null)
+            {
+                Logger.Info(BotManager.LastTrade.ToString());
+            }
+
+            if (Sell(actualPrice.BuyPrice, tradeOrder))
+            {
+                Logger.Info("Sold.");
+            }
+            {
+                Logger.Err("Sell failed!");
+            }
         }
 
         protected override double GetBalance()
