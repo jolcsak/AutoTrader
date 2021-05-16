@@ -196,11 +196,11 @@
                 <CheckBox Content="Trend" x:Name="tendencyVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Tendency_Checked" Unchecked="Tendency_Unchecked"/>
                 <CheckBox Content="AI prediction" x:Name="predicitionVisible" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="4,0,4,0" Checked="Prediction_Checked" Unchecked="Prediction_Unchecked"/>
                 <DockPanel HorizontalAlignment="Right" Margin="0,0,18,0">
-                    <CheckBox Content="Spike bot" x:Name="spikeBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="SpikeBotEnabled_Checked" Unchecked="SpikeBotEnabled_Unchecked" />
-                    <CheckBox Content="MACD bot" x:Name="macdBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="MacdBotEnabled_Checked" Unchecked="MacdBotEnabled_Unchecked"/>
-                    <CheckBox Content="RSI bot" x:Name="rsiBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="RsiBotEnabled_Checked" Unchecked="RsiBotEnabled_Unchecked"/>
-                    <CheckBox Content="SMA bot" x:Name="smaBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="SmaBotEnabled_Checked" Unchecked="SmaBotEnabled_Unchecked"/>
-                    <Image Source="/bot.png" Margin="0,0,5,0" ToolTip="Bots" DockPanel.Dock="Right"/>
+                    <CheckBox Content="Spike" x:Name="spikeBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="SpikeBotEnabled_Checked" Unchecked="SpikeBotEnabled_Unchecked" />
+                    <CheckBox Content="MACD" x:Name="macdBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="MacdBotEnabled_Checked" Unchecked="MacdBotEnabled_Unchecked"/>
+                    <CheckBox Content="RSI" x:Name="rsiBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="RsiBotEnabled_Checked" Unchecked="RsiBotEnabled_Unchecked"/>
+                    <CheckBox Content="SMA" x:Name="smaBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="SmaBotEnabled_Checked" Unchecked="SmaBotEnabled_Unchecked"/>
+                    <Image Source="/bot.png" Margin="0,0,5,0" ToolTip="Bot Signals" DockPanel.Dock="Right"/>
                     <Label x:Name="projectedIncome" FontWeight="SemiBold" Grid.Column="0" DockPanel.Dock="Right"/>
                     <Label Content="Projected Income:" FontWeight="SemiBold" Grid.Column="0" DockPanel.Dock="Right"/>
                 </DockPanel>
