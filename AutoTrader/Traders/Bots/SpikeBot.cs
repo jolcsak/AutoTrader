@@ -20,12 +20,12 @@ namespace AutoTrader.Traders.Bots
 
         public bool Buy(int i)
         {
-            return Prices.IsSellSpike(i) < 0;
+            return Prices.IsSpike(i) < 0;
         }
 
         public bool Sell(int i)
         {
-            return Prices.IsBuySpike(i) > 0;
+            return Prices.IsSpike(i) > 0;
         }
 
         public List<TradeItem> RefreshAll()

@@ -87,7 +87,6 @@ namespace AutoTrader.Traders
                 }
 
                 Sell(ActualPrice);
-
                 SaveOrderBooksPrices();
             }
 

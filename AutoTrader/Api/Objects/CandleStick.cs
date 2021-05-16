@@ -35,7 +35,7 @@ namespace AutoTrader.Api.Objects
             close = price.SellPrice;
             low = close;
             high = close;
-            open = price.BuyPrice;
+            open = close;
             volume = price.BuyAmount;
             quote_volume = volume;
             time = (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;

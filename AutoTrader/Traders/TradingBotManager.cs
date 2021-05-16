@@ -231,7 +231,6 @@ namespace AutoTrader.Traders
             }
 
             money += Sell(tradeItems, Trades.Last());
-
             return money / startMoney;
         }
 
