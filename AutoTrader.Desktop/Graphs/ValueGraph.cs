@@ -82,7 +82,7 @@ namespace AutoTrader.Desktop
                 return new Tuple<double?, double>(cHeight, 0);
             }
 
-            Dispatcher?.BeginInvoke(() =>
+            Dispatcher?.Invoke(() =>
             {
                 int pointWidth = lineWeight * 3;
                 int halfPointSize = pointWidth / 2;

@@ -246,14 +246,14 @@ namespace AutoTrader.Desktop
                 if (TradeSettings.RsiVisible)
                 {
                     new RsiSections(graph).Draw();
-                    new ValueGraph<RsiValue>(graph, dateProvider, "Relative Strength Index", botManager.Rsi, Colors.Purple).Draw();
+                    new ValueGraph<RsiValue>(graph, dateProvider, "Relative Strength Index", botManager.Rsi, Colors.Purple, showPoints: false).Draw();
                 }
 
                 if (TradeSettings.MacdVisible)
                 {
                     new BarGraph<HistValue>(graph, dateProvider, "MACD Histogram", botManager.MacdProvider.Result.Histogram).Draw();
-                    var ret = new ValueGraph<EmaValue>(graph, dateProvider, "MACD Signal", botManager.MacdProvider.Result.Signal, Colors.DarkViolet).Draw();
-                    new ValueGraph<MacdLineValue>(graph, dateProvider, "MACD Line", botManager.MacdProvider.Result.Line, Colors.Orange).Draw(ret.Item1, ret.Item2);
+                    var ret = new ValueGraph<MacdLineValue>(graph, dateProvider, "MACD Line", botManager.MacdProvider.Result.Line, Colors.Orange, showPoints: false).Draw();
+                    new ValueGraph<EmaValue>(graph, dateProvider, "MACD Signal", botManager.MacdProvider.Result.Signal, Colors.DarkViolet, showPoints: false).Draw(ret.Item1, ret.Item2);
                 }
 
                 new DateGraph(graph, dateProvider, botManager.Dates).Draw();

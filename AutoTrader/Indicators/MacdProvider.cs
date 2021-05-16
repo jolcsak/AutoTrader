@@ -6,9 +6,9 @@ namespace AutoTrader.Indicators
 {
     public class MacdProvider
     {
-        protected int Fast = 12;
-        protected int Slow = 26;
-        protected int Signal = 15;
+        protected int Fast = 50;
+        protected int Slow = 200;
+        protected int Signal = 9;
 
         protected bool Percent = false;
 
@@ -64,7 +64,7 @@ namespace AutoTrader.Indicators
             }
 
             double previousValue = -1;
-            // Fill Signal and MACD Histogram lists
+            
             for (int i = 0; i < signalEmaValues.Count; i++)
             {
                 Result.Signal.Add(signalEmaValues[i]);

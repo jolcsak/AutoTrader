@@ -21,9 +21,9 @@ namespace AutoTrader.Traders
         private const int SMA_FAST_SMOOTHNESS = 5;
         private const int SMA_SLOW_SMOOTHNESS = 9;
 
-        private const int EMA_FAST = 12;
-        private const int EMA_SLOW = 24;
-        private const int MACD_SIGNAL = 19;
+        private const int EMA_FAST = 5;
+        private const int EMA_SLOW = 60;
+        private const int MACD_SIGNAL = 14;
 
         private ITrader trader;
 
