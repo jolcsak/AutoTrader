@@ -25,7 +25,7 @@ namespace AutoTrader.Traders.Bots
 
         public bool Buy(int i)
         {
-            bool buy = Histogram.IsSellSpike(i) < 0;
+            bool buy = false;
 
             //if (buy)
             //{
@@ -42,7 +42,7 @@ namespace AutoTrader.Traders.Bots
 
         public bool Sell(int i)
         {
-            var sell = Histogram.IsBuySpike(i) > 0;
+            var sell = false;
             //if (sell)
             //{
             //    double sellPrice = Histogram[i].CandleStick.close;

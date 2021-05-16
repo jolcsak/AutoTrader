@@ -65,6 +65,8 @@ namespace AutoTrader.Traders
 
         public ITradingBot MacdBot { get; set; }
 
+        public ITradingBot SpikeBot { get; set; }
+
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 
         public double ProjectedIncome => GetProjectedIncome();
@@ -79,6 +81,7 @@ namespace AutoTrader.Traders
             AoBot = new AoBot(this);
             RsiBot = new RsiBot(this);
             MacdBot = new MacdBot(this);
+            SpikeBot = new SpikeBot(this);
         }
 
         public void Refresh(ActualPrice actualPrice = null, bool add = false)
@@ -132,6 +135,7 @@ namespace AutoTrader.Traders
             List<TradeItem> aoTrades = new List<TradeItem>();
             List<TradeItem> rsiTrades = new List<TradeItem>();
             List<TradeItem> macdTrades = new List<TradeItem>();
+            List<TradeItem> spikeTrades = new List<TradeItem>();
 
             if (TradeSettings.SmaBotEnabled)
             {
@@ -145,12 +149,17 @@ namespace AutoTrader.Traders
             {
                 tasks.Add(Task.Factory.StartNew(() => macdTrades = MacdBot.RefreshAll()));
             }
+            if (TradeSettings.SpikeBotEnabled)
+            {
+                tasks.Add(Task.Factory.StartNew(() => spikeTrades = SpikeBot.RefreshAll()));
+            }
 
             Task.WaitAll(tasks.ToArray());
 
             Trades.AddRange(aoTrades);
             Trades.AddRange(rsiTrades);
             Trades.AddRange(macdTrades);
+            Trades.AddRange(spikeTrades);
             Trades = Trades.OrderBy(t => t.Date).ToList();
 
             if (lastCandleStick != null && Trades.Any())

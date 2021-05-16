@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AutoTrader.Api.Objects;
 using AutoTrader.Indicators;
 
 namespace AutoTrader.Traders.Bots
@@ -39,34 +40,34 @@ namespace AutoTrader.Traders.Bots
             return i - j;
         }
 
-        public static int IsSellSpike<T>(this List<T> values, int i, double ratio = SpikeRatio) where T : ValueBase
+        public static int IsSellSpike(this IList<CandleStick> values, int i, double ratio = SpikeRatio)
         {
-            double a = Math.Abs(values[i].CandleStick.close);
+            double a = Math.Abs(values[i].close);
             int j = i - 1;
             while (j >= 0 && values[j] != null && i - j < 2)
             {
-                double b = Math.Abs(values[j].CandleStick.close);
+                double b = Math.Abs(values[j].close);
                 double c = a > b ? a / b : b / a;
                 if (c >= ratio)
                 {
-                    return Math.Sign(values[i].CandleStick.close - values[j].CandleStick.close);
+                    return Math.Sign(values[i].close - values[j].close);
                 }
                 j--;
             }
             return 0;
         }
 
-        public static int IsBuySpike<T>(this List<T> values, int i, double ratio = SpikeRatio) where T : ValueBase
+        public static int IsBuySpike(this IList<CandleStick> values, int i, double ratio = SpikeRatio)
         {
-            double a = Math.Abs(values[i].CandleStick.open);
+            double a = Math.Abs(values[i].open);
             int j = i - 1;
             while (j >= 0 && values[j] != null && i - j < 2)
             {
-                double b = Math.Abs(values[j].CandleStick.close);
+                double b = Math.Abs(values[j].close);
                 double c = a > b ? a / b : b / a;
                 if (c >= ratio)
                 {
-                    return Math.Sign(values[i].CandleStick.close - values[j].CandleStick.close);
+                    return Math.Sign(values[i].open - values[j].open);
                 }
                 j--;
             }

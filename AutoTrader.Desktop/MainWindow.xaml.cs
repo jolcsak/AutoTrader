@@ -76,6 +76,7 @@ namespace AutoTrader.Desktop
             rsiBotEnabled.IsChecked = TradeSettings.RsiBotEnabled;
             macdVisible.IsChecked = TradeSettings.MacdVisible;
             macdBotEnabled.IsChecked = TradeSettings.MacdBotEnabled;
+            spikeBotEnabled.IsChecked = TradeSettings.SpikeBotEnabled;
 
             TradeSettings.SetCanSave(true);
         }
@@ -347,6 +348,18 @@ namespace AutoTrader.Desktop
         private void MacdBotEnabled_Unchecked(object sender, RoutedEventArgs e)
         {
             TradeSettings.MacdBotEnabled = false;
+            RefreshAllTraders();
+        }
+
+        private void SpikeBotEnabled_Checked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.SpikeBotEnabled = true;
+            RefreshAllTraders();
+        }
+
+        private void SpikeBotEnabled_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.SpikeBotEnabled = false;
             RefreshAllTraders();
         }
 
