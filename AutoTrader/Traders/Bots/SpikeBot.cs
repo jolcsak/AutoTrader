@@ -8,7 +8,7 @@ namespace AutoTrader.Traders.Bots
         public string Name => nameof(SpikeBot);
         protected TradingBotManager tradeManager { get; set; }
 
-        public IList<CandleStick> Prices => tradeManager.PastPrices;
+        public IList<CandleStick> Prices => new List<CandleStick>();
 
         private int lastBuy = -1;
         private int lastSell = -1;

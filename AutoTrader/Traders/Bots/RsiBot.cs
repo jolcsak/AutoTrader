@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using AutoTrader.Indicators;
 
 namespace AutoTrader.Traders.Bots
 {
@@ -11,7 +10,6 @@ namespace AutoTrader.Traders.Bots
 
         protected TradingBotManager botManager;
 
-        public IList<RsiValue> Rsi => botManager.Rsi;
 
         public RsiBot(TradingBotManager botManager)
         {
@@ -20,31 +18,31 @@ namespace AutoTrader.Traders.Bots
 
         public string Name  => nameof(RsiBot);
 
-        public bool IsBuy => Rsi.Count > 0 && Rsi[Rsi.Count - 1].IsBuy;
-        public bool IsSell => Rsi.Count > 0 && Rsi[Rsi.Count - 1].IsSell;
+        public bool IsBuy => false;
+        public bool IsSell => false;
 
         public bool Buy(int i)
         {
-            if (i > 0)
-            {
-                Rsi[i].IsBuy = Rsi[i - 1].Value >= OVERSOLD && Rsi[i].Value <= OVERSOLD;
-            }
-            return Rsi[i].IsBuy;
+            //if (i > 0)
+            //{
+            //    Rsi[i].IsBuy = Rsi[i - 1].Value >= OVERSOLD && Rsi[i].Value <= OVERSOLD;
+            //}
+            return false;
         }
 
         public bool Sell(int i)
         {
-            if (i > 0)
-            {
-                Rsi[i].IsSell = Rsi[i - 1].Value <= OVERBOUGHT && Rsi[i].Value >= OVERBOUGHT;
-            }
-            return Rsi[i].IsSell;
+            //if (i > 0)
+            //{
+            //    Rsi[i].IsSell = Rsi[i - 1].Value <= OVERBOUGHT && Rsi[i].Value >= OVERBOUGHT;
+            //}
+            return false;
         }
 
         public List<TradeItem> RefreshAll()
         {
             List<TradeItem> tradeItems = new List<TradeItem>();
-            for (int i = 0; i < Rsi.Count; i++)
+            for (int i = 0; i < 0; i++)
             {
                 bool isBuy = false;
                 bool isSell = Sell(i);
@@ -54,7 +52,7 @@ namespace AutoTrader.Traders.Bots
                 }
                 if (isBuy || isSell)
                 {                    
-                    tradeItems.Add(new TradeItem(Rsi[i].CandleStick.Date, Rsi[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell, Name, TradePeriod.Long));
+//                    tradeItems.Add(new TradeItem(Rsi[i].Date.Date, Rsi[i].Date., isBuy ? TradeType.Buy : TradeType.Sell, Name, TradePeriod.Long));
                 }
             }
             return tradeItems;

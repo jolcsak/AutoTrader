@@ -6,11 +6,14 @@ using AutoTrader.Api;
 using AutoTrader.Api.Objects;
 using AutoTrader.Db;
 using AutoTrader.Db.Entities;
-using AutoTrader.Indicators;
-using AutoTrader.Indicators.Values;
 using AutoTrader.Log;
 using AutoTrader.Traders.Bots;
+using AutoTrader.Traders.Trady;
 using MathNet.Filtering;
+using Trady.Analysis;
+using Trady.Analysis.Indicator;
+using Trady.Core;
+using Trady.Core.Infrastructure;
 
 namespace AutoTrader.Traders
 {
@@ -21,35 +24,31 @@ namespace AutoTrader.Traders
         private const int SMA_FAST_SMOOTHNESS = 5;
         private const int SMA_SLOW_SMOOTHNESS = 9;
 
-        private const int EMA_FAST = 5;
-        private const int EMA_SLOW = 60;
-        private const int MACD_SIGNAL = 14;
+        private const int EMA_FAST = 12;
+        private const int EMA_SLOW = 26;
+        private const int MACD_SIGNAL = 9;
 
         private ITrader trader;
-
-        protected SmaProvider smaSlowProvider;
-        protected SmaProvider smaFastProvider;
-
-        public RsiProvider RsiProvider { get; private set; }
-        public AoProvider AoProvider { get; private set; }
-
-        public MacdProvider MacdProvider { get; private set; }
 
         protected virtual ITradeLogger Logger => TradeLogManager.GetLogger(GetType());
         protected static Store Store => Store.Instance;
 
         protected static NiceHashApi NiceHashApi => NiceHashApi.Instance;
 
-        public IList<CandleStick> PastPrices { get; set; }
+        public IList<IOhlcv> PastPrices { get; set; }
 
-        public IList<SmaValue> SmaSlow => smaSlowProvider.Sma;
-        public IList<SmaValue> SmaFast => smaFastProvider.Sma;
+        public SimpleMovingAverage SmaSlow { get; private set; }
+        public SimpleMovingAverage SmaFast { get; private set; }
 
-        public IList<AoHistValue> Ao => AoProvider.Ao;
+        public SimpleMovingAverageOscillator Ao { get; private set; }
 
-        public IList<RsiValue> Rsi => RsiProvider.Rsi;
+        public RelativeStrengthIndex Rsi { get; private set; }
 
-        public IList<TrendValue> Trend { get; private set; }
+        public MovingAverageConvergenceDivergence Macd { get; private set; }
+
+        public MovingAverageConvergenceDivergenceHistogram MacdHistogram { get; private set; }
+
+        public List<AnalyzableTick<decimal?>> Trend { get; private set; }
 
         public IList<DateTime> Dates { get; set; }  
 
@@ -88,40 +87,27 @@ namespace AutoTrader.Traders
         {
             if (PastPrices == null)
             {
-                DateProvider = new DateProvider(DateTime.Now.AddMonths(-1), DateTime.Now);
-                CandleStick[] candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateProvider.MinDate, DateProvider.MaxDate, 60);
-
-                if (candleSticks == null || candleSticks.Length == 0)
+                DateProvider = new DateProvider(DateTime.UtcNow.AddMonths(-1), DateTime.UtcNow);
+                PastPrices = new NiceHashImporter().Import(trader.TargetCurrency, DateProvider.MinDate, DateProvider.MaxDate);
+                if (PastPrices.Count > 0)
                 {
-                    return;
+                    DateProvider.MinDate = PastPrices.First().DateTime.DateTime;
+                    Dates = new List<DateTime>(PastPrices.Select(cs => cs.DateTime.DateTime));
                 }
-
-                DateProvider.MinDate = candleSticks.First().Date;
-                PastPrices = candleSticks.ToList();
-                Dates = new List<DateTime>(candleSticks.Select(cs => cs.Date));
             }
 
             CandleStick lastCandleStick = actualPrice != null ? RefreshWithActualPrice(actualPrice, add) : null;
 
             var tasks = new List<Task>
             {
-                Task.Factory.StartNew(() => smaSlowProvider = new SmaProvider(PastPrices, SMA_SLOW_SMOOTHNESS)),
-                Task.Factory.StartNew(() => smaFastProvider = new SmaProvider(PastPrices, SMA_FAST_SMOOTHNESS)),
-                Task.Factory.StartNew(() => AoProvider = new AoProvider(PastPrices)),
-                Task.Factory.StartNew(() => RsiProvider = new RsiProvider(PastPrices, RSI_PERIOD)),
-                Task.Factory.StartNew(() => MacdProvider = new MacdProvider(PastPrices, EMA_FAST, EMA_SLOW, MACD_SIGNAL)),
+                Task.Factory.StartNew(() => SmaSlow = new SimpleMovingAverage(PastPrices, SMA_SLOW_SMOOTHNESS)),
+                Task.Factory.StartNew(() => SmaFast = new SimpleMovingAverage(PastPrices, SMA_FAST_SMOOTHNESS)),
+                Task.Factory.StartNew(() => Ao = new SimpleMovingAverageOscillator(PastPrices, SMA_FAST_SMOOTHNESS, SMA_SLOW_SMOOTHNESS)),
+                Task.Factory.StartNew(() => Rsi = new RelativeStrengthIndex(PastPrices, RSI_PERIOD)),
+                Task.Factory.StartNew(() => Macd = new MovingAverageConvergenceDivergence(PastPrices, EMA_FAST, EMA_SLOW, MACD_SIGNAL)),
+                Task.Factory.StartNew(() => MacdHistogram = new MovingAverageConvergenceDivergenceHistogram(PastPrices, EMA_FAST, EMA_SLOW, MACD_SIGNAL))
             };
             Task.WaitAll(tasks.ToArray());
-
-            DateTime firstAoDate = AoProvider.Ao?.FirstOrDefault()?.CandleStick.Date ?? DateTime.MaxValue;
-            DateTime firstMacdDate = MacdProvider.Result.Histogram.FirstOrDefault()?.CandleStick.Date ?? DateTime.MaxValue;
-            DateTime firstDate = firstAoDate <= firstMacdDate ? firstAoDate : firstMacdDate;
-
-            if (firstDate != DateTime.MaxValue)
-            {
-                DateProvider.MinDate = firstDate;
-            }
-
             tasks.Clear();
 
             SetTrend();
@@ -175,31 +161,32 @@ namespace AutoTrader.Traders
                 PastPrices.RemoveAt(PastPrices.Count - 1);
             }
 
-            CandleStick lastCandleStick = new CandleStick(actualPrice);
-            PastPrices.Add(lastCandleStick);
+            CandleStick[] candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateTime.UtcNow.AddHours(-1), DateTime.UtcNow, 1);
+            CandleStick lastCandleStick = candleSticks.LastOrDefault();
+            if (lastCandleStick != null)
+            {
+                PastPrices.Add(new Candle(lastCandleStick.Date, (decimal)lastCandleStick.open, (decimal)lastCandleStick.high, (decimal)lastCandleStick.low, (decimal)lastCandleStick.close, (decimal)lastCandleStick.volume));
 
-            DateProvider.MaxDate = lastCandleStick.Date;
-            Dates.Add(DateProvider.MaxDate);
+                DateProvider.MaxDate = lastCandleStick.Date;
+                Dates.Add(DateProvider.MaxDate);
 
+            }
             return lastCandleStick;
         }
 
         private void SetTrend()
         {
-            double amplitude = AoProvider.Amplitude;
-            if (!double.IsNaN(amplitude))
+            Trend = new List<AnalyzableTick<decimal?>>();
+            IList<double> pastPrices = PastPrices.Select(pp => (double)pp.Close).ToList();
+            double amplitude = Math.Abs(pastPrices.Max());
+            if (amplitude > 0)
             {
                 var filter = OnlineFilter.CreateLowpass(ImpulseResponse.Finite, 20, amplitude / 2);
-                double[] trendValues = filter.ProcessSamples(PastPrices.Select(pp => pp.close).ToArray());
-                Trend = new List<TrendValue>();
+                double[] trendValues = filter.ProcessSamples(pastPrices.ToArray());
                 for (int i = 0; i < PastPrices.Count; i++)
                 {
-                    Trend.Add(new TrendValue(trendValues[i], PastPrices[i]));
+                    Trend.Add(new AnalyzableTick<decimal?>(PastPrices[i].DateTime, (decimal)trendValues[i]));
                 }
-            }
-            else
-            {
-                Trend = Array.Empty<TrendValue>();
             }
         }
 

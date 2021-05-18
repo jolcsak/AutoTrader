@@ -12,6 +12,8 @@
     <PackageReference Include="NLog" Version="4.7.9" />
     <PackageReference Include="RestSharp" Version="106.11.7" />
     <PackageReference Include="RethinkDb.Driver" Version="2.3.150" />
+    <PackageReference Include="Trady.Analysis" Version="3.2.8" />
+    <PackageReference Include="Trady.Importer" Version="3.2.0" />
   </ItemGroup>
 
 </Project>

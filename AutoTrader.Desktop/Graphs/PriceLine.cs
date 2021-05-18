@@ -16,8 +16,8 @@ namespace AutoTrader.Desktop
         private string toolTipFormat = "N10";
         protected Dispatcher Dispatcher => Application.Current != null ? Application.Current.Dispatcher : null;
         
-        protected IEnumerable<double> values;
-        protected double value;
+        protected IEnumerable<decimal> values;
+        protected decimal value;
         
         private string graphName;
 
@@ -30,7 +30,7 @@ namespace AutoTrader.Desktop
             outlineBrush.Freeze();
         }
 
-        public PriceLine(Canvas graph, string graphName, IEnumerable<double> values, double value, Color lineColor, string toolTipFormat = "N10")
+        public PriceLine(Canvas graph, string graphName, IEnumerable<decimal> values, decimal value, Color lineColor, string toolTipFormat = "N10")
         {
             this.graph = graph;
             this.values = values;
@@ -44,13 +44,13 @@ namespace AutoTrader.Desktop
 
         public void Draw()
         {
-            if (!values.Any() || values.Any(v => double.IsNaN(v)))
+            if (!values.Any())
             {
                 return;
             }
 
-            double maxValue = values.Max();
-            double minValue = values.Min();
+            decimal maxValue = values.Max();
+            decimal minValue = values.Min();
             if (maxValue == minValue)
             {
                 return;
@@ -58,8 +58,8 @@ namespace AutoTrader.Desktop
 
             Dispatcher?.BeginInvoke(() =>
             {
-                double cHeight = graph.ActualHeight / (maxValue - minValue);
-                double y = graph.ActualHeight - (value - minValue) * cHeight;
+                double cHeight = graph.ActualHeight / (double)(maxValue - minValue);
+                double y = graph.ActualHeight - (double)(value - minValue) * cHeight;
                 string toolTip = graphName + ":" + value.ToString(toolTipFormat);
                 graph.Children.Add(new Line { Stroke = lineBrush, StrokeThickness = lineWeight, X1 = 0, Y1 = y, X2 = graph.ActualWidth, Y2 = y, ToolTip = toolTip });
                 graph.Children.Add(new Line { Stroke = outlineBrush, StrokeThickness = 1, X1 = 0, Y1 = y-1, X2 = graph.ActualWidth, Y2 = y-1, ToolTip = toolTip });

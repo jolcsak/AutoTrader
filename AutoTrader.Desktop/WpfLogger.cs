@@ -7,10 +7,10 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 using AutoTrader.Db.Entities;
-using AutoTrader.Indicators;
-using AutoTrader.Indicators.Values;
 using AutoTrader.Log;
 using AutoTrader.Traders;
+using Trady.Analysis;
+using Trady.Core.Infrastructure;
 
 namespace AutoTrader.Desktop
 {
@@ -220,12 +220,12 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.AoGraphVisible)
                 {
-                    new BarGraph<AoHistValue>(graph, dateProvider, "Awesome Oscillator", botManager.Ao).Draw();
+                    new BarGraph(graph, dateProvider, botManager.PastPrices.Count, "Awesome Oscillator", botManager.Ao).Draw();
                 }
 
                 if (TradeSettings.TendencyGraphVisible)
                 {
-                    new ValueGraph<TrendValue>(graph, dateProvider,  "Trend", botManager.Trend, Colors.Orange, showPoints: false).Draw();
+                    new ValueGraph(graph, dateProvider,  "Trend", botManager.Trend, botManager.Trend.Count, Colors.Orange, showPoints: false).Draw();
                 }
 
                 if (TradeSettings.AiPredicitionVisible)
@@ -234,26 +234,38 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.PriceGraphVisible)
                 {
-                    new ValueGraph<ValueBase>(graph, dateProvider, "Prices", botManager.PastPrices.Select(p => new ValueBase { Value = p.close, CandleStick = p }).ToList(), Colors.DarkGray, showPoints: false).
+                    new ValueGraph(graph, dateProvider, "Prices", botManager.PastPrices.Select(p => new AnalyzableTick<decimal?>(p.DateTime, p.Close)).ToList(), botManager.PastPrices.Count, Colors.DarkGray, showPoints: false).
                         Draw(null, 0, TradeSettings.TradesVisible ? botManager.Trades : null, TradeSettings.TradesVisible ? trader.TradeOrders : null);
                 }
                 if (TradeSettings.SmaGraphVisible)
                 {
-                    var ret = new ValueGraph<SmaValue>(graph, dateProvider, "Fast Simple Moving Average", botManager.SmaFast, Colors.Blue, showPoints: false).Draw();
-                    new ValueGraph<SmaValue>(graph, dateProvider, "Slow Simple Moving Average", botManager.SmaSlow, Colors.LightBlue, showPoints: false).Draw(ret.Item1, ret.Item2);
+                    var ret = new ValueGraph(graph, dateProvider, "Fast Simple Moving Average", botManager.SmaFast, botManager.PastPrices.Count, Colors.Blue, showPoints: true).Draw();
+                    new ValueGraph(graph, dateProvider, "Slow Simple Moving Average", botManager.SmaSlow, botManager.PastPrices.Count, Colors.LightBlue, showPoints: false).Draw(ret.Item1, ret.Item2);
                 }
 
                 if (TradeSettings.RsiVisible)
                 {
                     new RsiSections(graph).Draw();
-                    new ValueGraph<RsiValue>(graph, dateProvider, "Relative Strength Index", botManager.Rsi, Colors.Purple, showPoints: false).Draw();
+                    new ValueGraph(graph, dateProvider, "Relative Strength Index", botManager.Rsi, botManager.PastPrices.Count, Colors.Purple, showPoints: false).Draw();
                 }
 
                 if (TradeSettings.MacdVisible)
                 {
-                    new BarGraph<HistValue>(graph, dateProvider, "MACD Histogram", botManager.MacdProvider.Result.Histogram).Draw();
-                    var ret = new ValueGraph<MacdLineValue>(graph, dateProvider, "MACD Line", botManager.MacdProvider.Result.Line, Colors.Orange, showPoints: false).Draw();
-                    new ValueGraph<EmaValue>(graph, dateProvider, "MACD Signal", botManager.MacdProvider.Result.Signal, Colors.DarkViolet, showPoints: false).Draw(ret.Item1, ret.Item2);
+                    var macdLine = new List<AnalyzableTick<decimal?>>();
+                    var macdSignal = new List<AnalyzableTick<decimal?>>();
+
+                    for (int i = 0; i < botManager.PastPrices.Count; i++)
+                    {
+                        if (botManager.Macd[i]?.Tick != null) {
+                            macdLine.Add(new AnalyzableTick<decimal?>(botManager.Macd[i].DateTime, botManager.Macd[i].Tick.MacdLine));
+                            macdSignal.Add(new AnalyzableTick<decimal?>(botManager.Macd[i].DateTime, botManager.Macd[i].Tick.SignalLine));
+                        }
+                    }
+
+                    new BarGraph(graph, dateProvider, botManager.PastPrices.Count, "MACD Histogram", botManager.MacdHistogram).Draw();
+
+                    var ret = new ValueGraph(graph, dateProvider, "MACD Line", macdLine, botManager.PastPrices.Count, Colors.Orange, showPoints: false).Draw();
+                    new ValueGraph(graph, dateProvider, "MACD Signal", macdSignal, botManager.PastPrices.Count, Colors.DarkViolet, showPoints: false).Draw(ret.Item1, ret.Item2);
                 }
 
                 new DateGraph(graph, dateProvider, botManager.Dates).Draw();
@@ -263,7 +275,7 @@ namespace AutoTrader.Desktop
                     if (TradeSettings.BalanceGraphVisible)
                     {
                         new Graph(graph, "Total FIAT balance", botManager.FiatBalances, Colors.Olive, showPoints: false, "N0", 3).Draw();
-                        //new Graph(graph, "Total BTC balance", botManager.BtcBalances, Colors.DarkGray, showPoints: true, "N8", 3).Draw();
+                        new Graph(graph, "Total BTC balance", botManager.BtcBalances, Colors.DarkOliveGreen, showPoints: false, "N8", 2).Draw();
                     }
                     Dispatcher?.BeginInvoke(() => totalBalanceText.Content = botManager.FiatBalances.Last().ToString("N1") + " HUF");
                 }
@@ -274,7 +286,7 @@ namespace AutoTrader.Desktop
 
                 if (SelectedTradeOrder != null)
                 {
-                    new PriceLine(graph, "Selected price", botManager.PastPrices.Select(pp => pp.close), SelectedTradeOrder.Price, Colors.Brown).Draw();
+                    new PriceLine(graph, "Selected price", botManager.PastPrices.Select(pp => pp.Close), (decimal)SelectedTradeOrder.Price, Colors.Brown).Draw();
                 }
             }
         }

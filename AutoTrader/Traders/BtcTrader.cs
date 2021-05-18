@@ -65,7 +65,7 @@ namespace AutoTrader.Traders
 
             bool isNewPeriod = lastUpdate.AddMinutes(60) < LastPriceDate;
 
-            if (PreviousPrice?.BuyPrice != ActualPrice?.BuyPrice|| isNewPeriod)
+            if (PreviousPrice?.SellPrice != ActualPrice?.SellPrice || PreviousPrice?.BuyPrice != ActualPrice?.BuyPrice || isNewPeriod)
             {
                 double btcBalance = RefreshBalance();
 
@@ -112,7 +112,7 @@ namespace AutoTrader.Traders
                     }
                     else
                     {
-                        if (tradeOrder.Period == TradePeriod.Short && (tradeOrder.ActualYield < -2 || tradeOrder.BuyDate.AddHours(6) < DateTime.Now))
+                        if (tradeOrder.Period == TradePeriod.Short && (tradeOrder.ActualYield < -15 || tradeOrder.BuyDate.AddHours(6) < DateTime.Now))
                         {
                             Logger.Warn($"{TargetCurrency}: Loss sell at price {actualPrice}, yield: {tradeOrder.ActualYield:N2}");
                             Sell(actualPrice, tradeOrder);
