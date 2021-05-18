@@ -140,7 +140,6 @@ namespace AutoTrader.Desktop
                     DateTime currenDate = value.DateTime.Value.DateTime;
                     RotateTransform currentTransform = null;
 
-                    var tradeItem = trades?.FirstOrDefault(ti => ti.Date == value.DateTime.Value.DateTime);
                     var tradeOrder =
                         value == lastValue ?
                             tradeOrders?.FirstOrDefault(to => to.BuyDate >= previousDate && to.BuyDate > value.DateTime.Value.DateTime) :
@@ -148,44 +147,45 @@ namespace AutoTrader.Desktop
 
                     DrawTradeOrder(height, currentX, (double)y, tradeOrder);
 
-                    //if ((tradeValue?.ShowTrade == true && (tradeValue?.IsBuy == true || tradeValue?.IsSell == true)) || showPoints || tradeItem != null)
-                    //{
-                    //    Brush currentBrush = pointFillBrush;
-                    //    string prefix = GetSellBuyPrefix(rotate45, ref currentTransform, tradeValue, tradeItem, ref currentBrush);
-                    //    string toolTip = prefix + " " + value.Tick.Value.ToString(toolTipFormat) + Environment.NewLine + value.DateTime.Value.Date;
-                    //    var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = currentBrush, Width = pointWidth, Height = pointWidth, ToolTip = toolTip };
-                    //    rect.RenderTransformOrigin = new Point(0.5, 0.5);
-                    //    Canvas.SetLeft(rect, currentX - halfPointSize);
-                    //    Canvas.SetBottom(rect, (double)(y - halfPointSize));
-                    //    if (currentTransform != null)
-                    //    {
-                    //        rect.RenderTransform = currentTransform;
-                    //    }
-                    //    graph.Children.Add(rect);
-                    //}
+                    var tradeItem = trades?.FirstOrDefault(ti => ti.Date == value.DateTime.Value.DateTime);
+                    if (tradeItem != null)
+                    {
+                        Brush currentBrush = pointFillBrush;
+                        string prefix = GetSellBuyPrefix(rotate45, ref currentTransform, tradeOrder, tradeItem, ref currentBrush);
+                        string toolTip = prefix + " " + value.Tick.Value.ToString(toolTipFormat) + Environment.NewLine + value.DateTime.Value.DateTime;
+                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = currentBrush, Width = pointWidth, Height = pointWidth, ToolTip = toolTip };
+                        rect.RenderTransformOrigin = new Point(0.5, 0.5);
+                        Canvas.SetLeft(rect, currentX - halfPointSize);
+                        Canvas.SetBottom(rect, (double)(y - halfPointSize));
+                        if (currentTransform != null)
+                        {
+                            rect.RenderTransform = currentTransform;
+                        }
+                        graph.Children.Add(rect);
+                    }
                     previousDate = currenDate;
                 }
             });
             return new Tuple<double?, double>(cHeight, minValue);
         }
 
-        //private static string GetSellBuyPrefix(RotateTransform rotate, ref RotateTransform currentTransform, TradeValueBase tradeValue, TradeItem tradeItem, ref Brush currentBrush)
-        //{
-        //    string prefix = string.Empty;
-        //    if (tradeValue?.IsBuy == true || tradeItem?.Type == TradeType.Buy)
-        //    {
-        //        currentBrush = buyBrush;
-        //        prefix = "Buy at";
-        //        currentTransform = rotate;
-        //    }
-        //    if (tradeValue?.IsSell == true || tradeItem?.Type == TradeType.Sell)
-        //    {
-        //        currentBrush = sellBrush;
-        //        prefix = "Sell at";
-        //    }
+        private static string GetSellBuyPrefix(RotateTransform rotate, ref RotateTransform currentTransform, TradeOrder tradeValue, TradeItem tradeItem, ref Brush currentBrush)
+        {
+            string prefix = string.Empty;
+            if (tradeValue?.State == TradeOrderState.OPEN || tradeItem?.Type == TradeType.Buy)
+            {
+                currentBrush = buyBrush;
+                prefix = "Buy at";
+                currentTransform = rotate;
+            }
+            if (tradeValue?.State == TradeOrderState.CLOSED || tradeItem?.Type == TradeType.Sell)
+            {
+                currentBrush = sellBrush;
+                prefix = "Sell at";
+            }
 
-        //    return prefix;
-        //}
+            return prefix;
+        }
 
         private void DrawTradeOrder(double height, double currentX, double y, TradeOrder tradeOrder)
         {

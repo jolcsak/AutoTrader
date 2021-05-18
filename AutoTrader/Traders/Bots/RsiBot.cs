@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
+using Trady.Analysis;
+using Trady.Analysis.Extension;
 
 namespace AutoTrader.Traders.Bots
 {
     public class RsiBot : ITradingBot
     {
 
-        public const double OVERBOUGHT = 70;
-        public const double OVERSOLD = 30;
+        public const int OVERBOUGHT = 70;
+        public const int OVERSOLD = 30;
 
         protected TradingBotManager botManager;
 
@@ -18,43 +20,29 @@ namespace AutoTrader.Traders.Bots
 
         public string Name  => nameof(RsiBot);
 
-        public bool IsBuy => false;
-        public bool IsSell => false;
-
-        public bool Buy(int i)
-        {
-            //if (i > 0)
-            //{
-            //    Rsi[i].IsBuy = Rsi[i - 1].Value >= OVERSOLD && Rsi[i].Value <= OVERSOLD;
-            //}
-            return false;
-        }
-
-        public bool Sell(int i)
-        {
-            //if (i > 0)
-            //{
-            //    Rsi[i].IsSell = Rsi[i - 1].Value <= OVERBOUGHT && Rsi[i].Value >= OVERBOUGHT;
-            //}
-            return false;
-        }
-
         public List<TradeItem> RefreshAll()
         {
             List<TradeItem> tradeItems = new List<TradeItem>();
-            for (int i = 0; i < 0; i++)
+
+            // Build buy rule & sell rule based on various patterns
+            var sellRule = Rule.Create(c => c.IsRsiOverbought());
+            var buyRule = Rule.Create(c => c.IsRsiOversold());
+            
+            using (var ctx = new AnalyzeContext(botManager.PastPrices))
             {
-                bool isBuy = false;
-                bool isSell = Sell(i);
-                if (!isSell)
+                var buys = new SimpleRuleExecutor(ctx, buyRule).Execute();
+                foreach (var buy in buys)
                 {
-                    isBuy = Buy(i);
+                    tradeItems.Add(new TradeItem(buy.DateTime.DateTime, 0, TradeType.Buy, nameof(AoBot), TradePeriod.Long));
                 }
-                if (isBuy || isSell)
-                {                    
-//                    tradeItems.Add(new TradeItem(Rsi[i].Date.Date, Rsi[i].Date., isBuy ? TradeType.Buy : TradeType.Sell, Name, TradePeriod.Long));
+
+                var sells = new SimpleRuleExecutor(ctx, sellRule).Execute();
+                foreach (var sell in sells)
+                {
+                    tradeItems.Add(new TradeItem(sell.DateTime.DateTime, 0, TradeType.Sell, nameof(AoBot), TradePeriod.Long));
                 }
             }
+
             return tradeItems;
         }
     }

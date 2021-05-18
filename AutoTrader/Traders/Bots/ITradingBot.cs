@@ -7,10 +7,6 @@ namespace AutoTrader.Traders.Bots
     {
         string Name { get; }
 
-        bool IsBuy { get; }
-        bool IsSell { get; }
-        bool Buy(int i);
-        bool Sell(int i);
         List<TradeItem> RefreshAll();
     }
 }

@@ -130,7 +130,7 @@ namespace AutoTrader.Desktop
 
         private void aoRatio_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            AoBot.Ratio = e.NewValue;
+            //AoBot.Ratio = e.NewValue;
             if (CurrentTrader != null)
             {
                 foreach (ITrader trader in TraderThread.Traders) {
