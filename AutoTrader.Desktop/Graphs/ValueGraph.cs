@@ -5,6 +5,7 @@ using AutoTrader.Traders.Bots;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -151,12 +152,11 @@ namespace AutoTrader.Desktop
                     if (tradeItem != null)
                     {
                         Brush currentBrush = pointFillBrush;
-                        string prefix = GetSellBuyPrefix(rotate45, ref currentTransform, tradeOrder, tradeItem, ref currentBrush);
-                        string toolTip = prefix + " " + value.Tick.Value.ToString(toolTipFormat) + Environment.NewLine + value.DateTime.Value.DateTime;
-                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = currentBrush, Width = pointWidth, Height = pointWidth, ToolTip = toolTip };
+                        string tooltip = GetTooltip(value, rotate45, ref currentTransform, tradeOrder, tradeItem, ref currentBrush);
+                        var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = currentBrush, Width = pointWidth, Height = pointWidth, ToolTip = tooltip };
                         rect.RenderTransformOrigin = new Point(0.5, 0.5);
                         Canvas.SetLeft(rect, currentX - halfPointSize);
-                        Canvas.SetBottom(rect, (double)(y - halfPointSize));
+                        Canvas.SetBottom(rect, y - halfPointSize);
                         if (currentTransform != null)
                         {
                             rect.RenderTransform = currentTransform;
@@ -169,22 +169,22 @@ namespace AutoTrader.Desktop
             return new Tuple<double?, double>(cHeight, minValue);
         }
 
-        private static string GetSellBuyPrefix(RotateTransform rotate, ref RotateTransform currentTransform, TradeOrder tradeValue, TradeItem tradeItem, ref Brush currentBrush)
+        private string GetTooltip(AnalyzableTick<decimal?> value, RotateTransform rotate, ref RotateTransform currentTransform, TradeOrder tradeValue, TradeItem tradeItem, ref Brush currentBrush)
         {
-            string prefix = string.Empty;
+            var tooltip = new StringBuilder();
             if (tradeValue?.State == TradeOrderState.OPEN || tradeItem?.Type == TradeType.Buy)
             {
                 currentBrush = buyBrush;
-                prefix = "Buy at";
+                tooltip.Append("Buy at");
                 currentTransform = rotate;
             }
             if (tradeValue?.State == TradeOrderState.CLOSED || tradeItem?.Type == TradeType.Sell)
             {
                 currentBrush = sellBrush;
-                prefix = "Sell at";
+                tooltip.Append("Sell at");
             }
 
-            return prefix;
+            return tooltip.Append(' ').Append(value.Tick.Value.ToString(toolTipFormat)).Append(Environment.NewLine).Append(value.DateTime.Value.DateTime).ToString();
         }
 
         private void DrawTradeOrder(double height, double currentX, double y, TradeOrder tradeOrder)

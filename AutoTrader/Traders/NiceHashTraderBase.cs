@@ -93,7 +93,7 @@ namespace AutoTrader.Traders
         {
             Logger.Info($"Try to sell at price {actualPrice}, amount: {tradeOrder.TargetAmount}, buy price: {tradeOrder.Price}, sell price: {actualPrice}, yield: {actualPrice / tradeOrder.Price * 100}%");
             OrderTrade orderResponse = NiceHashApi.Order(tradeOrder.Currency + "BTC", isBuy: false, tradeOrder.TargetAmount - tradeOrder.Fee, tradeOrder.Amount);
-            if (orderResponse.state == "FULL")
+            if (orderResponse?.state == "FULL")
             {
                 tradeOrder.State = TradeOrderState.CLOSED;
                 tradeOrder.SellBtcAmount = orderResponse.executedSndQty;
