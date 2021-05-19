@@ -166,10 +166,8 @@ namespace AutoTrader.Traders
             if (lastCandleStick != null)
             {
                 PastPrices.Add(new Candle(lastCandleStick.Date, (decimal)lastCandleStick.open, (decimal)lastCandleStick.high, (decimal)lastCandleStick.low, (decimal)lastCandleStick.close, (decimal)lastCandleStick.volume));
-
                 DateProvider.MaxDate = lastCandleStick.Date;
                 Dates.Add(DateProvider.MaxDate);
-
             }
             return lastCandleStick;
         }
