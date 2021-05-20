@@ -9,9 +9,11 @@ using AutoTrader.Db.Entities;
 using AutoTrader.Log;
 using AutoTrader.Traders.Bots;
 using AutoTrader.Traders.Trady;
+using Trady.Analysis;
 using Trady.Analysis.Indicator;
 using Trady.Core;
 using Trady.Core.Infrastructure;
+using Trady.Analysis.Backtest;
 
 namespace AutoTrader.Traders
 {
@@ -67,6 +69,9 @@ namespace AutoTrader.Traders
 
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 
+        protected Predicate<IIndexedOhlcv> buyRule;
+        protected Predicate<IIndexedOhlcv> sellRule;
+
         public double ProjectedIncome => GetProjectedIncome();
 
         public DateProvider DateProvider { get; private set; }
@@ -121,21 +126,28 @@ namespace AutoTrader.Traders
             List<TradeItem> macdTrades = new List<TradeItem>();
             List<TradeItem> spikeTrades = new List<TradeItem>();
 
+            buyRule = Rule.Create(c => false);
+            sellRule = Rule.Create(c => false);
+
             if (TradeSettings.SmaBotEnabled)
             {
                 tasks.Add(Task.Factory.StartNew(() => aoTrades = AoBot.RefreshAll()));
+                MergeBotRule(AoBot);
             }
             if (TradeSettings.RsiBotEnabled)
             {
                 tasks.Add(Task.Factory.StartNew(() => rsiTrades = RsiBot.RefreshAll()));
+                MergeBotRule(RsiBot);
             }
             if (TradeSettings.MacdBotEnabled)
             {
                 tasks.Add(Task.Factory.StartNew(() => macdTrades = MacdBot.RefreshAll()));
+                MergeBotRule(MacdBot);
             }
             if (TradeSettings.SpikeBotEnabled)
             {
                 tasks.Add(Task.Factory.StartNew(() => spikeTrades = SpikeBot.RefreshAll()));
+                MergeBotRule(SpikeBot);
             }
 
             Task.WaitAll(tasks.ToArray());
@@ -150,6 +162,12 @@ namespace AutoTrader.Traders
             {
                 LastTrade = Trades.FirstOrDefault(t => t.Date.Equals(lastCandleStick.Date));
             }
+        }
+
+        private void MergeBotRule(ITradingBot bot)
+        {
+            buyRule = Rule.Or(bot.BuyRule, buyRule);
+            sellRule = Rule.Or(bot.SellRule, sellRule);
         }
 
         private CandleStick RefreshWithActualPrice(ActualPrice actualPrice, bool add)
@@ -172,33 +190,21 @@ namespace AutoTrader.Traders
 
         private double GetProjectedIncome()
         {
-            if (Trades == null  || !Trades.Any()) {
-                return 1;
-            }
-
-            double money = 100 * Trades.First().Price;
-            double startMoney = money;
-            double amount = 25;
-            IList<TradeOrder> tradeItems = new List<TradeOrder>();
-            foreach (var trade in Trades)
+            if (PastPrices?.Count > 0)
             {
-                if (trade.Type == TradeType.Buy)
-                {
-                    double sum = amount * trade.Price;
-                    if (money >= sum)
-                    {
-                        money -= sum;
-                        tradeItems.Add(new TradeOrder(TradeOrderType.MARKET, string.Empty, trade.Price, amount, amount, string.Empty, 0, string.Empty, trade.Period));
-                    }
-                }
-                else if (trade.Type == TradeType.Sell)
-                {
-                    money += Sell(tradeItems, trade);
-                }
-            }
+                var runner = new Builder()
+                    .Add(PastPrices)
+                    .Buy(buyRule)
+                    .Sell(sellRule)
+                    .BuyWithAllAvailableCash()
+                    .FlatExchangeFeeRate(0.001m)
+                    .Premium(1)
+                    .Build();
 
-            money += Sell(tradeItems, Trades.Last());
-            return money / startMoney;
+                var result = runner.Run(100, DateProvider.MinDate, DateProvider.MaxDate);
+                return (double)result.TotalCorrectedBalance;
+            }
+            return 0;
         }
 
         private double Sell( IList<TradeOrder> tradeItems, TradeItem trade)

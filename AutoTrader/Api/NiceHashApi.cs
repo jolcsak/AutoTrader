@@ -42,7 +42,7 @@ namespace AutoTrader.Api
         public double GetBalance(string currency)
         {
             var balance = Get<Balance>($"/main/api/v2/accounting/account2/{currency}", true, ServerTime);
-            return balance.available;
+            return balance == null ? 0 : balance.available;
         }
 
         public Symbols GetExchangeSettings()
