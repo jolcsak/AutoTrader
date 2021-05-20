@@ -5,38 +5,52 @@ using Trady.Core.Infrastructure;
 
 namespace AutoTrader.Traders.Bots
 {
-    public class TradingBotBase
+    public class TradingBotBase : ITradingBot
     {
+        public virtual string Name { get; } = string.Empty;
 
-        private const int COOLDOWN_IN_MINUTES = 120;
+        public virtual Predicate<IIndexedOhlcv> SellRule { get; } = Rule.Create(c => false);
 
-        protected string BotName { get; set; } = string.Empty;
+        public virtual Predicate<IIndexedOhlcv> BuyRule { get; } = Rule.Create(c => false);
 
-        protected List<TradeItem> GetTrades(IList<IOhlcv> prices, Predicate<global::Trady.Core.Infrastructure.IIndexedOhlcv> sellRule, Predicate<global::Trady.Core.Infrastructure.IIndexedOhlcv> buyRule, TradePeriod tradePeriod, int coolDown = COOLDOWN_IN_MINUTES)
+        protected TradingBotManager botManager;
+
+        protected int coolDownInMinutes;
+
+        protected TradePeriod tradePeriod;
+
+        protected TradingBotBase(TradingBotManager botManager, TradePeriod tradePeriod, int coolDownInMinutes = 120)
+        {
+            this.botManager = botManager;
+            this.coolDownInMinutes = coolDownInMinutes;
+            this.tradePeriod = tradePeriod;
+        }
+
+        public List<TradeItem> RefreshAll()
         {
             int i = 0;
             List<TradeItem> tradeItems = new List<TradeItem>();
-            using (var ctx = new AnalyzeContext(prices))
+            using (var ctx = new AnalyzeContext(botManager.PastPrices))
             {
-                var buys = new SimpleRuleExecutor(ctx, buyRule).Execute();
+                var buys = new SimpleRuleExecutor(ctx, BuyRule).Execute();
                 DateTime lastTrade = DateTime.MinValue;
                 foreach (var buy in buys)
                 {
-                    if (buy.DateTime.DateTime > lastTrade.AddMinutes(coolDown))
+                    if (buy.DateTime.DateTime > lastTrade.AddMinutes(coolDownInMinutes))
                     {
-                        tradeItems.Add(new TradeItem(buy.DateTime.DateTime, 0, TradeType.Buy, BotName, tradePeriod));
+                        tradeItems.Add(new TradeItem(buy.DateTime.DateTime, 0, TradeType.Buy, Name, tradePeriod));
                         lastTrade = buy.DateTime.DateTime;
                     }
                     i++;
                 }
 
-                var sells = new SimpleRuleExecutor(ctx, sellRule).Execute();
+                var sells = new SimpleRuleExecutor(ctx, SellRule).Execute();
                 lastTrade = DateTime.MinValue;
                 foreach (var sell in sells)
                 {
-                    if (sell.DateTime.DateTime > lastTrade.AddMinutes(coolDown))
+                    if (sell.DateTime.DateTime > lastTrade.AddMinutes(coolDownInMinutes))
                     {
-                        tradeItems.Add(new TradeItem(sell.DateTime.DateTime, 0, TradeType.Sell, BotName, tradePeriod));
+                        tradeItems.Add(new TradeItem(sell.DateTime.DateTime, 0, TradeType.Sell, Name, tradePeriod));
                         lastTrade = sell.DateTime.DateTime;
                     }
                     i++;
