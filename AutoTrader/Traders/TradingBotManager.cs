@@ -202,7 +202,7 @@ namespace AutoTrader.Traders
                     .Build();
 
                 var result = runner.Run(100, DateProvider.MinDate, DateProvider.MaxDate);
-                return (double)result.TotalCorrectedBalance;
+                return (double)result.TotalCorrectedBalance - 100;
             }
             return 0;
         }
