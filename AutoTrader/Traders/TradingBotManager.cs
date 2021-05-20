@@ -9,8 +9,6 @@ using AutoTrader.Db.Entities;
 using AutoTrader.Log;
 using AutoTrader.Traders.Bots;
 using AutoTrader.Traders.Trady;
-using MathNet.Filtering;
-using Trady.Analysis;
 using Trady.Analysis.Indicator;
 using Trady.Core;
 using Trady.Core.Infrastructure;
@@ -20,7 +18,8 @@ namespace AutoTrader.Traders
     public class TradingBotManager
     {
         public const int RSI_PERIOD = 14;
-        
+        public const int EMA_PERIOD = 48;
+
         private const int SMA_FAST_SMOOTHNESS = 5;
         private const int SMA_SLOW_SMOOTHNESS = 9;
 
@@ -48,7 +47,7 @@ namespace AutoTrader.Traders
 
         public MovingAverageConvergenceDivergenceHistogram MacdHistogram { get; private set; }
 
-        public List<AnalyzableTick<decimal?>> Trend { get; private set; }
+        public ExponentialMovingAverage Ema { get; private set; }
 
         public IList<DateTime> Dates { get; set; }  
 
@@ -105,12 +104,11 @@ namespace AutoTrader.Traders
                 Task.Factory.StartNew(() => Ao = new SimpleMovingAverageOscillator(PastPrices, SMA_FAST_SMOOTHNESS, SMA_SLOW_SMOOTHNESS)),
                 Task.Factory.StartNew(() => Rsi = new RelativeStrengthIndex(PastPrices, RSI_PERIOD)),
                 Task.Factory.StartNew(() => Macd = new MovingAverageConvergenceDivergence(PastPrices, EMA_FAST, EMA_SLOW, MACD_SIGNAL)),
-                Task.Factory.StartNew(() => MacdHistogram = new MovingAverageConvergenceDivergenceHistogram(PastPrices, EMA_FAST, EMA_SLOW, MACD_SIGNAL))
+                Task.Factory.StartNew(() => MacdHistogram = new MovingAverageConvergenceDivergenceHistogram(PastPrices, EMA_FAST, EMA_SLOW, MACD_SIGNAL)),
+                Task.Factory.StartNew(() => Ema = new ExponentialMovingAverage(PastPrices, EMA_PERIOD))
             };
             Task.WaitAll(tasks.ToArray());
             tasks.Clear();
-
-            SetTrend();
 
             var storedBalances = Store.TotalBalances.GetTotalBalances(trader).Where(tb => tb.FiatBalance > 1).ToList();
 
@@ -170,22 +168,6 @@ namespace AutoTrader.Traders
                 Dates.Add(DateProvider.MaxDate);
             }
             return lastCandleStick;
-        }
-
-        private void SetTrend()
-        {
-            Trend = new List<AnalyzableTick<decimal?>>();
-            IList<double> pastPrices = PastPrices.Select(pp => (double)pp.Close).ToList();
-            double amplitude = Math.Abs(pastPrices.Max());
-            if (amplitude > 0)
-            {
-                var filter = OnlineFilter.CreateLowpass(ImpulseResponse.Finite, 20, amplitude / 2);
-                double[] trendValues = filter.ProcessSamples(pastPrices.ToArray());
-                for (int i = 0; i < PastPrices.Count; i++)
-                {
-                    Trend.Add(new AnalyzableTick<decimal?>(PastPrices[i].DateTime, (decimal)trendValues[i]));
-                }
-            }
         }
 
         private double GetProjectedIncome()

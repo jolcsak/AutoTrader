@@ -16,7 +16,7 @@ using Trady.Core.Infrastructure;
 
 namespace AutoTrader.Desktop
 {
-    public class ValueGraph
+    public class ValueLine
     {
         private Canvas graph;
 
@@ -41,7 +41,7 @@ namespace AutoTrader.Desktop
 
         private DateProvider dateProvider;
 
-        static ValueGraph()
+        static ValueLine()
         {
             buyBrush.Freeze();
             sellBrush.Freeze();
@@ -50,7 +50,7 @@ namespace AutoTrader.Desktop
             rotate45.Freeze();
         }
 
-        public ValueGraph(Canvas graph, DateProvider dateProvider, string graphName, IAnalyzable<AnalyzableTick<decimal?>> values, int count, Color lineColor, bool showPoints = false, string toolTipFormat = "N10", int lineWeight = 2)            
+        public ValueLine(Canvas graph, DateProvider dateProvider, string graphName, IAnalyzable<AnalyzableTick<decimal?>> values, int count, Color lineColor, bool showPoints = false, string toolTipFormat = "N10", int lineWeight = 2)            
         {
             this.graph = graph;
             this.graphName = graphName;
@@ -73,7 +73,7 @@ namespace AutoTrader.Desktop
             lineBrush.Freeze();
         }
 
-        public ValueGraph(Canvas graph, DateProvider dateProvider, string graphName, List<AnalyzableTick<decimal?>> values, int count, Color lineColor, bool showPoints = false, string toolTipFormat = "N10", int lineWeight = 2)
+        public ValueLine(Canvas graph, DateProvider dateProvider, string graphName, List<AnalyzableTick<decimal?>> values, int count, Color lineColor, bool showPoints = false, string toolTipFormat = "N10", int lineWeight = 2)
         {
             this.graph = graph;
             this.graphName = graphName;

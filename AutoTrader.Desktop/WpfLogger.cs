@@ -225,7 +225,7 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.TendencyGraphVisible)
                 {
-                    new ValueGraph(graph, dateProvider,  "Trend", botManager.Trend, botManager.Trend.Count, Colors.Orange, showPoints: false).Draw();
+                    var ret = new ValueLine(graph, dateProvider, "EMA", botManager.Ema, botManager.PastPrices.Count, Colors.Blue, showPoints: true).Draw();
                 }
 
                 if (TradeSettings.AiPredicitionVisible)
@@ -234,19 +234,19 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.PriceGraphVisible)
                 {
-                    new ValueGraph(graph, dateProvider, "Prices", botManager.PastPrices.Select(p => new AnalyzableTick<decimal?>(p.DateTime, p.Close)).ToList(), botManager.PastPrices.Count, Colors.DarkGray, showPoints: false).
+                    new ValueLine(graph, dateProvider, "Prices", botManager.PastPrices.Select(p => new AnalyzableTick<decimal?>(p.DateTime, p.Close)).ToList(), botManager.PastPrices.Count, Colors.DarkGray, showPoints: false).
                         Draw(null, 0, TradeSettings.TradesVisible ? botManager.Trades : null, TradeSettings.TradesVisible ? trader.TradeOrders : null);
                 }
                 if (TradeSettings.SmaGraphVisible)
                 {
-                    var ret = new ValueGraph(graph, dateProvider, "Fast Simple Moving Average", botManager.SmaFast, botManager.PastPrices.Count, Colors.Blue, showPoints: true).Draw();
-                    new ValueGraph(graph, dateProvider, "Slow Simple Moving Average", botManager.SmaSlow, botManager.PastPrices.Count, Colors.LightBlue, showPoints: false).Draw(ret.Item1, ret.Item2);
+                    var ret = new ValueLine(graph, dateProvider, "Fast Simple Moving Average", botManager.SmaFast, botManager.PastPrices.Count, Colors.Blue, showPoints: true).Draw();
+                    new ValueLine(graph, dateProvider, "Slow Simple Moving Average", botManager.SmaSlow, botManager.PastPrices.Count, Colors.LightBlue, showPoints: false).Draw(ret.Item1, ret.Item2);
                 }
 
                 if (TradeSettings.RsiVisible)
                 {
                     new RsiSections(graph).Draw();
-                    new ValueGraph(graph, dateProvider, "Relative Strength Index", botManager.Rsi, botManager.PastPrices.Count, Colors.Purple, showPoints: false).Draw();
+                    new ValueLine(graph, dateProvider, "Relative Strength Index", botManager.Rsi, botManager.PastPrices.Count, Colors.Purple, showPoints: false).Draw();
                 }
 
                 if (TradeSettings.MacdVisible)
@@ -264,8 +264,8 @@ namespace AutoTrader.Desktop
 
                     new BarGraph(graph, dateProvider, botManager.PastPrices.Count, "MACD Histogram", botManager.MacdHistogram).Draw();
 
-                    var ret = new ValueGraph(graph, dateProvider, "MACD Line", macdLine, botManager.PastPrices.Count, Colors.Orange, showPoints: false).Draw();
-                    new ValueGraph(graph, dateProvider, "MACD Signal", macdSignal, botManager.PastPrices.Count, Colors.DarkViolet, showPoints: false).Draw(ret.Item1, ret.Item2);
+                    var ret = new ValueLine(graph, dateProvider, "MACD Line", macdLine, botManager.PastPrices.Count, Colors.Orange, showPoints: false).Draw();
+                    new ValueLine(graph, dateProvider, "MACD Signal", macdSignal, botManager.PastPrices.Count, Colors.DarkViolet, showPoints: false).Draw(ret.Item1, ret.Item2);
                 }
 
                 new DateGraph(graph, dateProvider, botManager.Dates).Draw();

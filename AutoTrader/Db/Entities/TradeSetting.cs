@@ -17,7 +17,7 @@ namespace AutoTrader
 
         public double SellRatio { get; set; } = 0.90;
 
-        public double MinSellYield { get; set; } = 1.02;
+        public double MinSellYield { get; set; } = 1.025;
 
         public bool BalanceGraphVisible { get; set; }
 

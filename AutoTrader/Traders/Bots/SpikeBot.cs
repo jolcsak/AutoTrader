@@ -1,73 +1,29 @@
 ﻿using System.Collections.Generic;
-using AutoTrader.Api.Objects;
+using Trady.Analysis;
+using Trady.Analysis.Extension;
 
 namespace AutoTrader.Traders.Bots
 {
-    public class SpikeBot : ITradingBot
+    public class SpikeBot : TradingBotBase, ITradingBot
     {
+        private const int COOLDOWN_IN_MINUTES = 60;
+        private const int PRICE_PERCENTAGE_CHANGE = 5;
+
         public string Name => nameof(SpikeBot);
-        protected TradingBotManager tradeManager { get; set; }
+        protected TradingBotManager botManager { get; set; }
 
-        public IList<CandleStick> Prices => new List<CandleStick>();
-
-        private int lastBuy = -1;
-        private int lastSell = -1;
-
-        public bool IsBuy { get; }
-        public bool IsSell { get; }
-
-        public SpikeBot(TradingBotManager tradeManager)
+        public SpikeBot(TradingBotManager botManager)
         {
-            this.tradeManager = tradeManager;
-        }
-
-        public bool Buy(int i)
-        {
-            bool isBuy = Prices.IsSpike(i) < 0;
-            if (isBuy)
-            {
-                if (i - lastBuy > 3)
-                {
-                    lastBuy = i;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public bool Sell(int i)
-        {
-            bool isSell = Prices.IsSpike(i) > 0;
-            if (isSell)
-            {
-                if (i - lastSell > 3)
-                {
-                    lastSell = i;
-                    return true;
-                }
-            }
-            return false;
+            this.botManager = botManager;
+            BotName = Name;
         }
 
         public List<TradeItem> RefreshAll()
         {
-            lastSell = -1;
-            lastBuy = -1;
-            List<TradeItem> tradeItems = new List<TradeItem>();
-            for (int i = 0; i < Prices.Count; i++)
-            {
-                bool isBuy = false;
-                bool isSell = Sell(i);
-                if (!isSell)
-                {
-                    isBuy = Buy(i);
-                }
-                if (isBuy || isSell)
-                {
-                    tradeItems.Add(new TradeItem(Prices[i].Date, Prices[i].close, isBuy ? TradeType.Buy : TradeType.Sell, Name, TradePeriod.Short));
-                }
-            }
-            return tradeItems;
+            var sellRule = Rule.Create(c => c.Prev != null && c.ClosePricePercentageChange() + c.Prev.ClosePricePercentageChange() > PRICE_PERCENTAGE_CHANGE);
+            var buyRule = Rule.Create(c => c.Prev != null && c.ClosePricePercentageChange() + c.Prev.ClosePricePercentageChange() < -PRICE_PERCENTAGE_CHANGE).And(c => c.IsEmaBullish(TradingBotManager.EMA_PERIOD));
+
+            return GetTrades(botManager.PastPrices, sellRule, buyRule, TradePeriod.Short, COOLDOWN_IN_MINUTES);
         }
     }
 }

@@ -14,7 +14,16 @@ namespace AutoTrader.Traders
         protected DateTime lastUpdate = DateTime.MinValue;
 
         public static double MinBtcTradeAmount = 0.00025;
-      
+
+        protected static int ShortStopLossPercentage = -10;
+
+        protected static int LongStopLossPercentage = -15;
+
+        protected static int ShortTradeMaxAgeInHours = 24;
+
+        protected static int LongTradeMaxAgeInHours = 24 * 4;
+
+
         public BtcTrader(string targetCurrency) : base()
         {
             TargetCurrency = targetCurrency;
@@ -112,7 +121,9 @@ namespace AutoTrader.Traders
                     }
                     else
                     {
-                        if (tradeOrder.Period == TradePeriod.Short && (tradeOrder.ActualYield < -15 || tradeOrder.BuyDate.AddHours(6) < DateTime.Now))
+                        bool isShortSell = tradeOrder.Period == TradePeriod.Short && (tradeOrder.ActualYield < ShortStopLossPercentage || tradeOrder.BuyDate.AddHours(ShortTradeMaxAgeInHours) < DateTime.Now);
+                        bool isLongSell = tradeOrder.Period == TradePeriod.Long && (tradeOrder.ActualYield < LongStopLossPercentage || tradeOrder.BuyDate.AddHours(LongTradeMaxAgeInHours) < DateTime.Now);
+                        if (isShortSell || isLongSell)
                         {
                             Logger.Warn($"{TargetCurrency}: Loss sell at price {actualPrice}, yield: {tradeOrder.ActualYield:N2}");
                             Sell(actualPrice, tradeOrder);

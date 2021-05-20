@@ -1,57 +1,27 @@
 ﻿using System.Collections.Generic;
-using Trady.Analysis.Indicator;
+using Trady.Analysis;
+using Trady.Analysis.Extension;
 
 namespace AutoTrader.Traders.Bots
 {
-    public class MacdBot : ITradingBot
+    public class MacdBot : TradingBotBase, ITradingBot
     {
+
         public string Name => nameof(MacdBot);
+        protected TradingBotManager botManager { get; set; }
 
-        protected TradingBotManager tradeManager { get; set; }
-
-        public MovingAverageConvergenceDivergence Line => tradeManager.Macd;
-        public MovingAverageConvergenceDivergenceHistogram Histogram => tradeManager.MacdHistogram;
-
-        public bool IsBuy { get; }
-        public bool IsSell { get; }
-
-        public MacdBot(TradingBotManager tradeManager)
+        public MacdBot(TradingBotManager botManager)
         {
-            this.tradeManager = tradeManager;
-        }
-
-        public bool Buy(int i)
-        {
-            //return Signal.IsCross(Line, i) < 0;
-            return false;
-        }
-
-        public bool Sell(int i)
-        {
-            //return Signal.IsCross(Line, i) > 0;
-            return false;
+            this.botManager = botManager;
+            BotName = Name;
         }
 
         public List<TradeItem> RefreshAll()
         {
-            List<TradeItem> tradeItems = new List<TradeItem>();
-            //for (int i = 0; i < Signal.Count; i++)
-            //{
-            //    if (i > 0 && Signal[i] != null && Signal[i - 1] != null)
-            //    {
-            //        bool isBuy = false;
-            //        bool isSell = Sell(i);
-            //        if (!isSell)
-            //        {
-            //            isBuy = Buy(i);
-            //        }
-            //        if (isBuy || isSell)
-            //        {
-            //          tradeItems.Add(new TradeItem(Signal[i].CandleStick.Date, Signal[i].CandleStick.close, isBuy ? TradeType.Buy : TradeType.Sell, Name, TradePeriod.Short));
-            //        }
-            //    }
-            //}
-            return tradeItems;
+            var buyRule = Rule.Create(c => c.Prev != null && c.IsMacdBearishCross()).And(c => c.IsEmaBullish(TradingBotManager.EMA_PERIOD));
+            var sellRule = Rule.Create(c => c.Prev != null && c.IsMacdBullishCross());
+
+            return GetTrades(botManager.PastPrices, sellRule, buyRule, TradePeriod.Long);
         }
     }
 }
