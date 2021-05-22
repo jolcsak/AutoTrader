@@ -15,13 +15,15 @@ namespace AutoTrader.Traders
 
         public static double MinBtcTradeAmount = 0.00025;
 
-        protected static int ShortStopLossPercentage = -10;
+        protected static int ShortStopLossPercentage = -25;
 
-        protected static int LongStopLossPercentage = -15;
+        protected static int LongStopLossPercentage = -35;
 
         protected static int ShortTradeMaxAgeInHours = 24;
 
         protected static int LongTradeMaxAgeInHours = 24 * 4;
+
+        protected DateTime lastBuy = DateTime.MinValue;
 
 
         public BtcTrader(string targetCurrency) : base()
@@ -89,9 +91,13 @@ namespace AutoTrader.Traders
                 {
                     if (BotManager.LastTrade?.Type == TradeType.Buy)
                     {
-                        Logger.Info($"{TargetCurrency}: Buy at {DateTime.Now} : prev={PreviousPrice},curr={ActualPrice}");
-                        Logger.Info(BotManager.LastTrade.ToString());
-                        Buy(MinBtcTradeAmount, ActualPrice, BotManager.LastTrade.Period);
+                        if (BotManager.LastTrade.Date >= lastBuy.AddHours(1))
+                        {
+                            Logger.Info($"{TargetCurrency}: Buy at {DateTime.Now} : prev={PreviousPrice},curr={ActualPrice}");
+                            Logger.Info(BotManager.LastTrade.ToString());
+                            Buy(MinBtcTradeAmount, ActualPrice, BotManager.LastTrade.Period);
+                            lastBuy = BotManager.LastTrade.Date;
+                        }
                     }
                 }
 

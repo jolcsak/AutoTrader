@@ -30,7 +30,7 @@ namespace AutoTrader.Traders.Bots
         {
             int i = 0;
             List<TradeItem> tradeItems = new List<TradeItem>();
-            using (var ctx = new AnalyzeContext(botManager.PastPrices))
+            using (var ctx = new AnalyzeContext(botManager.Prices))
             {
                 var buys = new SimpleRuleExecutor(ctx, BuyRule).Execute();
                 DateTime lastTrade = DateTime.MinValue;
