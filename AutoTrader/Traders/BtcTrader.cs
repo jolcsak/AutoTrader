@@ -80,7 +80,7 @@ namespace AutoTrader.Traders
             {
                 double btcBalance = RefreshBalance();
 
-                BotManager.Refresh(ActualPrice, isNewPeriod);
+                BotManager.Refresh(isNewPeriod);
 
                 if (isNewPeriod)
                 {

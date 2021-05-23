@@ -87,7 +87,7 @@ namespace AutoTrader.Traders
             SpikeBot = new SpikeBot(this);
         }
 
-        public void Refresh(ActualPrice actualPrice = null, bool add = false)
+        public void Refresh(bool add = false)
         {
             if (Prices == null)
             {
@@ -100,7 +100,7 @@ namespace AutoTrader.Traders
                 }
             }
 
-            CandleStick lastCandleStick = actualPrice != null ? RefreshPrices(add) : null;
+            CandleStick lastCandleStick = RefreshPrices(add);
 
             var tasks = new List<Task>
             {
@@ -172,15 +172,15 @@ namespace AutoTrader.Traders
 
         private CandleStick RefreshPrices(bool add)
         {
-            if (!add && Prices.Count > 0)
-            {
-                Prices.RemoveAt(Prices.Count - 1);
-            }
-
             CandleStick[] candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateTime.UtcNow.AddHours(-1), DateTime.UtcNow, 1);
             CandleStick lastCandleStick = candleSticks.LastOrDefault();
             if (lastCandleStick != null)
             {
+                if (!add && Prices.Count > 0)
+                {
+                    Prices.RemoveAt(Prices.Count - 1);
+                }
+
                 Prices.Add(new Candle(lastCandleStick.Date, (decimal)lastCandleStick.open, (decimal)lastCandleStick.high, (decimal)lastCandleStick.low, (decimal)lastCandleStick.close, (decimal)lastCandleStick.volume));
                 DateProvider.MaxDate = lastCandleStick.Date;
                 Dates.Add(DateProvider.MaxDate);
