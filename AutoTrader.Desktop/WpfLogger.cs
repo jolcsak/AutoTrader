@@ -309,7 +309,7 @@ namespace AutoTrader.Desktop
             if (SelectedCurrency.Equals(trader.TargetCurrency))
             {
                 double projectedIncome = trader.BotManager.ProjectedIncome;
-                Dispatcher?.Invoke(() => projectedIncomeText.Content = (100 * projectedIncome - 100).ToString("N4") + " %");
+                Dispatcher?.Invoke(() => projectedIncomeText.Content = projectedIncome.ToString("N1") + " %");
             }
         }
 
