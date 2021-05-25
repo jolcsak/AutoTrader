@@ -25,13 +25,13 @@ namespace AutoTrader.Traders.Bots
 
         public override SellType ShouldSell(ActualPrice actualPrice, TradeOrder tradeOrder, TradeItem lastTrade)
         {
-            if (actualPrice.BuyPrice >= (tradeOrder.Price * TradeSettings.MinSellYield))
+            if (actualPrice.BuyPrice >= tradeOrder.Price * TradeSettings.MinSellYield)
             {
                 return SellType.Profit;
             }
             else
             {
-                bool shouldShell = tradeOrder.Period == TradePeriod.Short && (tradeOrder.ActualYield < STOP_PLOSS_PERCENTAGE || tradeOrder.BuyDate.AddHours(MAX_AGE_IN_HOURS) < DateTime.Now);
+                bool shouldShell = tradeOrder.ActualYield < STOP_PLOSS_PERCENTAGE || tradeOrder.BuyDate.AddHours(MAX_AGE_IN_HOURS) < DateTime.Now;
                 if (shouldShell)
                 {
                     return SellType.Loss;
