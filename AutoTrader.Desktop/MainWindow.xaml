@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:l="clr-namespace:AutoTrader.Desktop.Grid"
         mc:Ignorable="d"
-        Title="NiceHash AutoTrader v0.2" Height="941" Width="1950" SizeChanged="Window_SizeChanged" Closed="Window_Closed">
+        Title="NiceHash AutoTrader v0.2" Height="941" Width="1990" SizeChanged="Window_SizeChanged" Closed="Window_Closed">
     <Window.Resources>
         <l:TradeOrderValueConverter x:Key="tradeOrderValueConverter"/>
     </Window.Resources>
