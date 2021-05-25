@@ -155,11 +155,11 @@
                             <DockPanel DockPanel.Dock="Top">
                                 <Label Content="Closed Orders" DockPanel.Dock="Left" FontWeight="SemiBold"/>
                                 <StackPanel DockPanel.Dock="Left" Width="100" ></StackPanel>
-                                <Label Content="Day profit:" DockPanel.Dock="Left" FontWeight="SemiBold"/>
+                                <Label Content="Daily profit:" DockPanel.Dock="Left" FontWeight="SemiBold"/>
                                 <Label x:Name="dayProfit" Content="-" DockPanel.Dock="Left" FontWeight="SemiBold"/>
-                                <Label Content="Week profit:" DockPanel.Dock="Left" FontWeight="SemiBold"/>
+                                <Label Content="Weekly profit:" DockPanel.Dock="Left" FontWeight="SemiBold"/>
                                 <Label x:Name="weekProfit" Content="-" DockPanel.Dock="Left" FontWeight="SemiBold"/>
-                                <Label Content="Month profit:" DockPanel.Dock="Left" FontWeight="SemiBold"/>
+                                <Label Content="Monthly profit:" DockPanel.Dock="Left" FontWeight="SemiBold"/>
                                 <Label x:Name="monthProfit" Content="-" DockPanel.Dock="Left" FontWeight="SemiBold"/>
                             </DockPanel>
                             <DataGrid x:Name="closedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" ScrollViewer.IsDeferredScrollingEnabled="True" CanUserDeleteRows="False" SelectedCellsChanged="closedOrders_SelectedCellsChanged">
