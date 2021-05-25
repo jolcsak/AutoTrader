@@ -15,15 +15,9 @@ namespace AutoTrader.Traders
 
         public static double MinBtcTradeAmount = 0.00025;
 
-        protected static int ShortStopLossPercentage = -25;
-
-        protected static int LongStopLossPercentage = -35;
-
-        protected static int ShortTradeMaxAgeInHours = 24;
-
-        protected static int LongTradeMaxAgeInHours = 24 * 4;
-
         protected DateTime lastBuy = DateTime.MinValue;
+
+        protected static ISeller seller = new Seller();
 
 
         public BtcTrader(string targetCurrency) : base()
@@ -95,7 +89,7 @@ namespace AutoTrader.Traders
                         {
                             Logger.Info($"{TargetCurrency}: Buy at {DateTime.Now} : prev={PreviousPrice},curr={ActualPrice}");
                             Logger.Info(BotManager.LastTrade.ToString());
-                            Buy(MinBtcTradeAmount, ActualPrice, BotManager.LastTrade.Period);
+                            Buy(MinBtcTradeAmount, ActualPrice, BotManager.LastTrade.Period, BotManager.LastTrade.Bot);
                             lastBuy = BotManager.LastTrade.Date;
                         }
                     }
@@ -117,23 +111,11 @@ namespace AutoTrader.Traders
             {
                 foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.State == TradeOrderState.OPEN))
                 {
-                    if (actualPrice.BuyPrice >= (tradeOrder.Price * TradeSettings.MinSellYield))
+                    SellType sellType = seller.ShouldSell(actualPrice, tradeOrder, BotManager.LastTrade);
+                    if (sellType != SellType.None)
                     {
-                        if (tradeOrder.Period == TradePeriod.Short || (tradeOrder.Period == TradePeriod.Long && BotManager.LastTrade?.Type == TradeType.Sell))
-                        {
-                            Logger.Info($"{TargetCurrency}: Profit sell at price {actualPrice}, yield: {tradeOrder.ActualYield}");
-                            Sell(actualPrice, tradeOrder);
-                        }
-                    }
-                    else
-                    {
-                        bool isShortSell = tradeOrder.Period == TradePeriod.Short && (tradeOrder.ActualYield < ShortStopLossPercentage || tradeOrder.BuyDate.AddHours(ShortTradeMaxAgeInHours) < DateTime.Now);
-                        bool isLongSell = tradeOrder.Period == TradePeriod.Long && (tradeOrder.ActualYield < LongStopLossPercentage || tradeOrder.BuyDate.AddHours(LongTradeMaxAgeInHours) < DateTime.Now);
-                        if (isShortSell || isLongSell)
-                        {
-                            Logger.Warn($"{TargetCurrency}: Loss sell at price {actualPrice}, yield: {tradeOrder.ActualYield:N2}");
-                            Sell(actualPrice, tradeOrder);
-                        }
+                        Logger.Info($"{TargetCurrency}: {sellType} sell at price {actualPrice}, yield: {tradeOrder.ActualYield}");
+                        Sell(actualPrice, tradeOrder);
                     }
                 }
             }

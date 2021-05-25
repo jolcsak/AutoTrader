@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AutoTrader.Api;
 using AutoTrader.Api.Objects;
 using AutoTrader.Db;
-using AutoTrader.Db.Entities;
 using AutoTrader.Log;
 using AutoTrader.Traders.Bots;
 using AutoTrader.Traders.Trady;
@@ -87,7 +86,7 @@ namespace AutoTrader.Traders
             SpikeBot = new SpikeBot(this);
         }
 
-        public void Refresh(bool add = false)
+        public CandleStick Refresh(bool add = false)
         {
             if (Prices == null)
             {
@@ -162,6 +161,8 @@ namespace AutoTrader.Traders
             {
                 LastTrade = Trades.FirstOrDefault(t => t.Date.Equals(lastCandleStick.Date));
             }
+
+            return lastCandleStick;
         }
 
         private void MergeBotRule(ITradingBot bot)
@@ -205,21 +206,6 @@ namespace AutoTrader.Traders
                 return (double)result.TotalCorrectedBalance - 100;
             }
             return 0;
-        }
-
-        private double Sell( IList<TradeOrder> tradeItems, TradeItem trade)
-        {
-            double money = 0;
-            foreach (var tradeItem in tradeItems)
-            {
-                if (tradeItem.State == TradeOrderState.OPEN && trade.Price > tradeItem.Price * TradeSettings.MinSellYield)
-                {
-                    tradeItem.SellPrice = trade.Price;
-                    tradeItem.State = TradeOrderState.CLOSED;
-                    money += tradeItem.Amount * trade.Price;
-                }
-            }
-            return money;
         }
     }
 }

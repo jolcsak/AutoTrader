@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:l="clr-namespace:AutoTrader.Desktop.Grid"
         mc:Ignorable="d"
-        Title="NiceHash AutoTrader v0.1" Height="941" Width="1810" SizeChanged="Window_SizeChanged" Closed="Window_Closed">
+        Title="NiceHash AutoTrader v0.2" Height="941" Width="1950" SizeChanged="Window_SizeChanged" Closed="Window_Closed">
     <Window.Resources>
         <l:TradeOrderValueConverter x:Key="tradeOrderValueConverter"/>
     </Window.Resources>
@@ -133,6 +133,7 @@
                                     <DataGridTextColumn Binding="{Binding TargetAmount}" Header="Amount" />
                                     <DataGridTextColumn Binding="{Binding Fee, StringFormat={}{0:N8}}" Header="Fee" />
                                     <DataGridTextColumn Binding="{Binding Period}" Header="Period" />
+                                    <DataGridTextColumn Binding="{Binding BotName}" Header="Bot" />
                                     <DataGridTemplateColumn>
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
@@ -169,6 +170,7 @@
                                     <DataGridTextColumn Binding="{Binding SellBtcAmount, StringFormat={}{0:N8}}" Header="Sell BTC" FontWeight="Bold" />
                                     <DataGridTextColumn Binding="{Binding Yield, StringFormat={}{0:N2}%}" Header="Yield" />
                                     <DataGridTextColumn Binding="{Binding Period}" Header="Period" />
+                                    <DataGridTextColumn Binding="{Binding BotName}" Header="Bot" />                                    
                                 </DataGrid.Columns>
                             </DataGrid>
                         </DockPanel>

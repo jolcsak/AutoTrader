@@ -30,7 +30,7 @@ namespace AutoTrader.Traders
 
         IList<Price> GetAllPastPrices();
 
-        bool Buy(double amount, ActualPrice actualPrice, TradePeriod period);
+        bool Buy(double amount, ActualPrice actualPrice, TradePeriod period, string botName);
 
         bool Sell(double actualPrice, TradeOrder tradeOrder);
 

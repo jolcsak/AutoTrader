@@ -50,12 +50,12 @@ namespace AutoTrader.Traders
             return null;
         }
 
-        public void StoreTradeOrder(TradeOrderType type, string orderId, double price, double amount, double targetAmount, double fee, string currency, TradePeriod period)
+        public void StoreTradeOrder(TradeOrderType type, string orderId, double price, double amount, double targetAmount, double fee, string currency, TradePeriod period, string botName)
         {
-            Store.OrderBooks.Save(new TradeOrder(type, orderId, price, amount, targetAmount, currency, fee, TraderId, period));
+            Store.OrderBooks.Save(new TradeOrder(type, orderId, price, amount, targetAmount, currency, fee, TraderId, period, botName));
         }
 
-        public bool Buy(double amount, ActualPrice actualPrice, TradePeriod period)
+        public bool Buy(double amount, ActualPrice actualPrice, TradePeriod period, string bot)
         {
             Logger.Info($"Try to buy {TargetCurrency}");
             if (actualPrice.SellAmount > amount)
@@ -68,7 +68,7 @@ namespace AutoTrader.Traders
                     if (r != null)
                     {
                         Logger.Info($"{TargetCurrency} : Price={r.price}, Amount={amount}, Qty={r.qty}, SecQty={r.sndQty}");
-                        StoreTradeOrder(TradeOrderType.MARKET, orderResponse.orderId, r.price, amount, r.qty, r.fee, TargetCurrency, period);
+                        StoreTradeOrder(TradeOrderType.MARKET, orderResponse.orderId, r.price, amount, r.qty, r.fee, TargetCurrency, period, bot);
                         return true;
                     }
                     else

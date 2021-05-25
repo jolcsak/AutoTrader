@@ -392,7 +392,7 @@ namespace AutoTrader.Desktop
                 var currency = (sender as Button).DataContext as Currency;
                 if (btcBalance >= BtcTrader.MinBtcTradeAmount)
                 {
-                    if (currencyTrader.Buy(BtcTrader.MinBtcTradeAmount, currencyTrader.ActualPrice, period))
+                    if (currencyTrader.Buy(BtcTrader.MinBtcTradeAmount, currencyTrader.ActualPrice, period, null))
                     {
                         currencyTrader.RefreshBalance();
                         Logger.LogTradeOrders(CurrentTrader.AllTradeOrders);

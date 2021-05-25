@@ -29,11 +29,13 @@ namespace AutoTrader.Db.Entities
 
         public string Trader { get; set; }
 
+        public string BotName { get; set; }
+
         public TradeOrder()
         {
         }
 
-        protected TradeOrder(TradeOrderType type, string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader, TradeOrderState state, TradePeriod period) : base()
+        protected TradeOrder(TradeOrderType type, string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader, TradeOrderState state, TradePeriod period, string botName) : base()
         {
             Type = type;
             OrderId = orderId;
@@ -47,9 +49,10 @@ namespace AutoTrader.Db.Entities
             State = state;
             ActualPrice = price;
             Period = period;
+            BotName = botName;
         }
 
-        public TradeOrder(TradeOrderType type, string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader, TradePeriod period) : this(type, orderId, price, amount, targetAmount, currency, fee, trader, TradeOrderState.OPEN, period)
+        public TradeOrder(TradeOrderType type, string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader, TradePeriod period, string botName) : this(type, orderId, price, amount, targetAmount, currency, fee, trader, TradeOrderState.OPEN, period, botName)
         {
         }
 

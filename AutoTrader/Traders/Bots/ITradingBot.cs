@@ -4,7 +4,7 @@ using Trady.Core.Infrastructure;
 
 namespace AutoTrader.Traders.Bots
 {
-    public interface ITradingBot
+    public interface ITradingBot : ISeller
     {
         string Name { get; }
 
