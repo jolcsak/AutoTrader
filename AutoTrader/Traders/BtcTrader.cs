@@ -150,6 +150,7 @@ namespace AutoTrader.Traders
             {
                 Logger.Info("Sold.");
             }
+            else
             {
                 Logger.Err("Sell failed!");
             }
