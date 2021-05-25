@@ -10,7 +10,6 @@ using AutoTrader.Db.Entities;
 using AutoTrader.Log;
 using AutoTrader.Traders;
 using Trady.Analysis;
-using Trady.Core.Infrastructure;
 
 namespace AutoTrader.Desktop
 {
@@ -33,6 +32,10 @@ namespace AutoTrader.Desktop
         private static Label totalBalanceText;
         private static TradeOrder selectedTradeOrder;
         private static Label projectedIncomeText;
+
+        private static Label dailyProfitLabel;
+        private static Label weeklyProfitLabel;
+        private static Label monthlyProfitLabel;
 
         private static readonly ObservableCollection<Currency> currencyList = new ObservableCollection<Currency>();
         private static readonly ObservableCollection<TradeOrder> openedOrdersData = new ObservableCollection<TradeOrder>();
@@ -74,7 +77,9 @@ namespace AutoTrader.Desktop
 
         protected Dispatcher Dispatcher => Application.Current != null ? Application.Current.Dispatcher : null;
 
-        public static void Init(TextBox consoleInstance, ScrollViewer consoleScrollInstance, DataGrid openedOrdersInstance, DataGrid closedOrdersInstance, Label balanceInstance, DataGrid currenciesInstance, Canvas graphInstance, Label selectedCurrencyInst, Label totalBalanceInstance, Label projectedIncome)
+        public static void Init(TextBox consoleInstance, ScrollViewer consoleScrollInstance, DataGrid openedOrdersInstance, DataGrid closedOrdersInstance, Label balanceInstance, 
+                                DataGrid currenciesInstance, Canvas graphInstance, Label selectedCurrencyInst, Label totalBalanceInstance, Label projectedIncome,
+                                Label dailyProfit, Label weeklyProfit, Label monthlyProfit)
         {
             TradeLogManager.Init(new WpfLogger(string.Empty));
             console = consoleInstance;
@@ -91,6 +96,10 @@ namespace AutoTrader.Desktop
             currencies.ItemsSource = currencyList;
             openedOrders.ItemsSource = openedOrdersData;
             closedOrders.ItemsSource = closedOrdersData;
+
+            dailyProfitLabel = dailyProfit;
+            weeklyProfitLabel = weeklyProfit;
+            monthlyProfitLabel = monthlyProfit;
         }
 
         public static void SetConsole(TextBox consoleInstance)
@@ -302,6 +311,16 @@ namespace AutoTrader.Desktop
                 double projectedIncome = trader.BotManager.ProjectedIncome;
                 Dispatcher?.Invoke(() => projectedIncomeText.Content = (100 * projectedIncome - 100).ToString("N4") + " %");
             }
+        }
+
+        public void LogProfit(double daily, double weekly, double monthly)
+        {
+            Dispatcher?.BeginInvoke(() =>
+            {
+                dailyProfitLabel.Content = daily.ToString("N1") + "%";
+                weeklyProfitLabel.Content = weekly.ToString("N1") + "%";
+                monthlyProfitLabel.Content = monthly.ToString("N1") + "%";
+            });
         }
     }
 }

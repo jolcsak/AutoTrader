@@ -102,7 +102,23 @@ namespace AutoTrader.Traders
             PreviousPrice = ActualPrice;
 
             Logger.LogTradeOrders(AllTradeOrders);
+
+            LogProfit();
+
             Logger.LogCurrency(this, ActualPrice);
+        }
+
+        private void LogProfit()
+        {
+            var lastMonthOrders = AllTradeOrders.Where(to => to.State == TradeOrderState.CLOSED && to.SellDate >= DateTime.Now.AddMonths(-1)).ToList();
+            var lastWeekOrders = lastMonthOrders.Where(to => to.SellDate >= DateTime.Now.AddDays(-7)).ToList();
+            var lastDayOrders = lastWeekOrders.Where(to => to.SellDate >= DateTime.Now.AddDays(-1));
+
+            double lastMonthProfit = 100 * lastMonthOrders.Sum(o => o.SellBtcAmount) / lastMonthOrders.Sum(o => o.Amount);
+            double lastWeekProfit = 100 * lastWeekOrders.Sum(o => o.SellBtcAmount) / lastWeekOrders.Sum(o => o.Amount);
+            double lastDayProfit = 100 * lastDayOrders.Sum(o => o.SellBtcAmount) / lastDayOrders.Sum(o => o.Amount);
+
+            Logger.LogProfit(lastDayProfit, lastWeekProfit, lastMonthProfit);
         }
 
         private bool Sell(ActualPrice actualPrice)
