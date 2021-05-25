@@ -71,7 +71,7 @@
                             <DataGridTextColumn Binding="{Binding SellPrice, StringFormat={}{0:N10}}" Header="Sell Price" />
                             <DataGridTextColumn Binding="{Binding SellAmount}" Header="Sell Amount" />
                             <DataGridTextColumn Binding="{Binding SellChange}" Header="Sell Change" FontWeight="ExtraBold"/>
-                            <DataGridTextColumn Binding="{Binding Order, StringFormat={}{0:N1}}" Header="Order" />
+                            <DataGridTextColumn Binding="{Binding Order, StringFormat={}{0:N1}}" Header="Income" />
                             <DataGridTextColumn Binding="{Binding LastUpdate}" Header="Last Update" FontStyle="Italic"/>
                             <DataGridTemplateColumn>
                                 <DataGridTemplateColumn.CellTemplate>
