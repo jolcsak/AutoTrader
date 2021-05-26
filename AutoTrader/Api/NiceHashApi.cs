@@ -57,7 +57,7 @@ namespace AutoTrader.Api
 
         public OrderBooks GetOrderBook(string currencyBuy, string currencySell)
         {
-            return Get<OrderBooks>($"/exchange/api/v2/orderbook?market={currencyBuy}{currencySell}&limit=1", true, ServerTime);
+            return Get<OrderBooks>($"/exchange/api/v2/orderbook?market={currencyBuy}{currencySell}&limit=1", true, ServerTime, false);
         }
 
         public HistoricPrice[] GetLastPrices(string market, int limit)
@@ -123,15 +123,15 @@ namespace AutoTrader.Api
             return trades.Length == 1 ? trades[0] : null;
         }
 
-        private T Get<T>(string url, bool auth = false, string time = null)
+        private T Get<T>(string url, bool auth = false, string time = null, bool logErrors = true)
         {
-            string response = api.get(url, auth, time);
+            string response = api.get(url, auth, time, logErrors);
             // {"error_id":"3a71f9a1-be49-46ac-8a8b-862da6b8ad91","errors":[{"code":2001,"message":"Session Time skew detected"}]}
             while (response.Contains("\"code\":2001"))
             {
                 QueryServerTime();
                 Thread.Sleep(RETRY_PERIOD);
-                response = api.get(url, true, ServerTime);
+                response = api.get(url, true, ServerTime, logErrors);
             }
 
             return JsonConvert.DeserializeObject<T>(response);

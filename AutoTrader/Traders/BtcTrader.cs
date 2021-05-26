@@ -60,7 +60,6 @@ namespace AutoTrader.Traders
             OrderBooks orderBooks = NiceHashApi.GetOrderBook(TargetCurrency, BTC);
             if (orderBooks == null)
             {
-                Logger.Err("No orderbook returned!");
                 return;
             }
 

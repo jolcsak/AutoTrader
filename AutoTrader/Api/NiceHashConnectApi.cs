@@ -83,12 +83,12 @@ namespace AutoTrader.Api
             return string.Join("", baHashedText.ToList().Select(b => b.ToString("x2")).ToArray());
         }
 
-        public string get(string url)
+        public string get(string url, bool logErrors = true)
         {
-            return this.get(url, false, null);
+            return this.get(url, false, null, logErrors);
         }
 
-        public string get(string url, bool auth, string time)
+        public string get(string url, bool auth, string time, bool logErrors)
         {
             var request = new RestRequest(url);
             if (auth)
@@ -96,7 +96,7 @@ namespace AutoTrader.Api
                 AddHeaders(time, request, "GET", url);
             }
 
-            return GetContent(request, Method.GET);
+            return GetContent(request, Method.GET, logErrors);
         }
 
         public string post(string url, string payload, string time, bool requestId)
@@ -133,7 +133,7 @@ namespace AutoTrader.Api
             return GetContent(request, Method.DELETE);
         }
 
-        private string GetContent(RestRequest request, Method method)
+        private string GetContent(RestRequest request, Method method, bool logErrors = true)
         {
             IRestResponse response;
             bool hasValidResponse;
@@ -151,7 +151,11 @@ namespace AutoTrader.Api
                 
                 if (!response.IsSuccessful)
                 {
-                    Logger.Err($"Request failed: Status={response.StatusCode}, URL={response.ResponseUri}, RespStatus={response.ResponseStatus}, Error={response.ErrorMessage}, Desc={response.StatusDescription}, Content={response.Content}");
+                    if (logErrors)
+                    {
+                        Logger.Err($"Request failed: Status={response.StatusCode}, URL={response.ResponseUri}, RespStatus={response.ResponseStatus}, Error={response.ErrorMessage}, Desc={response.StatusDescription}, Content={response.Content}");
+                    }
+
                     if (response.StatusCode == HttpStatusCode.TooManyRequests)
                     {
                         hasValidResponse = HandleTooManyRequests(response);

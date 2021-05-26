@@ -79,7 +79,6 @@ namespace AutoTrader
                     }
                 }
                 first = false;
-                Logger.Info($"Waiting {TRADE_WAIT / 1000} seconds...");
                 Thread.Sleep(TRADE_WAIT);
             } while (true);
         }
