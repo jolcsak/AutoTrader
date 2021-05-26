@@ -8,6 +8,8 @@ namespace AutoTrader.Traders.Bots
 {
     public class SpikeBot : TradingBotBase, ITradingBot
     {
+        public const int EMA_PERIOD = 48;
+
         private const int COOLDOWN_IN_MINUTES = 60;
         private const int PRICE_PERCENTAGE_CHANGE = 5;
 
@@ -15,7 +17,7 @@ namespace AutoTrader.Traders.Bots
         private const int MAX_AGE_IN_HOURS = 6;
 
         public override string Name => nameof(SpikeBot);
-        public override Predicate<IIndexedOhlcv> BuyRule => Rule.Create(c => c.Prev != null && c.ClosePricePercentageChange() + c.Prev.ClosePricePercentageChange() < -PRICE_PERCENTAGE_CHANGE).And(c => c.IsEmaBullish(TradingBotManager.EMA_PERIOD));
+        public override Predicate<IIndexedOhlcv> BuyRule => Rule.Create(c => c.Prev != null && c.ClosePricePercentageChange() + c.Prev.ClosePricePercentageChange() < -PRICE_PERCENTAGE_CHANGE).And(c => c.IsEmaBullish(EMA_PERIOD));
         public override Predicate<IIndexedOhlcv> SellRule => Rule.Create(c => c.Prev != null && c.ClosePricePercentageChange() + c.Prev.ClosePricePercentageChange() > PRICE_PERCENTAGE_CHANGE);
 
         public SpikeBot(TradingBotManager botManager) : base(botManager, TradePeriod.Short, COOLDOWN_IN_MINUTES)

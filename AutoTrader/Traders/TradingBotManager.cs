@@ -9,7 +9,6 @@ using AutoTrader.Log;
 using AutoTrader.Traders.Bots;
 using AutoTrader.Traders.Trady;
 using Trady.Analysis;
-using Trady.Analysis.Indicator;
 using Trady.Core;
 using Trady.Core.Infrastructure;
 using Trady.Analysis.Backtest;
@@ -18,16 +17,6 @@ namespace AutoTrader.Traders
 {
     public class TradingBotManager
     {
-        public const int RSI_PERIOD = 14;
-        public const int EMA_PERIOD = 48;
-
-        private const int SMA_FAST_SMOOTHNESS = 5;
-        private const int SMA_SLOW_SMOOTHNESS = 9;
-
-        private const int EMA_FAST = 12;
-        private const int EMA_SLOW = 26;
-        private const int MACD_SIGNAL = 9;
-
         private ITrader trader;
 
         protected virtual ITradeLogger Logger => TradeLogManager.GetLogger(GetType());
@@ -36,19 +25,6 @@ namespace AutoTrader.Traders
         protected static NiceHashApi NiceHashApi => NiceHashApi.Instance;
 
         public IList<IOhlcv> Prices { get; set; }
-
-        public SimpleMovingAverage SmaSlow { get; private set; }
-        public SimpleMovingAverage SmaFast { get; private set; }
-
-        public SimpleMovingAverageOscillator Ao { get; private set; }
-
-        public RelativeStrengthIndex Rsi { get; private set; }
-
-        public MovingAverageConvergenceDivergence Macd { get; private set; }
-
-        public MovingAverageConvergenceDivergenceHistogram MacdHistogram { get; private set; }
-
-        public ExponentialMovingAverage Ema { get; private set; }
 
         public IList<DateTime> Dates { get; set; }  
 
@@ -101,19 +77,6 @@ namespace AutoTrader.Traders
 
             CandleStick lastCandleStick = RefreshPrices(add);
 
-            var tasks = new List<Task>
-            {
-                Task.Factory.StartNew(() => SmaSlow = new SimpleMovingAverage(Prices, SMA_SLOW_SMOOTHNESS)),
-                Task.Factory.StartNew(() => SmaFast = new SimpleMovingAverage(Prices, SMA_FAST_SMOOTHNESS)),
-                Task.Factory.StartNew(() => Ao = new SimpleMovingAverageOscillator(Prices, SMA_FAST_SMOOTHNESS, SMA_SLOW_SMOOTHNESS)),
-                Task.Factory.StartNew(() => Rsi = new RelativeStrengthIndex(Prices, RSI_PERIOD)),
-                Task.Factory.StartNew(() => Macd = new MovingAverageConvergenceDivergence(Prices, EMA_FAST, EMA_SLOW, MACD_SIGNAL)),
-                Task.Factory.StartNew(() => MacdHistogram = new MovingAverageConvergenceDivergenceHistogram(Prices, EMA_FAST, EMA_SLOW, MACD_SIGNAL)),
-                Task.Factory.StartNew(() => Ema = new ExponentialMovingAverage(Prices, EMA_PERIOD))
-            };
-            Task.WaitAll(tasks.ToArray());
-            tasks.Clear();
-
             var storedBalances = Store.TotalBalances.GetTotalBalances(trader).Where(tb => tb.FiatBalance > 1).ToList();
 
             FiatBalances = storedBalances.Select(b => b.FiatBalance).ToList();
@@ -128,6 +91,7 @@ namespace AutoTrader.Traders
             buyRule = Rule.Create(c => false);
             sellRule = Rule.Create(c => false);
 
+            var tasks = new List<Task>();
             if (TradeSettings.SmaBotEnabled)
             {
                 tasks.Add(Task.Factory.StartNew(() => aoTrades = AoBot.RefreshAll()));
@@ -185,6 +149,16 @@ namespace AutoTrader.Traders
                 Prices.Add(new Candle(lastCandleStick.Date, (decimal)lastCandleStick.open, (decimal)lastCandleStick.high, (decimal)lastCandleStick.low, (decimal)lastCandleStick.close, (decimal)lastCandleStick.volume));
                 DateProvider.MaxDate = lastCandleStick.Date;
                 Dates.Add(DateProvider.MaxDate);
+                if (add) {
+                    if (Prices.Count > 1)
+                    {
+                        Prices.RemoveAt(0);
+                    }
+                    if (Dates.Count > 1)
+                    {
+                        Dates.Remove(0);
+                    }
+                }
             }
             return lastCandleStick;
         }

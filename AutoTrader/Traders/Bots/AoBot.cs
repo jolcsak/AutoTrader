@@ -7,6 +7,8 @@ namespace AutoTrader.Traders.Bots
 {
     public class AoBot : TradingBotBase, ITradingBot
     {
+        public const int EMA_PERIOD = 48;
+
         private const int COOLDOWN_IN_MINUTES = 60;
         private const int PRICE_PERCENTAGE_CHANGE = 5;
 
@@ -16,7 +18,7 @@ namespace AutoTrader.Traders.Bots
                 .And(c => c.IsMacdOscBullish(12, 26, 9))
                 .And(c => c.IsSmaOscBullish(10, 30))
                 .And(c => c.IsAccumDistBullish())
-                .And(c => c.IsEmaBullish(TradingBotManager.EMA_PERIOD));
+                .And(c => c.IsEmaBullish(EMA_PERIOD));
         public override Predicate<IIndexedOhlcv> SellRule =>
             Rule.Create(c => c.IsFullStoBearishCross(14, 3, 3))
                 .Or(c => c.IsMacdBearishCross(12, 24, 9))

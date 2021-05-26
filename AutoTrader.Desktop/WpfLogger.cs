@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -10,6 +11,7 @@ using AutoTrader.Db.Entities;
 using AutoTrader.Log;
 using AutoTrader.Traders;
 using Trady.Analysis;
+using Trady.Analysis.Indicator;
 
 namespace AutoTrader.Desktop
 {
@@ -18,6 +20,16 @@ namespace AutoTrader.Desktop
         private const string INFO = "INFO";
         private const string WARN = "WARNING";
         private const string ERR = "ERROR";
+
+        public const int RSI_PERIOD = 14;
+        public const int EMA_PERIOD = 48;
+
+        private const int SMA_FAST_SMOOTHNESS = 5;
+        private const int SMA_SLOW_SMOOTHNESS = 9;
+
+        private const int EMA_FAST = 12;
+        private const int EMA_SLOW = 26;
+        private const int MACD_SIGNAL = 9;
 
         private static TextBox console;
         private static ScrollViewer consoleScroll;
@@ -40,6 +52,19 @@ namespace AutoTrader.Desktop
         private static readonly ObservableCollection<Currency> currencyList = new ObservableCollection<Currency>();
         private static readonly ObservableCollection<TradeOrder> openedOrdersData = new ObservableCollection<TradeOrder>();
         private static readonly ObservableCollection<TradeOrder> closedOrdersData = new ObservableCollection<TradeOrder>();
+
+        public SimpleMovingAverage SmaSlow { get; private set; }
+        public SimpleMovingAverage SmaFast { get; private set; }
+
+        public SimpleMovingAverageOscillator Ao { get; private set; }
+
+        public RelativeStrengthIndex Rsi { get; private set; }
+
+        public MovingAverageConvergenceDivergence Macd { get; private set; }
+
+        public MovingAverageConvergenceDivergenceHistogram MacdHistogram { get; private set; }
+
+        public ExponentialMovingAverage Ema { get; private set; }
 
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 
@@ -221,20 +246,33 @@ namespace AutoTrader.Desktop
             }
             if (SelectedCurrency.Equals(trader.TargetCurrency))
             {
+                TradingBotManager botManager = trader.BotManager;
+
+                var tasks = new List<Task>
+                            {
+                                Task.Factory.StartNew(() => SmaSlow = TradeSettings.SmaGraphVisible ? new SimpleMovingAverage(botManager.Prices, SMA_SLOW_SMOOTHNESS) : null),
+                                Task.Factory.StartNew(() => SmaFast = TradeSettings.SmaGraphVisible ? new SimpleMovingAverage(botManager.Prices, SMA_FAST_SMOOTHNESS) : null),
+                                Task.Factory.StartNew(() => Ao = TradeSettings.AoGraphVisible ? new SimpleMovingAverageOscillator(botManager.Prices, SMA_FAST_SMOOTHNESS, SMA_SLOW_SMOOTHNESS) : null),
+                                Task.Factory.StartNew(() => Rsi = TradeSettings.RsiVisible ? new RelativeStrengthIndex(botManager.Prices, RSI_PERIOD) : null),
+                                Task.Factory.StartNew(() => Macd = TradeSettings.MacdVisible ? new MovingAverageConvergenceDivergence(botManager.Prices, EMA_FAST, EMA_SLOW, MACD_SIGNAL) : null),
+                                Task.Factory.StartNew(() => MacdHistogram = TradeSettings.MacdVisible ? new MovingAverageConvergenceDivergenceHistogram(botManager.Prices, EMA_FAST, EMA_SLOW, MACD_SIGNAL) : null),
+                                Task.Factory.StartNew(() => Ema = TradeSettings.TendencyGraphVisible ? new ExponentialMovingAverage(botManager.Prices, EMA_PERIOD) : null)
+                            };
+                Task.WaitAll(tasks.ToArray());
+
                 Dispatcher?.Invoke(() => graph.Children.Clear());
 
-                TradingBotManager botManager = trader.BotManager;
                 DateProvider dateProvider = botManager.DateProvider;
                 dateProvider.Width = graph.ActualWidth;
 
                 if (TradeSettings.AoGraphVisible)
                 {
-                    new BarGraph(graph, dateProvider, botManager.Prices.Count, "Awesome Oscillator", botManager.Ao).Draw();
+                    new BarGraph(graph, dateProvider, botManager.Prices.Count, "Awesome Oscillator", Ao).Draw();
                 }
 
                 if (TradeSettings.TendencyGraphVisible)
                 {
-                    var ret = new ValueLine(graph, dateProvider, "EMA", botManager.Ema, botManager.Prices.Count, Colors.Blue, showPoints: true).Draw();
+                    var ret = new ValueLine(graph, dateProvider, "EMA", Ema, botManager.Prices.Count, Colors.Blue, showPoints: true).Draw();
                 }
 
                 if (TradeSettings.AiPredicitionVisible)
@@ -248,14 +286,14 @@ namespace AutoTrader.Desktop
                 }
                 if (TradeSettings.SmaGraphVisible)
                 {
-                    var ret = new ValueLine(graph, dateProvider, "Fast Simple Moving Average", botManager.SmaFast, botManager.Prices.Count, Colors.Blue, showPoints: true).Draw();
-                    new ValueLine(graph, dateProvider, "Slow Simple Moving Average", botManager.SmaSlow, botManager.Prices.Count, Colors.LightBlue, showPoints: false).Draw(ret.Item1, ret.Item2);
+                    var ret = new ValueLine(graph, dateProvider, "Fast Simple Moving Average", SmaFast, botManager.Prices.Count, Colors.Blue, showPoints: true).Draw();
+                    new ValueLine(graph, dateProvider, "Slow Simple Moving Average", SmaSlow, botManager.Prices.Count, Colors.LightBlue, showPoints: false).Draw(ret.Item1, ret.Item2);
                 }
 
                 if (TradeSettings.RsiVisible)
                 {
                     new RsiSections(graph).Draw();
-                    new ValueLine(graph, dateProvider, "Relative Strength Index", botManager.Rsi, botManager.Prices.Count, Colors.Purple, showPoints: false).Draw();
+                    new ValueLine(graph, dateProvider, "Relative Strength Index", Rsi, botManager.Prices.Count, Colors.Purple, showPoints: false).Draw();
                 }
 
                 if (TradeSettings.MacdVisible)
@@ -265,13 +303,13 @@ namespace AutoTrader.Desktop
 
                     for (int i = 0; i < botManager.Prices.Count; i++)
                     {
-                        if (botManager.Macd[i]?.Tick != null) {
-                            macdLine.Add(new AnalyzableTick<decimal?>(botManager.Macd[i].DateTime, botManager.Macd[i].Tick.MacdLine));
-                            macdSignal.Add(new AnalyzableTick<decimal?>(botManager.Macd[i].DateTime, botManager.Macd[i].Tick.SignalLine));
+                        if (Macd[i]?.Tick != null) {
+                            macdLine.Add(new AnalyzableTick<decimal?>(Macd[i].DateTime, Macd[i].Tick.MacdLine));
+                            macdSignal.Add(new AnalyzableTick<decimal?>(Macd[i].DateTime, Macd[i].Tick.SignalLine));
                         }
                     }
 
-                    new BarGraph(graph, dateProvider, botManager.Prices.Count, "MACD Histogram", botManager.MacdHistogram).Draw();
+                    new BarGraph(graph, dateProvider, botManager.Prices.Count, "MACD Histogram", MacdHistogram).Draw();
 
                     var ret = new ValueLine(graph, dateProvider, "MACD Line", macdLine, botManager.Prices.Count, Colors.Orange, showPoints: false).Draw();
                     new ValueLine(graph, dateProvider, "MACD Signal", macdSignal, botManager.Prices.Count, Colors.DarkViolet, showPoints: false).Draw(ret.Item1, ret.Item2);
