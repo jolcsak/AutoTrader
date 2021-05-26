@@ -156,7 +156,7 @@ namespace AutoTrader.Traders
                     }
                     if (Dates.Count > 1)
                     {
-                        Dates.Remove(0);
+                        Dates.RemoveAt(0);
                     }
                 }
             }
