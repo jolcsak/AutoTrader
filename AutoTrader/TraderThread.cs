@@ -16,7 +16,7 @@ namespace AutoTrader
 {
     public class TraderThread
     {
-        private const string VERSION = "0.25";
+        private const string VERSION = "0.26";
         private const int COLLECTOR_WAIT = 1 * 60 * 1000;
         private const int TRADE_WAIT = 5 * 1000;
         private const int BUYER_NUMBER = 10;
@@ -62,16 +62,13 @@ namespace AutoTrader
             CreateTraders(niceHashApi);
 
             bool first = true;
-
             do
             {
-                int i = 0;
                 foreach (ITrader trader in Traders.OrderByDescending(t => t.Order).ToList())
                 {
                     try
                     {
-                        trader.Trade(i < BUYER_NUMBER && !first);
-                        i++;
+                        trader.Trade(trader.Order > 0 && !first);
                     }
                     catch (Exception ex)
                     {
