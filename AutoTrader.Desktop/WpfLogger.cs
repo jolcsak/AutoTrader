@@ -64,7 +64,10 @@ namespace AutoTrader.Desktop
 
         public MovingAverageConvergenceDivergenceHistogram MacdHistogram { get; private set; }
 
-        public ExponentialMovingAverage Ema { get; private set; }
+        public ExponentialMovingAverage Ema24 { get; private set; }
+        public ExponentialMovingAverage Ema48 { get; private set; }
+
+        public ExponentialMovingAverage Ema100 { get; private set; }
 
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 
@@ -256,7 +259,10 @@ namespace AutoTrader.Desktop
                                 Task.Factory.StartNew(() => Rsi = TradeSettings.RsiVisible ? new RelativeStrengthIndex(botManager.Prices, RSI_PERIOD) : null),
                                 Task.Factory.StartNew(() => Macd = TradeSettings.MacdVisible ? new MovingAverageConvergenceDivergence(botManager.Prices, EMA_FAST, EMA_SLOW, MACD_SIGNAL) : null),
                                 Task.Factory.StartNew(() => MacdHistogram = TradeSettings.MacdVisible ? new MovingAverageConvergenceDivergenceHistogram(botManager.Prices, EMA_FAST, EMA_SLOW, MACD_SIGNAL) : null),
-                                Task.Factory.StartNew(() => Ema = TradeSettings.TendencyGraphVisible ? new ExponentialMovingAverage(botManager.Prices, EMA_PERIOD) : null)
+                                Task.Factory.StartNew(() => Ema24 = TradeSettings.TendencyGraphVisible ? new ExponentialMovingAverage(botManager.Prices, 24) : null),
+                                Task.Factory.StartNew(() => Ema48 = TradeSettings.TendencyGraphVisible ? new ExponentialMovingAverage(botManager.Prices, 48) : null),
+                                Task.Factory.StartNew(() => Ema100 = TradeSettings.TendencyGraphVisible ? new ExponentialMovingAverage(botManager.Prices, 100) : null)
+
                             };
                 Task.WaitAll(tasks.ToArray());
 
@@ -272,7 +278,9 @@ namespace AutoTrader.Desktop
 
                 if (TradeSettings.TendencyGraphVisible)
                 {
-                    var ret = new ValueLine(graph, dateProvider, "EMA", Ema, botManager.Prices.Count, Colors.Blue, showPoints: true).Draw();
+                    var ret = new ValueLine(graph, dateProvider, "EMA24", Ema24, botManager.Prices.Count, Colors.Blue, showPoints: true).Draw();
+                    new ValueLine(graph, dateProvider, "EMA48", Ema48, botManager.Prices.Count, Colors.Magenta, showPoints: true).Draw(ret.Item1, ret.Item2);
+                    new ValueLine(graph, dateProvider, "EMA100", Ema100, botManager.Prices.Count, Colors.DodgerBlue, showPoints: true).Draw(ret.Item1, ret.Item2);
                 }
 
                 if (TradeSettings.AiPredicitionVisible)
