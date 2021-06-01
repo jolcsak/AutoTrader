@@ -47,7 +47,10 @@ namespace AutoTrader.Traders
         protected Predicate<IIndexedOhlcv> buyRule;
         protected Predicate<IIndexedOhlcv> sellRule;
 
-        public double ProjectedIncome => GetProjectedIncome();
+        protected Predicate<IIndexedOhlcv> tempBuyRule;
+        protected Predicate<IIndexedOhlcv> tempSellRule;
+
+        public double ProjectedIncome => GetProjectedIncome(buyRule, sellRule);
 
         public DateProvider DateProvider { get; private set; }
         public TradeItem LastTrade { get; set; }
@@ -91,6 +94,9 @@ namespace AutoTrader.Traders
             buyRule = Rule.Create(c => false);
             sellRule = Rule.Create(c => false);
 
+            tempBuyRule = Rule.Create(c => false);
+            tempSellRule = Rule.Create(c => false);
+
             var tasks = new List<Task>();
             if (TradeSettings.SmaBotEnabled)
             {
@@ -131,8 +137,14 @@ namespace AutoTrader.Traders
 
         private void MergeBotRule(ITradingBot bot)
         {
-            buyRule = Rule.Or(bot.BuyRule, buyRule);
-            sellRule = Rule.Or(bot.SellRule, sellRule);
+            tempBuyRule = Rule.Or(bot.BuyRule, buyRule);
+            tempSellRule = Rule.Or(bot.SellRule, sellRule);
+
+            if (GetProjectedIncome(tempBuyRule, tempSellRule) > GetProjectedIncome(buyRule, sellRule))
+            {
+                buyRule = Rule.Or(bot.BuyRule, buyRule);
+                sellRule = Rule.Or(bot.SellRule, sellRule);
+            }
         }
 
         private CandleStick RefreshPrices(bool add)
@@ -163,7 +175,7 @@ namespace AutoTrader.Traders
             return lastCandleStick;
         }
 
-        private double GetProjectedIncome()
+        private double GetProjectedIncome(Predicate<IIndexedOhlcv> buyRule, Predicate<IIndexedOhlcv> sellRule)
         {
             if (Prices?.Count > 0)
             {
