@@ -98,25 +98,21 @@ namespace AutoTrader.Traders
             tempSellRule = Rule.Create(c => false);
 
             var tasks = new List<Task>();
-            if (TradeSettings.SmaBotEnabled)
+            if (TradeSettings.SmaBotEnabled && IsBotRuleMerged(AoBot))
             {
                 tasks.Add(Task.Factory.StartNew(() => aoTrades = AoBot.RefreshAll()));
-                MergeBotRule(AoBot);
             }
-            if (TradeSettings.RsiBotEnabled)
+            if (TradeSettings.RsiBotEnabled && IsBotRuleMerged(RsiBot))
             {
                 tasks.Add(Task.Factory.StartNew(() => rsiTrades = RsiBot.RefreshAll()));
-                MergeBotRule(RsiBot);
             }
-            if (TradeSettings.MacdBotEnabled)
+            if (TradeSettings.MacdBotEnabled && IsBotRuleMerged(MacdBot))
             {
                 tasks.Add(Task.Factory.StartNew(() => macdTrades = MacdBot.RefreshAll()));
-                MergeBotRule(MacdBot);
             }
-            if (TradeSettings.SpikeBotEnabled)
+            if (TradeSettings.SpikeBotEnabled && IsBotRuleMerged(SpikeBot))
             {
-                tasks.Add(Task.Factory.StartNew(() => spikeTrades = SpikeBot.RefreshAll()));
-                MergeBotRule(SpikeBot);
+                tasks.Add(Task.Factory.StartNew(() => spikeTrades = SpikeBot.RefreshAll()));                
             }
 
             Task.WaitAll(tasks.ToArray());
@@ -135,7 +131,7 @@ namespace AutoTrader.Traders
             return lastCandleStick;
         }
 
-        private void MergeBotRule(ITradingBot bot)
+        private bool IsBotRuleMerged(ITradingBot bot)
         {
             tempBuyRule = Rule.Or(bot.BuyRule, buyRule);
             tempSellRule = Rule.Or(bot.SellRule, sellRule);
@@ -144,7 +140,9 @@ namespace AutoTrader.Traders
             {
                 buyRule = Rule.Or(bot.BuyRule, buyRule);
                 sellRule = Rule.Or(bot.SellRule, sellRule);
+                return true;
             }
+            return false;
         }
 
         private CandleStick RefreshPrices(bool add)
