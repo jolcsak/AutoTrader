@@ -20,12 +20,13 @@ namespace AutoTrader.Traders.Bots
 
         public override Predicate<IIndexedOhlcv> BuyRule =>
                         Rule.Create(c => c.Index > 0 && (c.IsBreakingLowestClose(32) || c.IsBreakingHistoricalHighestClose())).
-                        And(c => c.IsRsiOversold(RSI_PERIOD));
+                        And(c => c.IsRsiOversold(RSI_PERIOD)).
+                        And(c => c.Get<RateOfChange>(4)[c.Index].Tick > MinRateOfChange);
 
 
         public override Predicate<IIndexedOhlcv> SellRule =>
             Rule.Create(c => c.Index > 0 && (c.IsBreakingHighestClose(32) || c.IsBreakingHistoricalLowestClose())).
-            And(c => c.IsRsiOverbought(RSI_PERIOD));
+            And(c => c.IsRsiOverbought(RSI_PERIOD)).And(c => c.Get<RateOfChange>(4)[c.Index].Tick > MinRateOfChange);
 
 
         //public override Predicate<IIndexedOhlcv> BuyRule =>

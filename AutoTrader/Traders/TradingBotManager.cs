@@ -17,6 +17,7 @@ namespace AutoTrader.Traders
 {
     public class TradingBotManager
     {
+
         private ITrader trader;
 
         protected virtual ITradeLogger Logger => TradeLogManager.GetLogger(GetType());

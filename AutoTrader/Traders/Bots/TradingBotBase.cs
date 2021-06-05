@@ -14,7 +14,9 @@ namespace AutoTrader.Traders.Bots
 
         protected static int ShortTradeMaxAgeInHours = 24;
 
-        protected static int LongTradeMaxAgeInHours = 24 * 4;
+        protected static int LongTradeMaxAgeInHours = 24 * 7;
+
+        protected static decimal MinRateOfChange = 2.2M;
 
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 
