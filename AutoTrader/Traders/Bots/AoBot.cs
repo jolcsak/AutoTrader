@@ -2,7 +2,6 @@
 using Trady.Analysis;
 using Trady.Analysis.Extension;
 using Trady.Analysis.Indicator;
-using Trady.Analysis.Infrastructure;
 using Trady.Core.Infrastructure;
 
 namespace AutoTrader.Traders.Bots

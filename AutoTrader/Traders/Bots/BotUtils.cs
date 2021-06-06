@@ -9,22 +9,6 @@ namespace AutoTrader.Traders.Bots
     {
         public const double SpikeRatio = 1.07;
 
-        //public static int IsCross<T, T2>(this List<T> value1, List<T2> value2, int i)
-        //    where T : ValueBase
-        //    where T2 : ValueBase
-        //{
-        //    bool isScross = Math.Sign(value1[i].Value - value2[i].Value) * Math.Sign(value1[i - 1].Value - value2[i - 1].Value) < 0;
-        //    if (isScross)
-        //    {
-        //        return Math.Sign(value1[i].Value - value1[i - 1].Value);
-        //    }
-        //    return 0;
-        //}
-        //public static int IsFlex<T>(this List<T> values, int i) where T: ValueBase
-        //{
-        //    return values[i].Value * values[i - 1].Value < 0 ? Math.Sign(values[i].Value) : 0;
-        //}
-
         public static int IsSpike(this IList<CandleStick> values, int i, double ratio = SpikeRatio)
         {
             double a = Math.Abs(values[i].close);
