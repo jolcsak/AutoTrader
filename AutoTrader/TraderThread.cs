@@ -11,6 +11,7 @@ using System.IO;
 using System.Text;
 using System.Globalization;
 using AutoTrader.Db.Entities;
+using Trady.Analysis.Indicator;
 
 namespace AutoTrader
 {
@@ -136,27 +137,78 @@ namespace AutoTrader
             {
                 try
                 {
-                    Logger.Info($"Exporting {trader.TargetCurrency} past prices...");
-                    var r = trader.GetAllPastPrices().OrderBy(p => p.Time);
-                    
-                    foreach (Price price in r)
+                    trader.BotManager.Refresh();
+
+                    SimpleMovingAverage smaSlow = new SimpleMovingAverage(trader.BotManager.Prices, 5);
+                    SimpleMovingAverage smaFast = new SimpleMovingAverage(trader.BotManager.Prices, 9);
+
+                    SimpleMovingAverageOscillator ao = new SimpleMovingAverageOscillator(trader.BotManager.Prices, 5, 9);
+
+                    RelativeStrengthIndex rsi = new RelativeStrengthIndex(trader.BotManager.Prices, 14);
+
+                    MovingAverageConvergenceDivergence macd = new MovingAverageConvergenceDivergence(trader.BotManager.Prices, 12, 26, 9);
+
+                    ExponentialMovingAverage ema24 = new ExponentialMovingAverage(trader.BotManager.Prices, 24);
+                    ExponentialMovingAverage ema48 = new ExponentialMovingAverage(trader.BotManager.Prices, 48);
+                    ExponentialMovingAverage ema100 = new ExponentialMovingAverage(trader.BotManager.Prices, 100);
+
+                    StochasticsMomentum sto = new StochasticsMomentum(trader.BotManager.Prices, 14);
+                    StochasticsMomentumIndex stoIndex = new StochasticsMomentumIndex(trader.BotManager.Prices, 14, 3, 3);
+
+                    bool[] buys = new bool[trader.BotManager.Prices.Count];
+
+                    decimal highPrice = decimal.MinValue;
+
+                    for (int j = trader.BotManager.Prices.Count - 2; j > 0; j--)
                     {
-                        stringBuilder.Append(price.Time.Ticks).Append(";");
-                        stringBuilder.AppendLine(price.Value.ToString("N8", CultureInfo.InvariantCulture));
+                        decimal prevPrice = trader.BotManager.Prices[j - 1].Close;
+                        decimal currentPrice = trader.BotManager.Prices[j].Close;
+                        decimal nextPrice = trader.BotManager.Prices[j + 1].Close;
+
+                        if (highPrice < currentPrice)
+                        {
+                            highPrice = currentPrice;
+                        }
+                        else
+                        {
+                            if (prevPrice < currentPrice && nextPrice > currentPrice && highPrice > currentPrice * 1.1M)
+                            {
+                                buys[j] = true;
+                            }
+                        }
                     }
 
-                    Logger.Info($"{r.Count()} prices written to disk.");
+                    int i = 0;
+                    foreach (var price in trader.BotManager.Prices)
+                    {
+                        stringBuilder.Append(trader.TargetCurrency).Append(';');
+                        Append( stringBuilder, new decimal?[] { price.Open, price.Close, price.Low, price.High, smaSlow[i].Tick, smaFast[i].Tick, ao[i].Tick, 
+                                rsi[i].Tick, macd[i].Tick.MacdLine, macd[i].Tick.SignalLine, macd[i].Tick.MacdHistogram, ema24[i].Tick, 
+                                ema48[i].Tick, ema100[i].Tick });
+                        stringBuilder.AppendLine(buys[i] ? "1" : "0");
+                        i++;
+                    }
+                    
+                    Logger.Info($"{trader.TargetCurrency} : Training data written to disk.");
                 }
                 catch (Exception ex)
                 {
                     Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
                 }
-                break;
             }
 
             File.WriteAllText(Path.Combine(exportPath,"AiData.txt"), stringBuilder.ToString());
 
             Logger.Info("Done");
+        }
+
+        private static StringBuilder Append(StringBuilder builder, decimal?[] values)
+        {
+            foreach (var value in values)
+            {
+                builder.Append(value.HasValue ? value.Value.ToString("N9") : "N/A").Append(";");
+            }
+            return builder;
         }
 
         private static Tuple<double, double> GetTotalFiatBalance(NiceHashApi niceHashApi)

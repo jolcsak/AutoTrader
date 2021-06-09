@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoTrader.Desktop", "AutoT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoTrader.PriceCollector", "AutoTrader.PriceCollector\AutoTrader.PriceCollector.csproj", "{10964453-63BA-4C2D-BF72-73E90DA7D7A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoTrader.MachineLearning", "AutoTrader.MachineLearning\AutoTrader.MachineLearning.csproj", "{C070FD25-15D9-43DE-8E36-C7D57F238CD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoTrader.MachineLearning", "AutoTrader.MachineLearning\AutoTrader.MachineLearning.csproj", "{C070FD25-15D9-43DE-8E36-C7D57F238CD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

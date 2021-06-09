@@ -2,7 +2,7 @@
   "profiles": {
     "AutoTrader.MachineLearning": {
       "commandName": "Project",
-      "commandLineArgs": "Train"
+      "commandLineArgs": "Collect"
     }
   }
 }

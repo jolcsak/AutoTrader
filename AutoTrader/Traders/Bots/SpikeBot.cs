@@ -14,8 +14,8 @@ namespace AutoTrader.Traders.Bots
         private const int COOLDOWN_IN_MINUTES = 60;
         private const int PRICE_PERCENTAGE_CHANGE = 10;
 
-        private const int STOP_PLOSS_PERCENTAGE = 4;
-        private const int MAX_AGE_IN_HOURS = 6;
+        private const int STOP_PLOSS_PERCENTAGE = -5;
+        private const int MAX_AGE_IN_HOURS = 8;
 
         public override string Name => nameof(SpikeBot);
         public override Predicate<IIndexedOhlcv> BuyRule => Rule.Create(c => c.Index > 3 && c.ClosePricePercentageChange() + c.Prev.ClosePricePercentageChange() + c.Prev.Prev.ClosePricePercentageChange() < -PRICE_PERCENTAGE_CHANGE);
