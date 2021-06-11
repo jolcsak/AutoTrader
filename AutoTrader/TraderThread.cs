@@ -184,7 +184,7 @@ namespace AutoTrader
                         }
                         else
                         {
-                            if (prevPrice < currentPrice && nextPrice > currentPrice && highPrice > currentPrice * 1.05M)
+                            if (nextPrice > currentPrice &&  prevPrice > currentPrice && highPrice > currentPrice * 1.05M)
                             {
                                 buys[j] = true;
                                 if (sellIndex > -1)
@@ -192,6 +192,7 @@ namespace AutoTrader
                                     sells[sellIndex] = true;
                                 }
                                 highPrice = currentPrice;
+                                sellIndex = j;
                             }
                         }
                     }

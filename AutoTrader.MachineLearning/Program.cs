@@ -16,7 +16,7 @@ namespace AutoTrader.MachineLearning
             ConsoleLogger.Init();
             string path = AssemblyDirectory + "\\..\\..\\..\\LearningData";
 
-            TradingBotManager.LastMonths = -12;
+            TradingBotManager.LastMonths = -72;
             new TraderThread().ExportTraindData(path);
 
             // https://github.com/dotnet/machinelearning-samples/tree/main/samples/csharp/getting-started/BinaryClassification_HeartDiseaseDetection

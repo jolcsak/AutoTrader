@@ -122,7 +122,7 @@ namespace AutoTrader.Traders
             {
                 tasks.Add(Task.Factory.StartNew(() => spikeTrades = SpikeBot.RefreshAll()));                
             }
-            if (TradeSettings.AiBotEnabled && IsBotRuleMerged(AiBot))
+            if (TradeSettings.AiBotEnabled && MergeBotRule(AiBot))
             {
                 tasks.Add(Task.Factory.StartNew(() => aiTrades = AiBot.RefreshAll()));
             }
@@ -151,11 +151,16 @@ namespace AutoTrader.Traders
 
             if (GetProjectedIncome(tempBuyRule, tempSellRule) > GetProjectedIncome(buyRule, sellRule))
             {
-                buyRule = Rule.Or(bot.BuyRule, buyRule);
-                sellRule = Rule.Or(bot.SellRule, sellRule);
-                return true;
+                return MergeBotRule(bot);
             }
             return false;
+        }
+
+        private bool MergeBotRule(ITradingBot bot)
+        {
+            buyRule = Rule.Or(bot.BuyRule, buyRule);
+            sellRule = Rule.Or(bot.SellRule, sellRule);
+            return true;
         }
 
         private CandleStick RefreshPrices(bool add)
