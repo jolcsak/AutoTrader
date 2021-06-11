@@ -16,6 +16,8 @@ namespace AutoTrader.Traders.Bots
         private static PredictionEngine<BuyInput, TradePrediction> buyPredictionEngine;
         private static PredictionEngine<SellInput, TradePrediction> sellPredictionEngine;
 
+        public override string Name => "AIBot"; 
+
         public override Predicate<IIndexedOhlcv> BuyRule => Rule.Create( c => buyPredictionEngine.Predict(GetInput<BuyInput>(c)).Prediction);
 
         public override Predicate<IIndexedOhlcv> SellRule => Rule.Create(c => sellPredictionEngine.Predict(GetInput<SellInput>(c)).Prediction);

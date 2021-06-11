@@ -17,7 +17,6 @@ namespace AutoTrader.Traders
 {
     public class TradingBotManager
     {
-
         public static int LastMonths { get; set; } = -1;
 
         private ITrader trader;
