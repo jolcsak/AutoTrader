@@ -16,18 +16,17 @@ namespace AutoTrader.MachineLearning
             ConsoleLogger.Init();
             string path = AssemblyDirectory + "\\..\\..\\..\\LearningData";
 
-            if (args[0] == "Collect")
-            {
-                TradingBotManager.LastMonths = -12;
-                new TraderThread().ExportTraindData(path);
-            }
-            if (args[0] == "Train")
-            {
-                // https://github.com/dotnet/machinelearning-samples/tree/main/samples/csharp/getting-started/BinaryClassification_HeartDiseaseDetection
-                MLContext mLContext = new MLContext();
-                TrainData<BuyInput>("IsBuy", path, "BuyTrainingData.txt", "TrainedBuyData.zip", mLContext);
-                TrainData<SellInput>("IsSell", path, "SellTrainingData.txt", "TrainedSellData.zip", mLContext);
-            }
+            TradingBotManager.LastMonths = -12;
+
+            // https://github.com/dotnet/machinelearning-samples/tree/main/samples/csharp/getting-started/BinaryClassification_HeartDiseaseDetection
+            MLContext mLContext = new MLContext();
+
+            Console.WriteLine("Training...");
+
+            TrainData<BuyInput>("IsBuy", path, "BuyTrainingData.txt", "TrainedBuyData.zip", mLContext);
+            TrainData<SellInput>("IsSell", path, "SellTrainingData.txt", "TrainedSellData.zip", mLContext);
+
+            Console.WriteLine("Done.");
         }
 
         private static void TrainData<T>(string label, string path, string trainingFile, string trainedFile, MLContext mLContext)
