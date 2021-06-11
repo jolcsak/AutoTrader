@@ -27,7 +27,7 @@ namespace AutoTrader.MachineLearning
 
         private static void TrainData<T>(string label, string path, string trainingFile, string trainedFile, MLContext mLContext)
         {
-            var dataView = mLContext.Data.LoadFromTextFile<BuyInput>(Path.Combine(path, trainingFile), hasHeader: false, separatorChar: ';');
+            var dataView = mLContext.Data.LoadFromTextFile<T>(Path.Combine(path, trainingFile), hasHeader: false, separatorChar: ';');
 
             // STEP 2: Concatenate the features and set the training algorithm
             var pipeline = mLContext.Transforms.Concatenate("Features", BuyInput.InputColumnNames)
