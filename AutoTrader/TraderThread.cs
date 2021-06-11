@@ -134,7 +134,9 @@ namespace AutoTrader
 
             var buyBuilder = new StringBuilder();
             var sellBuilder = new StringBuilder();
+
             BuildBuyTrainData(buyBuilder, sellBuilder);
+
             File.WriteAllText(Path.Combine(exportPath, "BuyTrainingData.txt"), buyBuilder.ToString());
             File.WriteAllText(Path.Combine(exportPath, "SellTrainingData.txt"), sellBuilder.ToString());
 
@@ -153,9 +155,7 @@ namespace AutoTrader
                     SimpleMovingAverage smaFast = new SimpleMovingAverage(trader.BotManager.Prices, 9);
 
                     SimpleMovingAverageOscillator ao = new SimpleMovingAverageOscillator(trader.BotManager.Prices, 5, 9);
-
                     RelativeStrengthIndex rsi = new RelativeStrengthIndex(trader.BotManager.Prices, 14);
-
                     MovingAverageConvergenceDivergence macd = new MovingAverageConvergenceDivergence(trader.BotManager.Prices, 12, 26, 9);
 
                     ExponentialMovingAverage ema24 = new ExponentialMovingAverage(trader.BotManager.Prices, 24);
@@ -191,6 +191,7 @@ namespace AutoTrader
                                 {
                                     sells[sellIndex] = true;
                                 }
+                                highPrice = currentPrice;
                             }
                         }
                     }

@@ -17,22 +17,19 @@ namespace AutoTrader.MachineLearning
             string path = AssemblyDirectory + "\\..\\..\\..\\LearningData";
 
             TradingBotManager.LastMonths = -12;
+            new TraderThread().ExportTraindData(path);
 
             // https://github.com/dotnet/machinelearning-samples/tree/main/samples/csharp/getting-started/BinaryClassification_HeartDiseaseDetection
             MLContext mLContext = new MLContext();
-
-            Console.WriteLine("Training...");
-
             TrainData<BuyInput>("IsBuy", path, "BuyTrainingData.txt", "TrainedBuyData.zip", mLContext);
             TrainData<SellInput>("IsSell", path, "SellTrainingData.txt", "TrainedSellData.zip", mLContext);
-
-            Console.WriteLine("Done.");
         }
 
         private static void TrainData<T>(string label, string path, string trainingFile, string trainedFile, MLContext mLContext)
         {
-            var dataView = mLContext.Data.LoadFromTextFile<T>(Path.Combine(path, trainingFile), hasHeader: false, separatorChar: ';');
+            var dataView = mLContext.Data.LoadFromTextFile<BuyInput>(Path.Combine(path, trainingFile), hasHeader: false, separatorChar: ';');
 
+            // STEP 2: Concatenate the features and set the training algorithm
             var pipeline = mLContext.Transforms.Concatenate("Features", BuyInput.InputColumnNames)
                             .Append(mLContext.BinaryClassification.Trainers.FastTree(labelColumnName: label, featureColumnName: "Features"));
 
@@ -46,9 +43,7 @@ namespace AutoTrader.MachineLearning
             get
             {
                 string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-                UriBuilder uri = new UriBuilder(codeBase);
-                string path = Uri.UnescapeDataString(uri.Path);
-                return Path.GetDirectoryName(path);
+                return Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(codeBase).Path));
             }
         }
     }
