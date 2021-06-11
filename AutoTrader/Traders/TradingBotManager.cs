@@ -122,7 +122,7 @@ namespace AutoTrader.Traders
             {
                 tasks.Add(Task.Factory.StartNew(() => spikeTrades = SpikeBot.RefreshAll()));                
             }
-            if (TradeSettings.AiBotEnabled && MergeBotRule(AiBot))
+            if (TradeSettings.AiBotEnabled && IsBotRuleMerged(AiBot))
             {
                 tasks.Add(Task.Factory.StartNew(() => aiTrades = AiBot.RefreshAll()));
             }

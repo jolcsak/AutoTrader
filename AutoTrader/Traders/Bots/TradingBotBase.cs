@@ -16,6 +16,8 @@ namespace AutoTrader.Traders.Bots
 
         protected static int LongTradeMaxAgeInHours = 24 * 14;
 
+        protected static int LongTradeSellAgeInHours = 24 * 7;
+
         protected static decimal MinRateOfChange = 2.5M;
 
         protected TradeSetting TradeSettings => TradeSetting.Instance;
@@ -76,7 +78,7 @@ namespace AutoTrader.Traders.Bots
         {
             if (actualPrice.BuyPrice >= (tradeOrder.Price * TradeSettings.MinSellYield))
             {
-                if (tradeOrder.Period == TradePeriod.Short || (tradeOrder.Period == TradePeriod.Long && lastTrade?.Type == TradeType.Sell))
+                if (tradeOrder.Period == TradePeriod.Short || (tradeOrder.Period == TradePeriod.Long && (lastTrade?.Type == TradeType.Sell || tradeOrder.BuyDate.AddHours(LongTradeSellAgeInHours) < DateTime.Now)))
                 {
                     return SellType.Profit;
                 }
