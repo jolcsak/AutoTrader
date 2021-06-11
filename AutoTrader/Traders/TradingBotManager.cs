@@ -18,12 +18,16 @@ namespace AutoTrader.Traders
     public class TradingBotManager
     {
 
+        public static int LastMonths { get; set; } = -1;
+
         private ITrader trader;
 
         protected virtual ITradeLogger Logger => TradeLogManager.GetLogger(GetType());
         protected static Store Store => Store.Instance;
 
         protected static NiceHashApi NiceHashApi => NiceHashApi.Instance;
+
+        public ITrader Trader => trader;
 
         public IList<IOhlcv> Prices { get; set; }
 
@@ -42,6 +46,8 @@ namespace AutoTrader.Traders
         public ITradingBot MacdBot { get; set; }
 
         public ITradingBot SpikeBot { get; set; }
+
+        public ITradingBot AiBot { get; set; }
 
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 
@@ -64,13 +70,14 @@ namespace AutoTrader.Traders
             RsiBot = new RsiBot(this);
             MacdBot = new MacdBot(this);
             SpikeBot = new SpikeBot(this);
+            AiBot = new AiBot(this);
         }
 
         public CandleStick Refresh(bool add = false)
         {
             if (Prices == null)
             {
-                DateProvider = new DateProvider(DateTime.UtcNow.AddMonths(-1), DateTime.UtcNow);
+                DateProvider = new DateProvider(DateTime.UtcNow.AddMonths(LastMonths), DateTime.UtcNow);
                 Prices = new NiceHashImporter().Import(trader.TargetCurrency, DateProvider.MinDate, DateProvider.MaxDate);
                 if (Prices.Count > 0)
                 {
@@ -91,6 +98,7 @@ namespace AutoTrader.Traders
             List<TradeItem> rsiTrades = new List<TradeItem>();
             List<TradeItem> macdTrades = new List<TradeItem>();
             List<TradeItem> spikeTrades = new List<TradeItem>();
+            List<TradeItem> aiTrades = new List<TradeItem>();
 
             buyRule = Rule.Create(c => false);
             sellRule = Rule.Create(c => false);
@@ -115,6 +123,10 @@ namespace AutoTrader.Traders
             {
                 tasks.Add(Task.Factory.StartNew(() => spikeTrades = SpikeBot.RefreshAll()));                
             }
+            if (TradeSettings.AiBotEnabled && IsBotRuleMerged(AiBot))
+            {
+                tasks.Add(Task.Factory.StartNew(() => aiTrades = AiBot.RefreshAll()));
+            }
 
             Task.WaitAll(tasks.ToArray());
 
@@ -122,6 +134,7 @@ namespace AutoTrader.Traders
             Trades.AddRange(rsiTrades);
             Trades.AddRange(macdTrades);
             Trades.AddRange(spikeTrades);
+            Trades.AddRange(aiTrades);
             Trades = Trades.OrderBy(t => t.Date).ToList();
 
             if (lastCandleStick != null && Trades.Any())

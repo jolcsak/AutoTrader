@@ -1,12 +1,11 @@
-﻿using AutoTrader.Log;
-using Microsoft.ML;
-using Microsoft.ML.Transforms.TimeSeries;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using AutoTrader.Ai;
+using AutoTrader.Log;
+using AutoTrader.Traders;
+using Microsoft.ML;
 
 namespace AutoTrader.MachineLearning
 {
@@ -19,40 +18,28 @@ namespace AutoTrader.MachineLearning
 
             if (args[0] == "Collect")
             {
+                TradingBotManager.LastMonths = -12;
                 new TraderThread().ExportTraindData(path);
             }
             if (args[0] == "Train")
             {
-                // https://docs.microsoft.com/en-us/dotnet/machine-learning/tutorials/time-series-demand-forecasting
+                // https://github.com/dotnet/machinelearning-samples/tree/main/samples/csharp/getting-started/BinaryClassification_HeartDiseaseDetection
                 MLContext mLContext = new MLContext();
-                var dataView = mLContext.Data.LoadFromTextFile<ModelInput>(Path.Combine(path, "AiData.txt"), hasHeader: false, separatorChar: ';');
-
-                var forecastingPipeline = mLContext.Forecasting.ForecastBySsa(
-                    outputColumnName: "ForecastedPrices",
-                    inputColumnName: "Price",
-                    windowSize: 100,
-                    seriesLength: 1000,
-                    trainSize: 270000,
-                    horizon: 100,
-                    confidenceLevel: 0.95f,
-                    confidenceLowerBoundColumn: "LowerBoundPrices",
-                    confidenceUpperBoundColumn: "UpperBoundPrices");
-
-                SsaForecastingTransformer forecaster = forecastingPipeline.Fit(dataView);
-
-                var trainedModel = forecaster.Transform(dataView);
-
-//                mLContext.Model.Save(trainedModel, dataView.Schema, Path.Combine(path, "TrainedAiData.zip"));
-
-                var  outputs = new List<Single>(mLContext.Data.CreateEnumerable<ModelOutput>(trainedModel, true).Select(s => s.ForecastedPrices[0]));
-                StringBuilder sb = new StringBuilder();
-                foreach(var output in outputs)
-                {
-                    sb.AppendLine(output.ToString("N8"));
-                }
-
-                File.WriteAllText(Path.Combine(path, "FutureAiData.txt"), sb.ToString());
+                TrainData<BuyInput>("IsBuy", path, "BuyTrainingData.txt", "TrainedBuyData.zip", mLContext);
+                TrainData<SellInput>("IsSell", path, "SellTrainingData.txt", "TrainedSellData.zip", mLContext);
             }
+        }
+
+        private static void TrainData<T>(string label, string path, string trainingFile, string trainedFile, MLContext mLContext)
+        {
+            var dataView = mLContext.Data.LoadFromTextFile<T>(Path.Combine(path, trainingFile), hasHeader: false, separatorChar: ';');
+
+            var pipeline = mLContext.Transforms.Concatenate("Features", BuyInput.InputColumnNames)
+                            .Append(mLContext.BinaryClassification.Trainers.FastTree(labelColumnName: label, featureColumnName: "Features"));
+
+            var trainedModel = pipeline.Fit(dataView);
+
+            mLContext.Model.Save(trainedModel, dataView.Schema, Path.Combine(path, trainedFile));
         }
 
         public static string AssemblyDirectory

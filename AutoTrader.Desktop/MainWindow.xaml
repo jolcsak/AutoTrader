@@ -211,6 +211,7 @@
                     <CheckBox Content="MACD" x:Name="macdBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="MacdBotEnabled_Checked" Unchecked="MacdBotEnabled_Unchecked"/>
                     <CheckBox Content="RSI" x:Name="rsiBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="RsiBotEnabled_Checked" Unchecked="RsiBotEnabled_Unchecked"/>
                     <CheckBox Content="SMA" x:Name="smaBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="SmaBotEnabled_Checked" Unchecked="SmaBotEnabled_Unchecked"/>
+                    <CheckBox Content="AI" x:Name="aiBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="AiBotEnabled_Checked" Unchecked="AiBotEnabled_Unchecked" />
                     <Image Source="/bot.png" Margin="0,0,5,0" ToolTip="Bot Signals" DockPanel.Dock="Right"/>
                     <Label x:Name="projectedIncome" FontWeight="SemiBold" Grid.Column="0" DockPanel.Dock="Right"/>
                     <Label Content="Projected Income:" FontWeight="SemiBold" Grid.Column="0" DockPanel.Dock="Right"/>

@@ -44,7 +44,7 @@ namespace AutoTrader
 
         public bool MacdBotEnabled { get; set; }
         public bool SpikeBotEnabled { get; set; }
-
+        public bool AiBotEnabled { get; set; }
 
         public void SetCanSave(bool canSave)
         {

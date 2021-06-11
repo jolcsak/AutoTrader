@@ -132,7 +132,17 @@ namespace AutoTrader
 
             CreateTraders(niceHashApi);
 
-            var stringBuilder = new StringBuilder();
+            var buyBuilder = new StringBuilder();
+            var sellBuilder = new StringBuilder();
+            BuildBuyTrainData(buyBuilder, sellBuilder);
+            File.WriteAllText(Path.Combine(exportPath, "BuyTrainingData.txt"), buyBuilder.ToString());
+            File.WriteAllText(Path.Combine(exportPath, "SellTrainingData.txt"), sellBuilder.ToString());
+
+            Logger.Info("Done");
+        }
+
+        private void BuildBuyTrainData(StringBuilder buyBuilder, StringBuilder sellBuilder)
+        {
             foreach (ITrader trader in Traders)
             {
                 try
@@ -156,8 +166,10 @@ namespace AutoTrader
                     StochasticsMomentumIndex stoIndex = new StochasticsMomentumIndex(trader.BotManager.Prices, 14, 3, 3);
 
                     bool[] buys = new bool[trader.BotManager.Prices.Count];
+                    bool[] sells = new bool[trader.BotManager.Prices.Count];
 
                     decimal highPrice = decimal.MinValue;
+                    int sellIndex = -1;
 
                     for (int j = trader.BotManager.Prices.Count - 2; j > 0; j--)
                     {
@@ -168,12 +180,17 @@ namespace AutoTrader
                         if (highPrice < currentPrice)
                         {
                             highPrice = currentPrice;
+                            sellIndex = j;
                         }
                         else
                         {
-                            if (prevPrice < currentPrice && nextPrice > currentPrice && highPrice > currentPrice * 1.1M)
+                            if (prevPrice < currentPrice && nextPrice > currentPrice && highPrice > currentPrice * 1.05M)
                             {
                                 buys[j] = true;
+                                if (sellIndex > -1)
+                                {
+                                    sells[sellIndex] = true;
+                                }
                             }
                         }
                     }
@@ -181,14 +198,23 @@ namespace AutoTrader
                     int i = 0;
                     foreach (var price in trader.BotManager.Prices)
                     {
-                        stringBuilder.Append(trader.TargetCurrency).Append(';');
-                        Append( stringBuilder, new decimal?[] { price.Open, price.Close, price.Low, price.High, smaSlow[i].Tick, smaFast[i].Tick, ao[i].Tick, 
-                                rsi[i].Tick, macd[i].Tick.MacdLine, macd[i].Tick.SignalLine, macd[i].Tick.MacdHistogram, ema24[i].Tick, 
-                                ema48[i].Tick, ema100[i].Tick });
-                        stringBuilder.AppendLine(buys[i] ? "1" : "0");
+                        int currencyHash = trader.TargetCurrency.GetHashCode();
+                        buyBuilder.Append(currencyHash).Append(';');
+                        sellBuilder.Append(currencyHash).Append(';');
+
+                        decimal?[] values = new decimal?[] { price.Open, price.Close, price.Low, price.High, smaSlow[i].Tick, smaFast[i].Tick, ao[i].Tick,
+                                rsi[i].Tick, macd[i].Tick.MacdLine, macd[i].Tick.SignalLine, macd[i].Tick.MacdHistogram, ema24[i].Tick,
+                                ema48[i].Tick, ema100[i].Tick };
+
+                        Append(buyBuilder, values);
+                        Append(sellBuilder, values);
+
+                        buyBuilder.AppendLine(buys[i] ? "1" : "0");
+                        sellBuilder.AppendLine(sells[i] ? "1" : "0");
+
                         i++;
                     }
-                    
+
                     Logger.Info($"{trader.TargetCurrency} : Training data written to disk.");
                 }
                 catch (Exception ex)
@@ -196,17 +222,13 @@ namespace AutoTrader
                     Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
                 }
             }
-
-            File.WriteAllText(Path.Combine(exportPath,"AiData.txt"), stringBuilder.ToString());
-
-            Logger.Info("Done");
         }
 
         private static StringBuilder Append(StringBuilder builder, decimal?[] values)
         {
             foreach (var value in values)
             {
-                builder.Append(value.HasValue ? value.Value.ToString("N9") : "N/A").Append(";");
+                builder.Append(value.HasValue ? value.Value.ToString("N9", CultureInfo.InvariantCulture) : "N/A").Append(";");
             }
             return builder;
         }
