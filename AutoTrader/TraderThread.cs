@@ -12,12 +12,17 @@ using System.Text;
 using System.Globalization;
 using AutoTrader.Db.Entities;
 using Trady.Analysis.Indicator;
+using Trady.Core.Infrastructure;
+using AutoTrader.Traders.Trady;
 
 namespace AutoTrader
 {
     public class TraderThread
     {
         private const string VERSION = "0.26";
+
+        private const int FAKE_CYCLE = 1000;
+
         private const int COLLECTOR_WAIT = 1 * 60 * 1000;
         private const int TRADE_WAIT = 5 * 1000;
         private const string FIAT = "HUF";
@@ -130,98 +135,118 @@ namespace AutoTrader
             niceHashApi.QueryServerTime();
             Logger.Info("Server time:" + niceHashApi.ServerTime);
 
-            CreateTraders(niceHashApi);
+            // CreateTraders(niceHashApi);
 
-            var buyBuilder = new StringBuilder();
-            var sellBuilder = new StringBuilder();
-
-            BuildBuyTrainData(buyBuilder, sellBuilder);
-
-            File.WriteAllText(Path.Combine(exportPath, "BuyTrainingData.txt"), buyBuilder.ToString());
-            File.WriteAllText(Path.Combine(exportPath, "SellTrainingData.txt"), sellBuilder.ToString());
+            BuildTrainData(exportPath);
 
             Logger.Info("Done");
         }
 
-        private void BuildBuyTrainData(StringBuilder buyBuilder, StringBuilder sellBuilder)
+        private void BuildTrainData(string exportPath)
         {
-            foreach (ITrader trader in Traders)
+            for (int i = 0; i < FAKE_CYCLE; i++)
             {
-                try
+                var buyBuilder = new StringBuilder();
+                var sellBuilder = new StringBuilder();
+
+                Logger.Info($"Writing FAKE #{i}/{FAKE_CYCLE}...");
+                var prices = new FakeNiceHashImporter().Import(string.Empty, DateTime.Now.AddMonths(-1), DateTime.Now);
+                CollectPrices(buyBuilder, sellBuilder, prices);
+
+                using (StreamWriter sw = File.AppendText(Path.Combine(exportPath, "BuyTrainingData.txt")))
                 {
-                    trader.BotManager.Refresh();
+                    sw.Write(buyBuilder);
+                }
 
-                    SimpleMovingAverage smaSlow = new SimpleMovingAverage(trader.BotManager.Prices, 5);
-                    SimpleMovingAverage smaFast = new SimpleMovingAverage(trader.BotManager.Prices, 9);
+                using (StreamWriter sw = File.AppendText(Path.Combine(exportPath, "SellTrainingData.txt")))
+                {
+                    sw.Write(sellBuilder);
+                }
+            }
 
-                    SimpleMovingAverageOscillator ao = new SimpleMovingAverageOscillator(trader.BotManager.Prices, 5, 9);
-                    RelativeStrengthIndex rsi = new RelativeStrengthIndex(trader.BotManager.Prices, 14);
-                    MovingAverageConvergenceDivergence macd = new MovingAverageConvergenceDivergence(trader.BotManager.Prices, 12, 26, 9);
+            //foreach (ITrader trader in Traders)
+            //{
+            //    try
+            //    {
+            //        trader.BotManager.Refresh();
+            //        Logger.Info($"Writing {trader.BotManager.Trader.TargetCurrency} ...");
+            //        CollectPrices(buyBuilder, sellBuilder, trader.BotManager.Prices);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
+            //    }
+            //}
+        }
 
-                    ExponentialMovingAverage ema24 = new ExponentialMovingAverage(trader.BotManager.Prices, 24);
-                    ExponentialMovingAverage ema48 = new ExponentialMovingAverage(trader.BotManager.Prices, 48);
-                    ExponentialMovingAverage ema100 = new ExponentialMovingAverage(trader.BotManager.Prices, 100);
+        private static void CollectPrices(StringBuilder buyBuilder, StringBuilder sellBuilder, IList<IOhlcv> Prices)
+        {
+            SimpleMovingAverage smaSlow = new SimpleMovingAverage(Prices, 5);
+            SimpleMovingAverage smaFast = new SimpleMovingAverage(Prices, 9);
 
-                    StochasticsMomentum sto = new StochasticsMomentum(trader.BotManager.Prices, 14);
-                    StochasticsMomentumIndex stoIndex = new StochasticsMomentumIndex(trader.BotManager.Prices, 14, 3, 3);
+            SimpleMovingAverageOscillator ao = new SimpleMovingAverageOscillator(Prices, 5, 9);
+            RelativeStrengthIndex rsi = new RelativeStrengthIndex(Prices, 14);
+            MovingAverageConvergenceDivergence macd = new MovingAverageConvergenceDivergence(Prices, 12, 26, 9);
 
-                    bool[] buys = new bool[trader.BotManager.Prices.Count];
-                    bool[] sells = new bool[trader.BotManager.Prices.Count];
+            ExponentialMovingAverage ema24 = new ExponentialMovingAverage(Prices, 24);
+            ExponentialMovingAverage ema48 = new ExponentialMovingAverage(Prices, 48);
+            ExponentialMovingAverage ema100 = new ExponentialMovingAverage(Prices, 100);
 
-                    decimal highPrice = decimal.MinValue;
-                    int sellIndex = -1;
+            StochasticsMomentum sto = new StochasticsMomentum(Prices, 14);
+            StochasticsMomentumIndex stoIndex = new StochasticsMomentumIndex(Prices, 14, 3, 3);
 
-                    for (int j = trader.BotManager.Prices.Count - 2; j > 0; j--)
+            bool[] buys = new bool[Prices.Count];
+            bool[] sells = new bool[Prices.Count];
+
+            decimal highPrice = decimal.MinValue;
+            int sellIndex = -1;
+
+            for (int j = Prices.Count - 2; j > 0; j--)
+            {
+                decimal prevPrice = Prices[j - 1].Close;
+                decimal currentPrice = Prices[j].Close;
+                decimal nextPrice = Prices[j + 1].Close;
+
+                if (highPrice < currentPrice)
+                {
+                    highPrice = currentPrice;
+                    sellIndex = j;
+                }
+                else
+                {
+                    if (nextPrice > currentPrice && prevPrice > currentPrice && highPrice > currentPrice * 1.05M)
                     {
-                        decimal prevPrice = trader.BotManager.Prices[j - 1].Close;
-                        decimal currentPrice = trader.BotManager.Prices[j].Close;
-                        decimal nextPrice = trader.BotManager.Prices[j + 1].Close;
-
-                        if (highPrice < currentPrice)
+                        buys[j] = true;
+                        if (sellIndex > -1)
                         {
-                            highPrice = currentPrice;
-                            sellIndex = j;
+                            sells[sellIndex] = true;
                         }
-                        else
-                        {
-                            if (nextPrice > currentPrice &&  prevPrice > currentPrice && highPrice > currentPrice * 1.05M)
-                            {
-                                buys[j] = true;
-                                if (sellIndex > -1)
-                                {
-                                    sells[sellIndex] = true;
-                                }
-                                highPrice = currentPrice;
-                                sellIndex = j;
-                            }
-                        }
+                        highPrice = currentPrice;
+                        sellIndex = j;
                     }
+                }
+            }
 
-                    int i = 0;
-                    foreach (var price in trader.BotManager.Prices)
-                    {
-                        decimal?[] values = new decimal?[] { 
-                                price.Open / price.Close, price.Low / price.Close, price.Low / price.High, price.High / price.Close, 
+            int i = 0;
+            foreach (var price in Prices)
+            {
+                decimal?[] values = new decimal?[] {
+                                price.Open / price.Close, price.Low / price.Close, price.Low / price.High, price.High / price.Close,
                                 smaSlow[i].Tick, smaFast[i].Tick, ao[i].Tick,
-                                rsi[i].Tick, 
+                                rsi[i].Tick,
                                 macd[i].Tick.MacdLine, macd[i].Tick.SignalLine, macd[i].Tick.MacdHistogram, ema24[i].Tick,
                                 ema48[i].Tick, ema100[i].Tick };
 
-                        Append(buyBuilder, values);
-                        Append(sellBuilder, values);
-
-                        buyBuilder.AppendLine(buys[i] ? "1" : "0");
-                        sellBuilder.AppendLine(sells[i] ? "1" : "0");
-
-                        i++;
-                    }
-
-                    Logger.Info($"{trader.TargetCurrency} : Training data written to disk.");
-                }
-                catch (Exception ex)
+                if (!values.Any(v => v == null))
                 {
-                    Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
+                    Append(buyBuilder, values);
+                    Append(sellBuilder, values);
+
+                    buyBuilder.AppendLine(buys[i] ? "1" : "0");
+                    sellBuilder.AppendLine(sells[i] ? "1" : "0");
                 }
+
+                i++;
             }
         }
 

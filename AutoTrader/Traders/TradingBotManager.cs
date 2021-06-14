@@ -78,6 +78,7 @@ namespace AutoTrader.Traders
             {
                 DateProvider = new DateProvider(DateTime.UtcNow.AddMonths(LastMonths), DateTime.UtcNow);
                 Prices = new NiceHashImporter().Import(trader.TargetCurrency, DateProvider.MinDate, DateProvider.MaxDate);
+
                 if (Prices.Count > 0)
                 {
                     DateProvider.MinDate = Prices.First().DateTime.DateTime;

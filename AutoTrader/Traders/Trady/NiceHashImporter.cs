@@ -8,7 +8,7 @@ using Trady.Core.Period;
 
 namespace AutoTrader.Traders.Trady
 {
-    public class NiceHashImporter
+    public class NiceHashImporter : INiceHashImporter
     {
         protected static NiceHashApi NiceHashApi => NiceHashApi.Instance;
 
@@ -20,7 +20,8 @@ namespace AutoTrader.Traders.Trady
 
             if (candleSticks?.Length > 0)
             {
-                foreach (CandleStick candleStick in candleSticks) {
+                foreach (CandleStick candleStick in candleSticks)
+                {
                     Candle candle = new Candle(candleStick.Date, (decimal)candleStick.open, (decimal)candleStick.high, (decimal)candleStick.low, (decimal)candleStick.close, (decimal)candleStick.volume);
                     candles.Add(candle);
                 }
