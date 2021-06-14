@@ -28,11 +28,10 @@ namespace AutoTrader.Traders.Bots
 
             return new T
             {
-                Currency = botManager.Trader.TargetCurrency.GetHashCode(),
-                Open = (float)c.Open,
-                Close = (float)c.Close,
-                Low = (float)c.Low,
-                High = (float)c.High,
+                Open = (float)(c.Open / c.Close),
+                Close = (float)(c.Low / c.Close),
+                Low = (float)(c.Low / c.High),
+                High = (float)(c.High / c.Close),
                 SmaSlow = GetValue(c.Get<SimpleMovingAverage>(5)[c.Index].Tick),
                 SmaFast = GetValue(c.Get<SimpleMovingAverage>(9)[c.Index].Tick),
                 Ao = GetValue(c.Get<SimpleMovingAverageOscillator>(5, 9)[c.Index].Tick),

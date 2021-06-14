@@ -200,12 +200,11 @@ namespace AutoTrader
                     int i = 0;
                     foreach (var price in trader.BotManager.Prices)
                     {
-                        int currencyHash = trader.TargetCurrency.GetHashCode();
-                        buyBuilder.Append(currencyHash).Append(';');
-                        sellBuilder.Append(currencyHash).Append(';');
-
-                        decimal?[] values = new decimal?[] { price.Open, price.Close, price.Low, price.High, smaSlow[i].Tick, smaFast[i].Tick, ao[i].Tick,
-                                rsi[i].Tick, macd[i].Tick.MacdLine, macd[i].Tick.SignalLine, macd[i].Tick.MacdHistogram, ema24[i].Tick,
+                        decimal?[] values = new decimal?[] { 
+                                price.Open / price.Close, price.Low / price.Close, price.Low / price.High, price.High / price.Close, 
+                                smaSlow[i].Tick, smaFast[i].Tick, ao[i].Tick,
+                                rsi[i].Tick, 
+                                macd[i].Tick.MacdLine, macd[i].Tick.SignalLine, macd[i].Tick.MacdHistogram, ema24[i].Tick,
                                 ema48[i].Tick, ema100[i].Tick };
 
                         Append(buyBuilder, values);

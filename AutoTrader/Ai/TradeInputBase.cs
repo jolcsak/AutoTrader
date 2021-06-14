@@ -14,51 +14,48 @@ namespace AutoTrader.Ai
             }
         }
 
-        [LoadColumn(0)]
-        public float Currency { get; set; }
 
-        [LoadColumn(1)]
+        [LoadColumn(0)]
         public float Open { get; set; }
 
-
-        [LoadColumn(2)]
+        [LoadColumn(1)]
         public float Close { get; set; }
 
-        [LoadColumn(3)]
+        [LoadColumn(2)]
         public float Low { get; set; }
 
-        [LoadColumn(4)]
+        [LoadColumn(3)]
         public float High { get; set; }
 
-        [LoadColumn(5)]
+        [LoadColumn(4)]
         public float SmaSlow { get; set; }
 
-        [LoadColumn(6)]
+        [LoadColumn(5)]
         public float SmaFast { get; set; }
 
-        [LoadColumn(7)]
+        [LoadColumn(6)]
         public float Ao { get; set; }
 
-        [LoadColumn(8)]
+        [LoadColumn(7)]
         public float Rsi { get; set; }
 
-        [LoadColumn(9)]
+        [LoadColumn(8)]
         public float MacdLine { get; set; }
 
-        [LoadColumn(10)]
+        [LoadColumn(9)]
         public float MacdSignalLine { get; set; }
 
-        [LoadColumn(11)]
+        [LoadColumn(10)]
         public float MacdHistogram { get; set; }
 
 
-        [LoadColumn(12)]
+        [LoadColumn(11)]
         public float Ema24 { get; set; }
 
-        [LoadColumn(13)]
+        [LoadColumn(12)]
         public float Ema48 { get; set; }
 
-        [LoadColumn(14)]
+        [LoadColumn(13)]
         public float Ema100 { get; set; }
     }
 }
