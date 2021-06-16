@@ -55,7 +55,7 @@ namespace AutoTrader.Traders
             Store.OrderBooks.Save(new TradeOrder(type, orderId, price, amount, targetAmount, currency, fee, TraderId, orderState, period, botName));
         }
 
-        public bool Buy(double amount, ActualPrice actualPrice, TradePeriod period, string bot)
+        public TradeResult Buy(double amount, ActualPrice actualPrice, TradePeriod period, string bot)
         {
             Logger.Info($"Try to buy {TargetCurrency}");
             if (actualPrice.SellAmount > amount)
@@ -67,35 +67,34 @@ namespace AutoTrader.Traders
                 {
                     if (state == "FULL")
                     {
-                        return StoreBuyFull(amount, period, bot, orderResponse);
+                        if (StoreBuyFull(amount, period, bot, orderResponse))
+                        {
+                            return TradeResult.DONE;
+                        }
                     }
                     else if (state == "ENTERED")
                     {
                         Logger.Info($"LIMIT BUY {TargetCurrency} : BTC Amount={amount}");
                         StoreTradeOrder(TradeOrderType.LIMIT, orderResponse.orderId, 0 , amount, 0, 0, TargetCurrency, period, bot, TradeOrderState.OPEN_ENTERED);
-                        return true;
+                        return TradeResult.LIMIT;
                     }
-                    return false;
-                }
-                else
-                {
-                    return false;
                 }
             }
             else
             {
                 Logger.Warn($"Buy cancelled because actualAmount: {actualPrice.SellAmount} < amount: {amount}!");
-                return false;
             }
+
+            return TradeResult.ERROR;
         }
 
-        private bool StoreBuyFull(double amount, TradePeriod period, string bot, OrderTrade orderResponse)
+        public bool StoreBuyFull(double amount, TradePeriod period, string bot, OrderTrade orderResponse, TradeOrderState state = TradeOrderState.OPEN)
         {
             var r = NiceHashApi.GetOrderSummary(TargetCurrency + "BTC", orderResponse.orderId);
             if (r != null)
             {
-                Logger.Info($"MARKET BUY {TargetCurrency} : Price={r.price}, Amount={amount}, Qty={r.qty}, SecQty={r.sndQty}");
-                StoreTradeOrder(TradeOrderType.LIMIT, orderResponse.orderId, r.price, amount, r.qty, r.fee, TargetCurrency, period, bot, TradeOrderState.OPEN);
+                Logger.Info($"BUY DONE -> {TargetCurrency} : Price={r.price}, Amount={amount}, Qty={r.qty}, SecQty={r.sndQty}");
+                StoreTradeOrder(TradeOrderType.LIMIT, orderResponse.orderId, r.price, amount, r.qty, r.fee, TargetCurrency, period, bot, state);
                 return true;
             }
             else
@@ -105,7 +104,26 @@ namespace AutoTrader.Traders
             }
         }
 
-        public bool Sell(double actualPrice, TradeOrder tradeOrder, bool isMarket = false)
+        public bool UpdateBuyFull(TradeOrder tradeOrder, OrderTrade orderResponse, TradeOrderState state = TradeOrderState.OPEN)
+        {
+            var r = NiceHashApi.GetOrderSummary(TargetCurrency + "BTC", orderResponse.orderId);
+            if (r != null)
+            {
+                tradeOrder.Price = r.price;
+                tradeOrder.TargetAmount = r.qty;
+                tradeOrder.Fee = r.fee;
+                tradeOrder.State = state;
+                Store.OrderBooks.SaveOrUpdate(tradeOrder);
+                return true;
+            }
+            else
+            {
+                Logger.Err($"BUY: Can't query order with market: {TargetCurrency}, id: {orderResponse.orderId}");
+                return false;
+            }
+        }
+
+        public TradeResult Sell(double actualPrice, TradeOrder tradeOrder, bool isMarket = false)
         {
             string msg = $" at price {actualPrice}, amount: {tradeOrder.TargetAmount}, buy price: {tradeOrder.Price}, sell price: {actualPrice}, yield: {actualPrice / tradeOrder.Price * 100}%";
             Logger.Info("Try to sell" + msg);
@@ -124,13 +142,13 @@ namespace AutoTrader.Traders
 
                 string sellMsg = isMarketSell ? "Sold" : "Limit sell placed";
                 Logger.Info(sellMsg + msg);
-                return true;
+                return isMarketSell ? TradeResult.DONE : TradeResult.LIMIT;
             }
             else
             {
                 Logger.Err("Sell failed!");
             }
-            return false;
+            return TradeResult.ERROR;
         }
 
         public void SellAll(bool onlyProfitable)

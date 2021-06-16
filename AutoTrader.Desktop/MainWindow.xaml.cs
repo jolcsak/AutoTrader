@@ -404,11 +404,17 @@ namespace AutoTrader.Desktop
                 var currency = (sender as Button).DataContext as Currency;
                 if (btcBalance >= BtcTrader.MinBtcTradeAmount)
                 {
-                    if (currencyTrader.Buy(BtcTrader.MinBtcTradeAmount, currencyTrader.ActualPrice, period, null))
+                    TradeResult tradeResult = currencyTrader.Buy(BtcTrader.MinBtcTradeAmount, currencyTrader.ActualPrice, period, null);
+                    if (tradeResult != TradeResult.ERROR)
                     {
                         currencyTrader.RefreshBalance();
                         Logger.LogTradeOrders(CurrentTrader.AllTradeOrders);
-                        MessageBox.Show($"{BtcTrader.MinBtcTradeAmount} {currency.Name} bought at price {currencyTrader.ActualPrice.BuyPrice:N8}.", "Sell", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        string message = tradeResult == TradeResult.DONE ? 
+                            $"{BtcTrader.MinBtcTradeAmount} {currency.Name} bought at price {currencyTrader.ActualPrice.BuyPrice:N8}." :
+                            $"{BtcTrader.MinBtcTradeAmount} {currency.Name} placed at price {currencyTrader.ActualPrice.BuyPrice:N8}.";
+
+                        MessageBox.Show(message, "Sell", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     else
                     {
@@ -450,11 +456,13 @@ namespace AutoTrader.Desktop
             if (CurrentTrader != null)
             {
                 var tradeOrder = (sender as Button).DataContext as TradeOrder;
-                if (CurrentTrader.Sell(tradeOrder.ActualPrice, tradeOrder, isMarket))
+                TradeResult tradeResult = CurrentTrader.Sell(tradeOrder.ActualPrice, tradeOrder, isMarket);
+                if (tradeResult != TradeResult.ERROR)
                 {
                     CurrentTrader.RefreshBalance();
                     Logger.LogTradeOrders(CurrentTrader.AllTradeOrders);
-                    MessageBox.Show($"Order sold at price {tradeOrder.ActualPrice:N8}.", "Sell", MessageBoxButton.OK, MessageBoxImage.Information);
+                    string message = tradeResult == TradeResult.DONE ? $"Order sold at price {tradeOrder.ActualPrice:N8}." : $"Order placed at price {tradeOrder.ActualPrice:N8}.";
+                    MessageBox.Show(message, "Sell", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {

@@ -96,6 +96,8 @@ namespace AutoTrader.Traders
             }
 
             Sell(ActualPrice);
+            HandleLimitOrders();
+
             SaveOrderBooksPrices();
 
             PreviousPrice = ActualPrice;
@@ -131,17 +133,44 @@ namespace AutoTrader.Traders
                         Sell(actualPrice, tradeOrder);
                     }
                 }
+            }
+            return true;
+        }
 
-                foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.State == TradeOrderState.ENTERED))
+        public void HandleLimitOrders()
+        {
+            foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.State == TradeOrderState.ENTERED || o.State == TradeOrderState.OPEN_ENTERED))
+            {
+                TradeOrderState state = tradeOrder.State;
+
+                var orderResponse = NiceHashApi.GetOrder(tradeOrder.Currency, tradeOrder.SellOrderId ?? tradeOrder.BuyOrderId);
+                if (orderResponse.state == "FULL")
                 {
-                    if (tradeOrder.SellOrderId != null)
+                    state = state == TradeOrderState.OPEN_ENTERED ? TradeOrderState.OPEN : TradeOrderState.CLOSED;
+                    if (!UpdateBuyFull(tradeOrder, orderResponse, state))
                     {
-                        var order = NiceHashApi.GetOrder(tradeOrder.Currency, tradeOrder.SellOrderId);
+                        Logger.Err($"Error during LIMIT order finalization: {tradeOrder}!");
                     }
                 }
 
+                if (state == TradeOrderState.ENTERED || state == TradeOrderState.OPEN_ENTERED)
+                {
+                    DateTime tradeDate = state == TradeOrderState.OPEN_ENTERED ? tradeOrder.BuyDate : tradeOrder.SellDate;
+
+                    if (tradeDate.AddHours(1) < DateTime.Now)
+                    {
+                        Logger.Warn($"Cancel order : {tradeOrder}");
+                        if (CancelLimit(tradeOrder))
+                        {
+                            Logger.Warn($"Canceled");
+                        }
+                        else
+                        {
+                            Logger.Err($"Cancel failed!");
+                        }
+                    }
+                }
             }
-            return true;
         }
 
         private void Sell(ActualPrice actualPrice, TradeOrder tradeOrder)
@@ -152,11 +181,16 @@ namespace AutoTrader.Traders
                 Logger.Info(BotManager.LastTrade.ToString());
             }
 
-            if (Sell(actualPrice.BuyPrice, tradeOrder))
+            TradeResult tradeResult = Sell(actualPrice.BuyPrice, tradeOrder);
+            if (tradeResult == TradeResult.LIMIT)
             {
                 Logger.Info("Sell limit order placed.");
             }
-            else
+            if (tradeResult == TradeResult.DONE)
+            {
+                Logger.Info("Sell done.");
+            }
+            if (tradeResult == TradeResult.ERROR)
             {
                 Logger.Err("Sell failed!");
             }

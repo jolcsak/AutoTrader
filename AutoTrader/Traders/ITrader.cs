@@ -5,6 +5,13 @@ using AutoTrader.Traders.Bots;
 
 namespace AutoTrader.Traders
 {
+    public enum TradeResult
+    {
+        LIMIT,
+        DONE,
+        ERROR
+    }
+
     public interface ITrader
     {
         string TraderId { get; }
@@ -30,9 +37,9 @@ namespace AutoTrader.Traders
 
         IList<Price> GetAllPastPrices();
 
-        bool Buy(double amount, ActualPrice actualPrice, TradePeriod period, string botName);
+        TradeResult Buy(double amount, ActualPrice actualPrice, TradePeriod period, string botName);
 
-        bool Sell(double actualPrice, TradeOrder tradeOrder, bool isMarket);
+        TradeResult Sell(double actualPrice, TradeOrder tradeOrder, bool isMarket);
 
         bool CancelLimit(TradeOrder tradeOrder);
 
