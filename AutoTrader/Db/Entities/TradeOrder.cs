@@ -1,13 +1,16 @@
-﻿using AutoTrader.Traders.Bots;
-using RethinkDb.Driver.Extras.Dao;
-using System;
+﻿using System;
 using System.ComponentModel;
+using AutoTrader.Traders.Bots;
+using RethinkDb.Driver.Extras.Dao;
 
 namespace AutoTrader.Db.Entities
 {
     public class TradeOrder : Document<Guid>, INotifyPropertyChanged
     {
-        public string OrderId { get; set; }
+        public string BuyOrderId { get; set; }
+
+        public string SellOrderId { get; set; }
+
         public double Amount { get; set; }
         public double TargetAmount { get; set; }
         public double Price { get; set; }
@@ -25,7 +28,9 @@ namespace AutoTrader.Db.Entities
         public TradePeriod Period {get; set;}
         public double ActualYield => ActualPrice > 0 ? ((ActualPrice / Price) * 100) - 100 : 0;
 
-        public double Yield => Price > 0 ? ((SellPrice / Price) * 100) - 100 : 0;
+        public double Yield => Price > 0 ? ((SellBtcAmount / Amount) * 100) - 100 : 0;
+
+        public bool IsEntered => State == TradeOrderState.ENTERED || State == TradeOrderState.OPEN_ENTERED;
 
         public string Trader { get; set; }
 
@@ -35,10 +40,10 @@ namespace AutoTrader.Db.Entities
         {
         }
 
-        protected TradeOrder(TradeOrderType type, string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader, TradeOrderState state, TradePeriod period, string botName) : base()
+        public TradeOrder(TradeOrderType type, string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader, TradeOrderState state, TradePeriod period, string botName) : base()
         {
             Type = type;
-            OrderId = orderId;
+            BuyOrderId = orderId;
             BuyDate = DateTime.Now;
             Price = price;
             Amount = amount;
@@ -52,10 +57,6 @@ namespace AutoTrader.Db.Entities
             BotName = botName;
         }
 
-        public TradeOrder(TradeOrderType type, string orderId, double price, double amount, double targetAmount, string currency, double fee, string trader, TradePeriod period, string botName) : this(type, orderId, price, amount, targetAmount, currency, fee, trader, TradeOrderState.OPEN, period, botName)
-        {
-        }
-
         public void RefreshFrom(TradeOrder tradeOrder)
         {
             if (tradeOrder.ActualPrice != ActualPrice)
@@ -64,6 +65,9 @@ namespace AutoTrader.Db.Entities
                 NotifyPropertyChanged(nameof(ActualPrice));
                 NotifyPropertyChanged(nameof(ActualYield));
             }
+            State = tradeOrder.State;
+            NotifyPropertyChanged(nameof(State));
+            NotifyPropertyChanged(nameof(IsEntered));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -78,14 +82,17 @@ namespace AutoTrader.Db.Entities
 
         public override string ToString()
         {
-            return $"TradeOrder: OrderId={OrderId}, Currency={Currency}, Buy Price={Price}, Buy Amount={Amount}, TargetAmount={TargetAmount}, Price={Price}, SellPrice={SellPrice}, Type={State}, Period={Period}";
+            return $"TradeOrder: OrderId={BuyOrderId}, Currency={Currency}, Buy Price={Price}, Buy Amount={Amount}, TargetAmount={TargetAmount}, Price={Price}, SellPrice={SellPrice}, Type={State}, Period={Period}";
         }
     }
 
     public enum TradeOrderState
     {
         OPEN = 0,
-        CLOSED = 1
+        CLOSED = 1,
+        ENTERED = 2,
+        OPEN_ENTERED = 3,
+        CANCELLED = 4
     }
 
     public enum TradeOrderType

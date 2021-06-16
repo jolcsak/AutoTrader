@@ -94,7 +94,7 @@ namespace AutoTrader.Desktop
             Store.SaveSettings();
         }
 
-        private void MinYield_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        private void MinYield_TextChanged(object sender, TextChangedEventArgs e)
         {
             double minSellYieldValue;
             if (double.TryParse(minYield.Text, out minSellYieldValue))
@@ -116,7 +116,7 @@ namespace AutoTrader.Desktop
             }
         }
 
-        private void currencies_SelectedCellsChanged(object sender, System.Windows.Controls.SelectedCellsChangedEventArgs e)
+        private void currencies_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
             var currentTrader = CurrentTrader;
             if (currentTrader != null)
@@ -166,7 +166,7 @@ namespace AutoTrader.Desktop
             }
         }
 
-        private void openedOrders_SelectedCellsChanged(object sender, System.Windows.Controls.SelectedCellsChangedEventArgs e)
+        private void openedOrders_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
             var selectedTradeOrder = openedOrders?.SelectedItem as TradeOrder;
             Logger.SelectedCurrency = selectedTradeOrder?.Currency;
@@ -401,7 +401,6 @@ namespace AutoTrader.Desktop
             if (currencyTrader != null)
             {
                 double btcBalance = currencyTrader.RefreshBalance();
-
                 var currency = (sender as Button).DataContext as Currency;
                 if (btcBalance >= BtcTrader.MinBtcTradeAmount)
                 {
@@ -423,12 +422,35 @@ namespace AutoTrader.Desktop
             }
         }
 
-        private void Sell(object sender, RoutedEventArgs e)
+        private void SellMarket(object sender, RoutedEventArgs e)
+        {
+            Sell(sender, true);
+        }
+
+        private void SellLimit(object sender, RoutedEventArgs e)
+        {
+            Sell(sender, false);
+        }
+
+        private void CancelLimit(object sender, RoutedEventArgs e)
+        {
+            var tradeOrder = (sender as Button).DataContext as TradeOrder;
+            if (CurrentTrader.CancelLimit(tradeOrder))
+            {
+                MessageBox.Show($"Order cancelled", "Trade", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("Order cancel failed! See the log.", "Trade", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void Sell(object sender, bool isMarket)
         {
             if (CurrentTrader != null)
             {
                 var tradeOrder = (sender as Button).DataContext as TradeOrder;
-                if (CurrentTrader.Sell(tradeOrder.ActualPrice, tradeOrder))
+                if (CurrentTrader.Sell(tradeOrder.ActualPrice, tradeOrder, isMarket))
                 {
                     CurrentTrader.RefreshBalance();
                     Logger.LogTradeOrders(CurrentTrader.AllTradeOrders);

@@ -126,6 +126,7 @@
                                     <DataGridTextColumn Binding="{Binding BuyDate}" Header="BuyDate" />
                                     <DataGridTextColumn Binding="{Binding Currency}" Header="Currency" />
                                     <DataGridTextColumn Binding="{Binding Type}" Header="Type" />
+                                    <DataGridTextColumn Binding="{Binding State}" Header="State" />                                    
                                     <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N8}}" Header="Buy Price" />
                                     <DataGridTextColumn Binding="{Binding ActualPrice, StringFormat={}{0:N8}}" Header="Actual Price" FontWeight="DemiBold"/>
                                     <DataGridTextColumn Binding="{Binding ActualYield, StringFormat={}{0:N2}%}" Header="Actual Yield" FontWeight="DemiBold"/>
@@ -137,17 +138,60 @@
                                     <DataGridTemplateColumn>
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Button Click="Sell">Sell</Button>
+                                                <Button Click="SellMarket">
+                                                    Sell Market
+                                                    <Button.Style>
+                                                        <Style TargetType="Button">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsEntered}" Value="False">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Button.Style>
+                                                </Button>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <!--<DataGridTemplateColumn>
+                                    <DataGridTemplateColumn>
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Button Click="Sell">Sell Market</Button>
+                                                <Button Click="SellLimit">
+                                                    Sell Limit
+                                                    <Button.Style>
+                                                        <Style TargetType="Button">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsEntered}" Value="False">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Button.Style>                                                    
+                                                </Button>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>-->
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Click="CancelLimit">
+                                                    Cancel
+                                                    <Button.Style>
+                                                        <Style TargetType="Button">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsEntered}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Button.Style>                                                    
+                                                </Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </DockPanel>
@@ -169,6 +213,7 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Binding="{Binding BuyDate}" Header="Buy Date" />
                                     <DataGridTextColumn Binding="{Binding SellDate}" Header="Sell Date" />
+                                    <DataGridTextColumn Binding="{Binding State}" Header="State" />
                                     <DataGridTextColumn Binding="{Binding Currency}" Header="Currency" />
                                     <DataGridTextColumn Binding="{Binding Type}" Header="Type" />
                                     <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N8}}" Header="Price" />
@@ -216,7 +261,6 @@
                     <Label x:Name="projectedIncome" FontWeight="SemiBold" Grid.Column="0" DockPanel.Dock="Right"/>
                     <Label Content="Projected Income:" FontWeight="SemiBold" Grid.Column="0" DockPanel.Dock="Right"/>
                 </DockPanel>
-
             </DockPanel>
         </Grid>
         <Canvas x:Name="graph" Margin="5,5,5,5" Grid.Row="2" RenderTransformOrigin="0.5,0.5" Grid.ColumnSpan="2">

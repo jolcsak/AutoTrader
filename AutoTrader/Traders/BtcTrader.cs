@@ -93,17 +93,15 @@ namespace AutoTrader.Traders
                         }
                     }
                 }
-
-                Sell(ActualPrice);
-                SaveOrderBooksPrices();
             }
+
+            Sell(ActualPrice);
+            SaveOrderBooksPrices();
 
             PreviousPrice = ActualPrice;
 
             Logger.LogTradeOrders(AllTradeOrders);
-
             LogProfit();
-
             Logger.LogCurrency(this, ActualPrice);
         }
 
@@ -133,6 +131,15 @@ namespace AutoTrader.Traders
                         Sell(actualPrice, tradeOrder);
                     }
                 }
+
+                foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.State == TradeOrderState.ENTERED))
+                {
+                    if (tradeOrder.SellOrderId != null)
+                    {
+                        var order = NiceHashApi.GetOrder(tradeOrder.Currency, tradeOrder.SellOrderId);
+                    }
+                }
+
             }
             return true;
         }
@@ -147,7 +154,7 @@ namespace AutoTrader.Traders
 
             if (Sell(actualPrice.BuyPrice, tradeOrder))
             {
-                Logger.Info("Sold.");
+                Logger.Info("Sell limit order placed.");
             }
             else
             {

@@ -50,9 +50,9 @@ namespace AutoTrader.Traders
             return null;
         }
 
-        public void StoreTradeOrder(TradeOrderType type, string orderId, double price, double amount, double targetAmount, double fee, string currency, TradePeriod period, string botName)
+        public void StoreTradeOrder(TradeOrderType type, string orderId, double price, double amount, double targetAmount, double fee, string currency, TradePeriod period, string botName, TradeOrderState orderState)
         {
-            Store.OrderBooks.Save(new TradeOrder(type, orderId, price, amount, targetAmount, currency, fee, TraderId, period, botName));
+            Store.OrderBooks.Save(new TradeOrder(type, orderId, price, amount, targetAmount, currency, fee, TraderId, orderState, period, botName));
         }
 
         public bool Buy(double amount, ActualPrice actualPrice, TradePeriod period, string bot)
@@ -60,22 +60,22 @@ namespace AutoTrader.Traders
             Logger.Info($"Try to buy {TargetCurrency}");
             if (actualPrice.SellAmount > amount)
             {
-                var orderResponse = NiceHashApi.Order(TargetCurrency + "BTC", isBuy: true, amount);
-                if (orderResponse.state == "FULL")
+                var orderResponse = NiceHashApi.Order(TargetCurrency + "BTC", isBuy: true, amount, actualPrice.SellPrice, isMarket: false);
+                string state = orderResponse?.state;
+
+                if (state == "FULL" || state == "ENTERED")
                 {
-                    Logger.Info($"{TargetCurrency} successfully bought");
-                    var r = NiceHashApi.GetOrder(TargetCurrency + "BTC", orderResponse.orderId);
-                    if (r != null)
+                    if (state == "FULL")
                     {
-                        Logger.Info($"{TargetCurrency} : Price={r.price}, Amount={amount}, Qty={r.qty}, SecQty={r.sndQty}");
-                        StoreTradeOrder(TradeOrderType.MARKET, orderResponse.orderId, r.price, amount, r.qty, r.fee, TargetCurrency, period, bot);
+                        return StoreBuyFull(amount, period, bot, orderResponse);
+                    }
+                    else if (state == "ENTERED")
+                    {
+                        Logger.Info($"LIMIT BUY {TargetCurrency} : BTC Amount={amount}");
+                        StoreTradeOrder(TradeOrderType.LIMIT, orderResponse.orderId, 0 , amount, 0, 0, TargetCurrency, period, bot, TradeOrderState.OPEN_ENTERED);
                         return true;
                     }
-                    else
-                    {
-                        Logger.Err($"BUY: Can't query order with market: {TargetCurrency}, id: {orderResponse.orderId}");
-                        return false;
-                    }
+                    return false;
                 }
                 else
                 {
@@ -87,20 +87,43 @@ namespace AutoTrader.Traders
                 Logger.Warn($"Buy cancelled because actualAmount: {actualPrice.SellAmount} < amount: {amount}!");
                 return false;
             }
-        }   
+        }
 
-        public bool Sell(double actualPrice, TradeOrder tradeOrder)
+        private bool StoreBuyFull(double amount, TradePeriod period, string bot, OrderTrade orderResponse)
         {
-            Logger.Info($"Try to sell at price {actualPrice}, amount: {tradeOrder.TargetAmount}, buy price: {tradeOrder.Price}, sell price: {actualPrice}, yield: {actualPrice / tradeOrder.Price * 100}%");
-            OrderTrade orderResponse = NiceHashApi.Order(tradeOrder.Currency + "BTC", isBuy: false, tradeOrder.TargetAmount - tradeOrder.Fee, tradeOrder.Amount);
-            if (orderResponse?.state == "FULL")
+            var r = NiceHashApi.GetOrderSummary(TargetCurrency + "BTC", orderResponse.orderId);
+            if (r != null)
             {
-                tradeOrder.State = TradeOrderState.CLOSED;
+                Logger.Info($"MARKET BUY {TargetCurrency} : Price={r.price}, Amount={amount}, Qty={r.qty}, SecQty={r.sndQty}");
+                StoreTradeOrder(TradeOrderType.LIMIT, orderResponse.orderId, r.price, amount, r.qty, r.fee, TargetCurrency, period, bot, TradeOrderState.OPEN);
+                return true;
+            }
+            else
+            {
+                Logger.Err($"BUY: Can't query order with market: {TargetCurrency}, id: {orderResponse.orderId}");
+                return false;
+            }
+        }
+
+        public bool Sell(double actualPrice, TradeOrder tradeOrder, bool isMarket = false)
+        {
+            string msg = $" at price {actualPrice}, amount: {tradeOrder.TargetAmount}, buy price: {tradeOrder.Price}, sell price: {actualPrice}, yield: {actualPrice / tradeOrder.Price * 100}%";
+            Logger.Info("Try to sell" + msg);
+            OrderTrade orderResponse = NiceHashApi.Order(tradeOrder.Currency + "BTC", isBuy: false, tradeOrder.TargetAmount - tradeOrder.Fee, tradeOrder.Price, isMarket);
+            string state = orderResponse?.state;
+            if (state == "FULL" || state == "ENTERED")
+            {
+                bool isMarketSell = state == "FULL";
+                tradeOrder.SellOrderId = orderResponse.orderId;
+                tradeOrder.State = isMarketSell ? TradeOrderState.CLOSED : TradeOrderState.ENTERED;
                 tradeOrder.SellBtcAmount = orderResponse.executedSndQty;
                 tradeOrder.SellPrice = actualPrice;
                 tradeOrder.SellDate = DateTime.Now;
+                
                 Store.OrderBooks.SaveOrUpdate(tradeOrder);
-                Logger.Info($"Sold at price {actualPrice}, amount: {tradeOrder.TargetAmount}, buy price: {tradeOrder.Price}, sell price: {actualPrice}, yield: {actualPrice / tradeOrder.Price * 100}%");
+
+                string sellMsg = isMarketSell ? "Sold" : "Limit sell placed";
+                Logger.Info(sellMsg + msg);
                 return true;
             }
             else
@@ -117,7 +140,7 @@ namespace AutoTrader.Traders
             {
                 if (!onlyProfitable || tradeOrder.ActualYield > yield)
                 {
-                    Sell(tradeOrder.ActualPrice, tradeOrder);
+                    Sell(tradeOrder.ActualPrice, tradeOrder, isMarket: true);
                 }
             }
             RefreshBalance();
@@ -137,6 +160,19 @@ namespace AutoTrader.Traders
             var balance = GetBalance();
             Logger.LogBalance(balance);
             return balance;
+        }
+
+        public bool CancelLimit(TradeOrder tradeOrder)
+        {
+            string id = tradeOrder.SellOrderId ?? tradeOrder.BuyOrderId;
+            var r = NiceHashApi.CancelOrder(tradeOrder.Currency + "BTC", id);
+            if (r?.state == "CANCELLED")
+            {
+                tradeOrder.State = TradeOrderState.CANCELLED;
+                Store.OrderBooks.SaveOrUpdate(tradeOrder);
+                return true;
+            }
+            return false;
         }
     }
 }

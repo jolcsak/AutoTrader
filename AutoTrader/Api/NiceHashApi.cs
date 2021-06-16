@@ -78,11 +78,19 @@ namespace AutoTrader.Api
             return new DateTime(unixStartTicks + unixTimeStampInTicks, DateTimeKind.Utc).ToLocalTime();
         }
 
-        public OrderTrade Order(string market, bool isBuy, double amount, double minSecQuantity = 0)
+        public OrderTrade Order(string market, bool isBuy, double amount, double price, bool isMarket)
         {
             string side = isBuy ? "buy" : "sell";
+            string type = isMarket ? "market" : "limit";
+
+            if (isBuy && !isMarket)
+            {
+                amount = amount * (1 / price);
+            }
+
             string amountStr = amount.ToString("F8", CultureInfo.InvariantCulture);
-            string url = $"/exchange/api/v2/order?market={market}&side={side}&type=market&quantity={amountStr}";
+            string priceStr = price.ToString("F8", CultureInfo.InvariantCulture);
+            string url = $"/exchange/api/v2/order?market={market}&side={side}&price={priceStr}&type={type}&quantity={amountStr}";
             if (isBuy)
             {
                 url += $"&secQuantity={amountStr}";
@@ -91,7 +99,7 @@ namespace AutoTrader.Api
             return Post<OrderTrade>(url);
         }
 
-        public GetOrderTrade GetOrder(string market, string orderId)
+        public GetOrderTrade GetOrderSummary(string market, string orderId)
         {
             var trades = Get<GetOrderTrade[]>($"/exchange/api/v2/info/orderTrades?market={market}&orderId={orderId}", true, ServerTime);
             if (trades.Length > 1)
@@ -123,6 +131,16 @@ namespace AutoTrader.Api
             return trades.Length == 1 ? trades[0] : null;
         }
 
+        public OrderTrade GetOrder(string market, string orderId)
+        {
+            return Get<OrderTrade>($"/exchange/api/v2/info/myOrder?market={market + "BTC"}&orderId={orderId}", true, ServerTime);
+        }
+
+        public OrderTrade CancelOrder(string market, string orderId)
+        {
+            return Delete<OrderTrade>($"/exchange/api/v2/order?market={market}&orderId={orderId}", ServerTime);
+        }
+
         private T Get<T>(string url, bool auth = false, string time = null, bool logErrors = true)
         {
             string response = api.get(url, auth, time, logErrors);
@@ -147,6 +165,20 @@ namespace AutoTrader.Api
                 Thread.Sleep(RETRY_PERIOD);
                 response = api.post(url, null, ServerTime, true);
             }
+            return JsonConvert.DeserializeObject<T>(response);
+        }
+
+        private T Delete<T>(string url, string time = null, bool logErrors = true)
+        {
+            string response = api.delete(url, time, logErrors);
+            // {"error_id":"3a71f9a1-be49-46ac-8a8b-862da6b8ad91","errors":[{"code":2001,"message":"Session Time skew detected"}]}
+            while (response.Contains("\"code\":2001"))
+            {
+                QueryServerTime();
+                Thread.Sleep(RETRY_PERIOD);
+                response = api.delete(url, ServerTime, logErrors);
+            }
+
             return JsonConvert.DeserializeObject<T>(response);
         }
     }

@@ -1,7 +1,7 @@
-﻿using AutoTrader.Db.Entities;
-using AutoTrader.Traders.Bots;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using AutoTrader.Db.Entities;
+using AutoTrader.Traders.Bots;
 
 namespace AutoTrader.Traders
 {
@@ -32,7 +32,9 @@ namespace AutoTrader.Traders
 
         bool Buy(double amount, ActualPrice actualPrice, TradePeriod period, string botName);
 
-        bool Sell(double actualPrice, TradeOrder tradeOrder);
+        bool Sell(double actualPrice, TradeOrder tradeOrder, bool isMarket);
+
+        bool CancelLimit(TradeOrder tradeOrder);
 
         public void SellAll(bool onlyProfitable);
 

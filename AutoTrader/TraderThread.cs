@@ -21,7 +21,7 @@ namespace AutoTrader
     {
         private const string VERSION = "0.26";
 
-        private const int FAKE_CYCLE = 1000;
+        private const int FAKE_CYCLE = 5000;
 
         private const int COLLECTOR_WAIT = 1 * 60 * 1000;
         private const int TRADE_WAIT = 5 * 1000;
