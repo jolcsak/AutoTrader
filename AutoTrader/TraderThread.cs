@@ -19,9 +19,9 @@ namespace AutoTrader
 {
     public class TraderThread
     {
-        private const string VERSION = "0.26";
+        private const string VERSION = "0.3";
 
-        private const int FAKE_CYCLE = 5000;
+        private const int FAKE_CYCLE = 500;
 
         private const int COLLECTOR_WAIT = 1 * 60 * 1000;
         private const int TRADE_WAIT = 5 * 1000;
@@ -129,11 +129,11 @@ namespace AutoTrader
 
         public void ExportTraindData(string exportPath)
         {
-            NiceHashApi niceHashApi = GetNiceHashApi();
-            Logger.Info("NiceHash AutoTrader Train data exporter " + VERSION);
+            //NiceHashApi niceHashApi = GetNiceHashApi();
+            //Logger.Info("NiceHash AutoTrader Train data exporter " + VERSION);
 
-            niceHashApi.QueryServerTime();
-            Logger.Info("Server time:" + niceHashApi.ServerTime);
+            //niceHashApi.QueryServerTime();
+            //Logger.Info("Server time:" + niceHashApi.ServerTime);
 
             // CreateTraders(niceHashApi);
 
@@ -144,6 +144,18 @@ namespace AutoTrader
 
         private void BuildTrainData(string exportPath)
         {
+            string buyDataPath = Path.Combine(exportPath, "BuyTrainingData.txt");
+            if (File.Exists(buyDataPath))
+            {
+                File.Delete(buyDataPath);
+            }
+
+            string sellDataPath = Path.Combine(exportPath, "SellTrainingData.txt");
+            if (File.Exists(sellDataPath))
+            {
+                File.Delete(sellDataPath);
+            }
+
             for (int i = 0; i < FAKE_CYCLE; i++)
             {
                 var buyBuilder = new StringBuilder();
@@ -153,12 +165,12 @@ namespace AutoTrader
                 var prices = new FakeNiceHashImporter().Import(string.Empty, DateTime.Now.AddMonths(-1), DateTime.Now);
                 CollectPrices(buyBuilder, sellBuilder, prices);
 
-                using (StreamWriter sw = File.AppendText(Path.Combine(exportPath, "BuyTrainingData.txt")))
+                using (StreamWriter sw = File.AppendText(buyDataPath))
                 {
                     sw.Write(buyBuilder);
                 }
 
-                using (StreamWriter sw = File.AppendText(Path.Combine(exportPath, "SellTrainingData.txt")))
+                using (StreamWriter sw = File.AppendText(sellDataPath))
                 {
                     sw.Write(sellBuilder);
                 }
