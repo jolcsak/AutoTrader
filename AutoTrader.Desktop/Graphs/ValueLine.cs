@@ -198,9 +198,9 @@ namespace AutoTrader.Desktop
         {
             if (tradeOrder != null)
             {
-                Brush currentBrush = pointFillBrush;
-                string operation = string.Empty;
-                string prefix = string.Empty;
+                Brush currentBrush;
+                string operation;
+                string prefix;
                 if (isBuy)
                 {
                     operation = "Buy";
