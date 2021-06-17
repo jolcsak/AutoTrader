@@ -41,7 +41,7 @@ namespace AutoTrader.Traders
 
         TradeResult Sell(double actualPrice, TradeOrder tradeOrder, bool isMarket);
 
-        bool CancelLimit(TradeOrder tradeOrder);
+        bool CancelLimit(TradeOrder tradeOrder, TradeOrderState cancelState);
 
         public void SellAll(bool onlyProfitable);
 

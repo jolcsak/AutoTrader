@@ -31,7 +31,7 @@ namespace AutoTrader.MachineLearning
 
             // STEP 2: Concatenate the features and set the training algorithm
             var pipeline = mLContext.Transforms.Concatenate("Features", BuyInput.InputColumnNames)
-                            .Append(mLContext.BinaryClassification.Trainers.LbfgsLogisticRegression(labelColumnName: label, featureColumnName: "Features"));
+                            .Append(mLContext.BinaryClassification.Trainers.FastTree(labelColumnName: label, featureColumnName: "Features"));
 
             var trainedModel = pipeline.Fit(dataView);
 

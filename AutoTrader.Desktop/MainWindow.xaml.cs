@@ -441,13 +441,22 @@ namespace AutoTrader.Desktop
         private void CancelLimit(object sender, RoutedEventArgs e)
         {
             var tradeOrder = (sender as Button).DataContext as TradeOrder;
-            if (CurrentTrader.CancelLimit(tradeOrder))
+            if (tradeOrder.State == TradeOrderState.OPEN_ENTERED || tradeOrder.State == TradeOrderState.ENTERED)
             {
-                MessageBox.Show($"Order cancelled", "Trade", MessageBoxButton.OK, MessageBoxImage.Information);
+                TradeOrderState cancelState = tradeOrder.State == TradeOrderState.OPEN_ENTERED ? TradeOrderState.CANCELLED : TradeOrderState.OPEN;
+
+                if (CurrentTrader.CancelLimit(tradeOrder, cancelState))
+                {
+                    MessageBox.Show($"Order cancelled", "Cancel", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Order cancel failed! See the log.", "Cancel", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
             else
             {
-                MessageBox.Show("Order cancel failed! See the log.", "Trade", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Order not cancelable!", "Cancel", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
