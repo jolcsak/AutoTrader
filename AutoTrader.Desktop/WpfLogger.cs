@@ -252,17 +252,17 @@ namespace AutoTrader.Desktop
                 TradingBotManager botManager = trader.BotManager;
 
                 var tasks = new List<Task>
-                            {
-                                Task.Factory.StartNew(() => SmaSlow = TradeSettings.SmaGraphVisible ? new SimpleMovingAverage(botManager.Prices, SMA_SLOW_SMOOTHNESS) : null),
-                                Task.Factory.StartNew(() => SmaFast = TradeSettings.SmaGraphVisible ? new SimpleMovingAverage(botManager.Prices, SMA_FAST_SMOOTHNESS) : null),
-                                Task.Factory.StartNew(() => Ao = TradeSettings.AoGraphVisible ? new SimpleMovingAverageOscillator(botManager.Prices, SMA_FAST_SMOOTHNESS, SMA_SLOW_SMOOTHNESS) : null),
-                                Task.Factory.StartNew(() => Rsi = TradeSettings.RsiVisible ? new RelativeStrengthIndex(botManager.Prices, RSI_PERIOD) : null),
-                                Task.Factory.StartNew(() => Macd = TradeSettings.MacdVisible ? new MovingAverageConvergenceDivergence(botManager.Prices, EMA_FAST, EMA_SLOW, MACD_SIGNAL) : null),
-                                Task.Factory.StartNew(() => MacdHistogram = TradeSettings.MacdVisible ? new MovingAverageConvergenceDivergenceHistogram(botManager.Prices, EMA_FAST, EMA_SLOW, MACD_SIGNAL) : null),
-                                Task.Factory.StartNew(() => Ema24 = TradeSettings.TendencyGraphVisible ? new ExponentialMovingAverage(botManager.Prices, 24) : null),
-                                Task.Factory.StartNew(() => Ema48 = TradeSettings.TendencyGraphVisible ? new ExponentialMovingAverage(botManager.Prices, 48) : null),
-                                Task.Factory.StartNew(() => Ema100 = TradeSettings.TendencyGraphVisible ? new ExponentialMovingAverage(botManager.Prices, 100) : null)
-                            };
+                    {
+                        Task.Factory.StartNew(() => SmaSlow = TradeSettings.SmaGraphVisible ? new SimpleMovingAverage(botManager.Prices, SMA_SLOW_SMOOTHNESS) : null),
+                        Task.Factory.StartNew(() => SmaFast = TradeSettings.SmaGraphVisible ? new SimpleMovingAverage(botManager.Prices, SMA_FAST_SMOOTHNESS) : null),
+                        Task.Factory.StartNew(() => Ao = TradeSettings.AoGraphVisible ? new SimpleMovingAverageOscillator(botManager.Prices, SMA_FAST_SMOOTHNESS, SMA_SLOW_SMOOTHNESS) : null),
+                        Task.Factory.StartNew(() => Rsi = TradeSettings.RsiVisible ? new RelativeStrengthIndex(botManager.Prices, RSI_PERIOD) : null),
+                        Task.Factory.StartNew(() => Macd = TradeSettings.MacdVisible ? new MovingAverageConvergenceDivergence(botManager.Prices, EMA_FAST, EMA_SLOW, MACD_SIGNAL) : null),
+                        Task.Factory.StartNew(() => MacdHistogram = TradeSettings.MacdVisible ? new MovingAverageConvergenceDivergenceHistogram(botManager.Prices, EMA_FAST, EMA_SLOW, MACD_SIGNAL) : null),
+                        Task.Factory.StartNew(() => Ema24 = TradeSettings.TendencyGraphVisible ? new ExponentialMovingAverage(botManager.Prices, 24) : null),
+                        Task.Factory.StartNew(() => Ema48 = TradeSettings.TendencyGraphVisible ? new ExponentialMovingAverage(botManager.Prices, 48) : null),
+                        Task.Factory.StartNew(() => Ema100 = TradeSettings.TendencyGraphVisible ? new ExponentialMovingAverage(botManager.Prices, 100) : null)
+                    };
                 Task.WaitAll(tasks.ToArray());
 
                 Dispatcher?.Invoke(() => graph.Children.Clear());
