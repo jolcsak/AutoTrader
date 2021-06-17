@@ -262,7 +262,6 @@ namespace AutoTrader.Desktop
                                 Task.Factory.StartNew(() => Ema24 = TradeSettings.TendencyGraphVisible ? new ExponentialMovingAverage(botManager.Prices, 24) : null),
                                 Task.Factory.StartNew(() => Ema48 = TradeSettings.TendencyGraphVisible ? new ExponentialMovingAverage(botManager.Prices, 48) : null),
                                 Task.Factory.StartNew(() => Ema100 = TradeSettings.TendencyGraphVisible ? new ExponentialMovingAverage(botManager.Prices, 100) : null)
-
                             };
                 Task.WaitAll(tasks.ToArray());
 

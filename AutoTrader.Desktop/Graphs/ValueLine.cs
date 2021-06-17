@@ -141,18 +141,25 @@ namespace AutoTrader.Desktop
                     DateTime currenDate = value.DateTime.Value.DateTime;
                     RotateTransform currentTransform = null;
 
-                    var tradeOrder =
-                        value == lastValue ?
+                    var buyTradeOrder =
+                        value == lastValue ?                            
                             tradeOrders?.FirstOrDefault(to => to.BuyDate >= previousDate && to.BuyDate > value.DateTime.Value.DateTime) :
                             tradeOrders?.FirstOrDefault(to => to.BuyDate >= previousDate && to.BuyDate <= value.DateTime.Value.DateTime);
 
-                    DrawTradeOrder(height, currentX, (double)y, tradeOrder);
+                    DrawTradeOrder(height, currentX, (double)y, buyTradeOrder, isBuy: true);
+
+                    var sellTradeOrder =
+                        value == lastValue ?
+                            tradeOrders?.FirstOrDefault(to => to.SellDate >= previousDate && to.SellDate > value.DateTime.Value.DateTime) :
+                            tradeOrders?.FirstOrDefault(to => to.SellDate >= previousDate && to.SellDate <= value.DateTime.Value.DateTime);
+
+                    DrawTradeOrder(height, currentX, (double)y, sellTradeOrder, isBuy: false);
 
                     var tradeItem = trades?.FirstOrDefault(ti => ti.Date == value.DateTime.Value.DateTime);
                     if (tradeItem != null)
                     {
                         Brush currentBrush = pointFillBrush;
-                        string tooltip = GetTooltip(value, rotate45, ref currentTransform, tradeOrder, tradeItem, ref currentBrush);
+                        string tooltip = GetTooltip(value, rotate45, ref currentTransform, buyTradeOrder, tradeItem, ref currentBrush);
                         var rect = new Rectangle { Stroke = pointOutlineBrush, Fill = currentBrush, Width = pointWidth, Height = pointWidth, ToolTip = tooltip };
                         rect.RenderTransformOrigin = new Point(0.5, 0.5);
                         Canvas.SetLeft(rect, currentX - halfPointSize);
@@ -172,7 +179,7 @@ namespace AutoTrader.Desktop
         private string GetTooltip(AnalyzableTick<decimal?> value, RotateTransform rotate, ref RotateTransform currentTransform, TradeOrder tradeValue, TradeItem tradeItem, ref Brush currentBrush)
         {
             var tooltip = new StringBuilder();
-            if (tradeValue?.State == TradeOrderState.OPEN || tradeItem?.Type == TradeType.Buy)
+            if (tradeValue?.State == TradeOrderState.OPEN || tradeValue?.State == TradeOrderState.ENTERED || tradeValue?.State == TradeOrderState.OPEN_ENTERED || tradeItem?.Type == TradeType.Buy)
             {
                 currentBrush = buyBrush;
                 tooltip.Append("Buy at");
@@ -187,21 +194,20 @@ namespace AutoTrader.Desktop
             return tooltip.Append(' ').Append(value.Tick.Value.ToString(toolTipFormat)).Append(Environment.NewLine).Append(value.DateTime.Value.DateTime).ToString();
         }
 
-        private void DrawTradeOrder(double height, double currentX, double y, TradeOrder tradeOrder)
+        private void DrawTradeOrder(double height, double currentX, double y, TradeOrder tradeOrder, bool isBuy)
         {
             if (tradeOrder != null)
             {
                 Brush currentBrush = pointFillBrush;
                 string operation = string.Empty;
                 string prefix = string.Empty;
-                if (tradeOrder.State == TradeOrderState.OPEN)
+                if (isBuy)
                 {
                     operation = "Buy";
                     prefix = "B";
                     currentBrush = buyBrush;
                 }
                 else
-                if (tradeOrder.State == TradeOrderState.CLOSED)
                 {
                     operation = "Sell";
                     prefix = "S";
