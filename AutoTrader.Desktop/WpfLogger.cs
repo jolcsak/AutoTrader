@@ -251,7 +251,7 @@ namespace AutoTrader.Desktop
             {
                 TradingBotManager botManager = trader.BotManager;
 
-                var tasks = new List<Task>
+                var tasks = new Task[]
                     {
                         Task.Factory.StartNew(() => SmaSlow = TradeSettings.SmaGraphVisible ? new SimpleMovingAverage(botManager.Prices, SMA_SLOW_SMOOTHNESS) : null),
                         Task.Factory.StartNew(() => SmaFast = TradeSettings.SmaGraphVisible ? new SimpleMovingAverage(botManager.Prices, SMA_FAST_SMOOTHNESS) : null),
@@ -263,7 +263,7 @@ namespace AutoTrader.Desktop
                         Task.Factory.StartNew(() => Ema48 = TradeSettings.TendencyGraphVisible ? new ExponentialMovingAverage(botManager.Prices, 48) : null),
                         Task.Factory.StartNew(() => Ema100 = TradeSettings.TendencyGraphVisible ? new ExponentialMovingAverage(botManager.Prices, 100) : null)
                     };
-                Task.WaitAll(tasks.ToArray());
+                Task.WaitAll(tasks);
 
                 Dispatcher?.Invoke(() => graph.Children.Clear());
 
