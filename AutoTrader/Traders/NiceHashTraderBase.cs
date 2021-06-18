@@ -202,6 +202,7 @@ namespace AutoTrader.Traders
                 tradeOrder.State = cancelState;
                 tradeOrder.SellPrice = tradeOrder.Price;
                 tradeOrder.Fee = 0;
+                tradeOrder.SellDate = DateTime.Now;
                 Store.OrderBooks.SaveOrUpdate(tradeOrder);
                 return true;
             }
