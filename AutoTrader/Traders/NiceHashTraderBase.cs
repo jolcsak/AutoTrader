@@ -200,6 +200,8 @@ namespace AutoTrader.Traders
             if (r?.state == CANCELLED)
             {
                 tradeOrder.State = cancelState;
+                tradeOrder.SellPrice = tradeOrder.Price;
+                tradeOrder.Fee = 0;
                 Store.OrderBooks.SaveOrUpdate(tradeOrder);
                 return true;
             }
