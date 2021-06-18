@@ -14,7 +14,6 @@ namespace AutoTrader.Ai
             }
         }
 
-
         [LoadColumn(0)]
         public float Open { get; set; }
 
@@ -34,28 +33,18 @@ namespace AutoTrader.Ai
         public float SmaFast { get; set; }
 
         [LoadColumn(6)]
-        public float Ao { get; set; }
-
-        [LoadColumn(7)]
         public float Rsi { get; set; }
 
-        [LoadColumn(8)]
-        public float MacdLine { get; set; }
-
-        [LoadColumn(9)]
-        public float MacdSignalLine { get; set; }
-
-        [LoadColumn(10)]
-        public float MacdHistogram { get; set; }
-
-
-        [LoadColumn(11)]
+        [LoadColumn(7)]
         public float Ema24 { get; set; }
 
-        [LoadColumn(12)]
+        [LoadColumn(8)]
         public float Ema48 { get; set; }
 
-        [LoadColumn(13)]
+        [LoadColumn(9)]
         public float Ema100 { get; set; }
+
+        [LoadColumn(10)]
+        public float StoIndex { get; set; }
     }
 }

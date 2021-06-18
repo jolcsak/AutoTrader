@@ -11,6 +11,8 @@ namespace AutoTrader.MachineLearning
 {
     class Program
     {
+        private static ITradeLogger Logger = TradeLogManager.GetLogger("AutoTrader");
+
         static void Main(string[] args)
         {
             ConsoleLogger.Init();
@@ -21,8 +23,12 @@ namespace AutoTrader.MachineLearning
 
             // https://github.com/dotnet/machinelearning-samples/tree/main/samples/csharp/getting-started/BinaryClassification_HeartDiseaseDetection
             MLContext mLContext = new MLContext();
+
+            Logger.Info("Training with buy data...");
             TrainData<BuyInput>("IsBuy", path, "BuyTrainingData.txt", "TrainedBuyData.zip", mLContext);
+            Logger.Info("Training with sell data...");
             TrainData<SellInput>("IsSell", path, "SellTrainingData.txt", "TrainedSellData.zip", mLContext);
+            Logger.Info("Done.");
         }
 
         private static void TrainData<T>(string label, string path, string trainingFile, string trainedFile, MLContext mLContext)

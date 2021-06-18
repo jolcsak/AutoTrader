@@ -24,24 +24,20 @@ namespace AutoTrader.Traders.Bots
 
         private T GetInput<T>(IIndexedOhlcv c) where T: TradeInputBase , new()
         {
-            var macd = c.Get<MovingAverageConvergenceDivergence>(12, 26, 9)[c.Index];
-
+            //var macd = c.Get<MovingAverageConvergenceDivergence>(12, 26, 9)[c.Index];
             return new T
             {
                 Open = (float)(c.Open / c.Close),
                 Close = (float)(c.Low / c.Close),
                 Low = (float)(c.Low / c.High),
                 High = (float)(c.High / c.Close),
-                SmaSlow = GetValue(c.Get<SimpleMovingAverage>(5)[c.Index].Tick),
-                SmaFast = GetValue(c.Get<SimpleMovingAverage>(9)[c.Index].Tick),
-                Ao = GetValue(c.Get<SimpleMovingAverageOscillator>(5, 9)[c.Index].Tick),
-                Rsi = GetValue(c.Get<RelativeStrengthIndex>(14)[c.Index].Tick),
-                MacdLine = GetValue(macd.Tick.MacdLine),
-                MacdSignalLine = GetValue(macd.Tick.SignalLine),
-                MacdHistogram = GetValue(macd.Tick.MacdHistogram),
-                Ema24 = GetValue(c.Get<ExponentialMovingAverage>(24)[c.Index].Tick),
-                Ema48 = GetValue(c.Get<ExponentialMovingAverage>(48)[c.Index].Tick),
-                Ema100 = GetValue(c.Get<ExponentialMovingAverage>(100)[c.Index].Tick)
+                SmaSlow = GetValue(c.Get<SimpleMovingAverage>(5)[c.Index].Tick) / (float)c.Close,
+                SmaFast = GetValue(c.Get<SimpleMovingAverage>(9)[c.Index].Tick) / (float)c.Close,
+                Rsi = GetValue(c.Get<RelativeStrengthIndex>(14)[c.Index].Tick) / 100,
+                Ema24 = GetValue(c.Get<ExponentialMovingAverage>(24)[c.Index].Tick) / (float)c.Close,
+                Ema48 = GetValue(c.Get<ExponentialMovingAverage>(48)[c.Index].Tick) / (float)c.Close,
+                Ema100 = GetValue(c.Get<ExponentialMovingAverage>(100)[c.Index].Tick) / (float)c.Close,
+                StoIndex = GetValue(c.Get<StochasticsMomentumIndex>(14, 3, 3)[c.Index].Tick) / 100
             };
         }
 

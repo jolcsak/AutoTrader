@@ -21,12 +21,15 @@ namespace AutoTrader
     {
         private const string VERSION = "0.3";
 
-        private const int FAKE_CYCLE = 500;
+        private const int FAKE_CYCLE = 1;
 
         private const int COLLECTOR_WAIT = 1 * 60 * 1000;
         private const int TRADE_WAIT = 5 * 1000;
         private const string FIAT = "HUF";
         private const bool collectPrices = false;
+
+        // CultureInfo.InvariantCulture
+        private static CultureInfo cultureInfo = CultureInfo.InvariantCulture;
 
         protected static Store Store => Store.Instance;
 
@@ -243,11 +246,19 @@ namespace AutoTrader
             foreach (var price in Prices)
             {
                 decimal?[] values = new decimal?[] {
-                                price.Open / price.Close, price.Low / price.Close, price.Low / price.High, price.High / price.Close,
-                                smaSlow[i].Tick, smaFast[i].Tick, ao[i].Tick,
-                                rsi[i].Tick,
-                                macd[i].Tick.MacdLine, macd[i].Tick.SignalLine, macd[i].Tick.MacdHistogram, ema24[i].Tick,
-                                ema48[i].Tick, ema100[i].Tick };
+                                price.Open / price.Close, 
+                                price.Low / price.Close, 
+                                price.Low / price.High, 
+                                price.High / price.Close,
+                                smaSlow[i].Tick / price.Close,
+                                smaFast[i].Tick / price.Close,
+                                rsi[i].Tick / 100,
+                                ema24[i].Tick / price.Close,
+                                ema48[i].Tick / price.Close, 
+                                ema100[i].Tick / price.Close,
+                                stoIndex[i].Tick / 100};
+
+                //decimal?[] values = new decimal?[] { price.Close };
 
                 if (!values.Any(v => v == null))
                 {
@@ -266,7 +277,7 @@ namespace AutoTrader
         {
             foreach (var value in values)
             {
-                builder.Append(value.HasValue ? value.Value.ToString("N9", CultureInfo.InvariantCulture) : "N/A").Append(";");
+                builder.Append(value.HasValue ? value.Value.ToString("N9", cultureInfo) : "N/A").Append(";");
             }
             return builder;
         }
