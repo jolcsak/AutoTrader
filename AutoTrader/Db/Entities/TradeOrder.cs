@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using AutoTrader.Traders;
 using AutoTrader.Traders.Bots;
 using RethinkDb.Driver.Extras.Dao;
 
@@ -35,6 +36,23 @@ namespace AutoTrader.Db.Entities
         public string Trader { get; set; }
 
         public string BotName { get; set; }
+
+        public double FiatProfit
+        {
+            get
+            {
+                double fiatRate = NiceHashTraderBase.FiatRate;
+                if (State == TradeOrderState.ENTERED || State == TradeOrderState.OPEN_ENTERED || State == TradeOrderState.OPEN)
+                {
+                    return  fiatRate * (ActualPrice * (TargetAmount - Fee) - Amount);
+                }
+                if (State == TradeOrderState.CLOSED)
+                {
+                    return fiatRate * (SellBtcAmount - Amount);
+                }
+                return 0;
+            }
+        }
 
         public TradeOrder()
         {

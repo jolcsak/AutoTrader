@@ -21,7 +21,7 @@ namespace AutoTrader
     {
         private const string VERSION = "0.3";
 
-        private const int FAKE_CYCLE = 1;
+        private const int FAKE_CYCLE = 1000;
 
         private const int COLLECTOR_WAIT = 1 * 60 * 1000;
         private const int TRADE_WAIT = 5 * 1000;
@@ -72,6 +72,8 @@ namespace AutoTrader
             bool first = true;
             do
             {
+                NiceHashTraderBase.FiatRate = TradingBotManager.GetTotalFiatBalance().Item2;
+
                 foreach (ITrader trader in Traders.OrderByDescending(t => t.Order).ToList())
                 {
                     try
@@ -106,7 +108,7 @@ namespace AutoTrader
                 if (totalBalance.Item1 != previousTotalBalance.Item1 || totalBalance.Item2 != previousTotalBalance.Item2)
                 {
                     Logger.Info($"Balance changed: {totalBalance.Item1:N8} BTC => {totalBalance.Item2:N1} HUF");
-                    Store.Instance.TotalBalances.Save(new TotalBalance { BtcBalance = totalBalance.Item1, FiatBalance = totalBalance.Item2, Date = DateTime.Now });
+                    Store.Instance.TotalBalances.Save(new TotalBalance { BtcBalance = totalBalance.Item1, FiatBalance = totalBalance.Item1 * totalBalance.Item2, Date = DateTime.Now });
                     previousTotalBalance = totalBalance;
                 }
 
@@ -288,7 +290,7 @@ namespace AutoTrader
             var btcCurrency = totalBalance.currencies.FirstOrDefault(c => c.currency == BtcTrader.BTC);
             if (totalBalance?.total != null && btcCurrency != null)
             {
-                return new Tuple<double, double>(totalBalance.total.totalBalance, totalBalance.total.totalBalance * btcCurrency.fiatRate);
+                return new Tuple<double, double>(totalBalance.total.totalBalance, btcCurrency.fiatRate);
             }
             return new Tuple<double, double>(0, 0);
         }

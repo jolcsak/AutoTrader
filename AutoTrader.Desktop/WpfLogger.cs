@@ -49,6 +49,11 @@ namespace AutoTrader.Desktop
         private static Label weeklyProfitLabel;
         private static Label monthlyProfitLabel;
 
+        private static Label dailyFiatProfitLabel;
+        private static Label weeklyFiatProfitLabel;
+        private static Label monthlyFiatProfitLabel;
+
+
         private static readonly ObservableCollection<Currency> currencyList = new ObservableCollection<Currency>();
         private static readonly ObservableCollection<TradeOrder> openedOrdersData = new ObservableCollection<TradeOrder>();
         private static readonly ObservableCollection<TradeOrder> closedOrdersData = new ObservableCollection<TradeOrder>();
@@ -107,7 +112,9 @@ namespace AutoTrader.Desktop
 
         public static void Init(TextBox consoleInstance, ScrollViewer consoleScrollInstance, DataGrid openedOrdersInstance, DataGrid closedOrdersInstance, Label balanceInstance, 
                                 DataGrid currenciesInstance, Canvas graphInstance, Label selectedCurrencyInst, Label totalBalanceInstance, Label projectedIncome,
-                                Label dailyProfit, Label weeklyProfit, Label monthlyProfit)
+                                Label dailyProfit, Label weeklyProfit, Label monthlyProfit,
+                                Label dailyFiatProfit, Label weeklyFiatProfit, Label monthlyFiatProfit
+                                )
         {
             TradeLogManager.Init(new WpfLogger(string.Empty));
             console = consoleInstance;
@@ -128,6 +135,10 @@ namespace AutoTrader.Desktop
             dailyProfitLabel = dailyProfit;
             weeklyProfitLabel = weeklyProfit;
             monthlyProfitLabel = monthlyProfit;
+
+            dailyFiatProfitLabel = dailyFiatProfit;
+            weeklyFiatProfitLabel = weeklyFiatProfit;
+            monthlyFiatProfitLabel = monthlyFiatProfit;
         }
 
         public static void SetConsole(TextBox consoleInstance)
@@ -203,7 +214,7 @@ namespace AutoTrader.Desktop
                        }
                    }
 
-                   foreach (var newClosedOrder in traderOrders.Where(o => (o.State == TradeOrderState.CLOSED || o.State == TradeOrderState.CANCELLED) && !closedOrdersData.Any(i => i.Id.Equals(o.Id))))
+                   foreach (var newClosedOrder in traderOrders.Where(o => (o.State == TradeOrderState.CLOSED) && !closedOrdersData.Any(i => i.Id.Equals(o.Id))))
                    {
                        var existingOpenedOrdersData = openedOrdersData.FirstOrDefault(oe => oe.Id == newClosedOrder.Id);
                        if (existingOpenedOrdersData != null)
@@ -365,6 +376,16 @@ namespace AutoTrader.Desktop
                 dailyProfitLabel.Content = daily.ToString("N1") + "%";
                 weeklyProfitLabel.Content = weekly.ToString("N1") + "%";
                 monthlyProfitLabel.Content = monthly.ToString("N1") + "%";
+            });
+        }
+
+        public void LogFiatProfit(double daily, double weekly, double monthly)
+        {
+            Dispatcher?.BeginInvoke(() =>
+            {
+                dailyFiatProfitLabel.Content = daily.ToString("N0") + " HUF";
+                weeklyFiatProfitLabel.Content = weekly.ToString("N0") + " HUF";
+                monthlyFiatProfitLabel.Content = monthly.ToString("N0") + " HUF";
             });
         }
     }

@@ -17,6 +17,8 @@ namespace AutoTrader.Traders
 {
     public class TradingBotManager
     {
+        private const string FIAT = "HUF";
+
         public static int LastMonths { get; set; } = -1;
 
         private ITrader trader;
@@ -162,6 +164,17 @@ namespace AutoTrader.Traders
             buyRule = Rule.Or(bot.BuyRule, buyRule);
             sellRule = Rule.Or(bot.SellRule, sellRule);
             return true;
+        }
+
+        public static Tuple<double, double> GetTotalFiatBalance()
+        {
+            TotalBalance totalBalance = NiceHashApi.GetTotalBalance(FIAT);
+            var btcCurrency = totalBalance.currencies.FirstOrDefault(c => c.currency == BtcTrader.BTC);
+            if (totalBalance?.total != null && btcCurrency != null)
+            {
+                return new Tuple<double, double>(totalBalance.total.totalBalance, btcCurrency.fiatRate);
+            }
+            return new Tuple<double, double>(0, 0);
         }
 
         private CandleStick RefreshPrices(bool add)

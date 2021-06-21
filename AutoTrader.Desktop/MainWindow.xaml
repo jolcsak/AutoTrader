@@ -133,6 +133,7 @@
                                     <DataGridTextColumn Binding="{Binding Amount}" Header="BTC" />
                                     <DataGridTextColumn Binding="{Binding TargetAmount}" Header="Amount" />
                                     <DataGridTextColumn Binding="{Binding Fee, StringFormat={}{0:N8}}" Header="Fee" />
+                                    <DataGridTextColumn Binding="{Binding FiatProfit, StringFormat={}{0:N0} HUF}" Header="Profit" FontWeight="Bold" />
                                     <DataGridTextColumn Binding="{Binding Period}" Header="Period" />
                                     <DataGridTextColumn Binding="{Binding BotName}" Header="Bot" />
                                     <DataGridTemplateColumn>
@@ -206,6 +207,16 @@
                                 <Label Content="Monthly profit:" DockPanel.Dock="Left" FontWeight="SemiBold"/>
                                 <Label x:Name="monthlyProfit" Content="-" DockPanel.Dock="Left" FontWeight="SemiBold"/>
                             </DockPanel>
+                            <DockPanel DockPanel.Dock="Top">
+                                <Label Content="Closed Orders" DockPanel.Dock="Left" FontWeight="SemiBold" Visibility="Hidden"/>
+                                <StackPanel DockPanel.Dock="Left" Width="100" ></StackPanel>
+                                <Label Content="Daily FIAT profit:" DockPanel.Dock="Left" FontWeight="SemiBold"/>
+                                <Label x:Name="dailyFiatProfit" Content="-" DockPanel.Dock="Left" FontWeight="SemiBold"/>
+                                <Label Content="Weekly FIAT profit:" DockPanel.Dock="Left" FontWeight="SemiBold"/>
+                                <Label x:Name="weeklyFiatProfit" Content="-" DockPanel.Dock="Left" FontWeight="SemiBold"/>
+                                <Label Content="Monthly FIAT profit:" DockPanel.Dock="Left" FontWeight="SemiBold"/>
+                                <Label x:Name="monthlyFiatProfit" Content="-" DockPanel.Dock="Left" FontWeight="SemiBold"/>
+                            </DockPanel>                            
                             <DataGrid x:Name="closedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" ScrollViewer.IsDeferredScrollingEnabled="True" CanUserDeleteRows="False" SelectedCellsChanged="closedOrders_SelectedCellsChanged">
                                 <DataGrid.Resources>
                                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkGray"/>
@@ -223,6 +234,7 @@
                                     <DataGridTextColumn Binding="{Binding SellPrice, StringFormat={}{0:N8}}" Header="Sell Price" />
                                     <DataGridTextColumn Binding="{Binding SellBtcAmount, StringFormat={}{0:N8}}" Header="Sell BTC" FontWeight="Bold" />
                                     <DataGridTextColumn Binding="{Binding Yield, StringFormat={}{0:N2}%}" Header="Yield" />
+                                    <DataGridTextColumn Binding="{Binding FiatProfit, StringFormat={}{0:N0} HUF}" Header="Profit" FontWeight="Bold" />
                                     <DataGridTextColumn Binding="{Binding Period}" Header="Period" />
                                     <DataGridTextColumn Binding="{Binding BotName}" Header="Bot" />                                    
                                 </DataGrid.Columns>

@@ -19,6 +19,8 @@ namespace AutoTrader.Traders
 
         protected static NiceHashApi NiceHashApi => NiceHashApi.Instance;
 
+        public static double FiatRate { get; set; }
+
         protected static Store Store => Store.Instance;
 
         public string TargetCurrency { get; protected set; }
@@ -115,6 +117,8 @@ namespace AutoTrader.Traders
         public bool UpdateBuyFull(TradeOrder tradeOrder, OrderTrade orderResponse, TradeOrderState state = TradeOrderState.OPEN)
         {
             var r = NiceHashApi.GetOrderSummary(TargetCurrency + BTC, orderResponse.orderId);
+            Logger.Info($"{TargetCurrency + BTC} fully processed: {orderResponse.orderId}, executedQty={orderResponse.executedQty}, executedSndQty={orderResponse.executedSndQty}, origQty={orderResponse.origQty}, origSndQty={orderResponse.origSndQty}, price={orderResponse.price}, state={orderResponse.state}, side={orderResponse.side}, owner={orderResponse.owner}, type={orderResponse.type}, market={orderResponse.market}");
+            Logger.Info($"{TargetCurrency + BTC} fully processed summary: {orderResponse.orderId} <=> {r.id}, qty={r.qty}, fee={r.fee}, sndQty={r.sndQty}, r.price={r.price}");
             if (r != null)
             {
                 tradeOrder.TargetAmount = r.qty;

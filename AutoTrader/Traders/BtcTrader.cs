@@ -118,6 +118,14 @@ namespace AutoTrader.Traders
             double lastDayProfit = 100 * lastDayOrders.Sum(o => o.SellBtcAmount) / lastDayOrders.Sum(o => o.Amount);
 
             Logger.LogProfit(lastDayProfit, lastWeekProfit, lastMonthProfit);
+
+            double lastMonthFiatProfit = lastMonthOrders.Sum(o => o.SellBtcAmount) - lastMonthOrders.Sum(o => o.Amount);
+            double lastWeekFiatProfit = lastWeekOrders.Sum(o => o.SellBtcAmount) - lastWeekOrders.Sum(o => o.Amount);
+            double lastDayFiatProfit = lastDayOrders.Sum(o => o.SellBtcAmount) - lastDayOrders.Sum(o => o.Amount); ;
+
+            double fiatRate = FiatRate;
+
+            Logger.LogFiatProfit(fiatRate * lastDayFiatProfit, fiatRate * lastWeekFiatProfit, fiatRate * lastMonthFiatProfit);
         }
 
         private bool Sell(ActualPrice actualPrice)

@@ -45,7 +45,9 @@ namespace AutoTrader.Desktop
 
         protected override void OnInitialized(EventArgs e)
         {
-            WpfLogger.Init(logWindow.Console, null, openedOrders, closedOrders, balance, currencies, graph, selectedCurrency, totalBalance, projectedIncome, dailyProfit, weeklyProfit, monthlyProfit);
+            WpfLogger.Init(logWindow.Console, null, openedOrders, closedOrders, balance, currencies, graph, selectedCurrency, totalBalance, projectedIncome, 
+                dailyProfit, weeklyProfit, monthlyProfit, dailyFiatProfit, weeklyFiatProfit, monthlyFiatProfit
+                );
             
             Store.Connect();
             Store.LoadSettings();
