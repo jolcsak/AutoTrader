@@ -82,6 +82,7 @@ namespace AutoTrader.Db.Entities
                 ActualPrice = tradeOrder.ActualPrice;
                 NotifyPropertyChanged(nameof(ActualPrice));
                 NotifyPropertyChanged(nameof(ActualYield));
+                NotifyPropertyChanged(nameof(FiatProfit));
             }
             State = tradeOrder.State;
             NotifyPropertyChanged(nameof(State));
