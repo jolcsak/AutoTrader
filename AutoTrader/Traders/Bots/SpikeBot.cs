@@ -2,6 +2,7 @@
 using System;
 using Trady.Analysis;
 using Trady.Analysis.Extension;
+using Trady.Analysis.Indicator;
 using Trady.Core.Infrastructure;
 
 namespace AutoTrader.Traders.Bots
@@ -12,17 +13,21 @@ namespace AutoTrader.Traders.Bots
         public const int EMA_PERIOD = 48;
 
         private const int COOLDOWN_IN_MINUTES = 60;
-        private const int PRICE_PERCENTAGE_CHANGE = 5;
+        private const int PRICE_PERCENTAGE_CHANGE = 2;
 
         private const int STOP_PLOSS_PERCENTAGE = -5;
         private const int MAX_AGE_IN_HOURS = 8;
 
         public override string Name => nameof(SpikeBot);
-        public override Predicate<IIndexedOhlcv> BuyRule => Rule.Create(c => c.Index > 3 && c.ClosePricePercentageChange() + c.Prev.ClosePricePercentageChange() + c.Prev.Prev.ClosePricePercentageChange() < -PRICE_PERCENTAGE_CHANGE);
+        public override Predicate<IIndexedOhlcv> BuyRule =>
+            Rule.Create(c => c.Index > 1).
+            And(c => (c.ClosePricePercentageChange() <= -PRICE_PERCENTAGE_CHANGE && c.IsBearish()) || (c.IsSmaBullish(100) && c.IsSmaBullish(24) && c.IsSmaBearishCross(9, 16)) ).
+            And(c => c.IsSmaBullish(4)).
+            And(c => c.Get<RateOfChange>(8)[c.Index].Tick > MinRateOfChange);
 
-        // .And(c => c.IsEmaBullish(24)).And(c => c.IsEmaBullish(48)).And(c => c.IsEmaBullish(96))
-
-        public override Predicate<IIndexedOhlcv> SellRule => Rule.Create(c => c.Index > 3 && c.ClosePricePercentageChange() + c.Prev.ClosePricePercentageChange() + c.Prev.Prev.ClosePricePercentageChange() > PRICE_PERCENTAGE_CHANGE);
+        public override Predicate<IIndexedOhlcv> SellRule => 
+            Rule.Create(c => c.Index > 1).
+            And(c => c.ClosePricePercentageChange() >= PRICE_PERCENTAGE_CHANGE || c.IsBreakingHighestClose(24) || c.IsBreakingHistoricalHighestClose() || c.IsSmaBullishCross(9, 16));
 
         public SpikeBot(TradingBotManager botManager) : base(botManager, TradePeriod.Short, COOLDOWN_IN_MINUTES)
         {

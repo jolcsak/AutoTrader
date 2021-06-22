@@ -109,25 +109,25 @@ namespace AutoTrader.Traders
             tempSellRule = Rule.Create(c => false);
 
             var tasks = new List<Task>();
-            if (TradeSettings.SmaBotEnabled && IsBotRuleMerged(AoBot))
-            {
-                tasks.Add(Task.Factory.StartNew(() => aoTrades = AoBot.RefreshAll()));
-            }
             if (TradeSettings.RsiBotEnabled && IsBotRuleMerged(RsiBot))
             {
                 tasks.Add(Task.Factory.StartNew(() => rsiTrades = RsiBot.RefreshAll()));
+            }
+            if (TradeSettings.AiBotEnabled && IsBotRuleMerged(AiBot))
+            {
+                tasks.Add(Task.Factory.StartNew(() => aiTrades = AiBot.RefreshAll()));
+            }
+            if (TradeSettings.SpikeBotEnabled && IsBotRuleMerged(SpikeBot))
+            {
+                tasks.Add(Task.Factory.StartNew(() => spikeTrades = SpikeBot.RefreshAll()));
             }
             if (TradeSettings.MacdBotEnabled && IsBotRuleMerged(MacdBot))
             {
                 tasks.Add(Task.Factory.StartNew(() => macdTrades = MacdBot.RefreshAll()));
             }
-            if (TradeSettings.SpikeBotEnabled && IsBotRuleMerged(SpikeBot))
+            if (TradeSettings.SmaBotEnabled && IsBotRuleMerged(AoBot))
             {
-                tasks.Add(Task.Factory.StartNew(() => spikeTrades = SpikeBot.RefreshAll()));                
-            }
-            if (TradeSettings.AiBotEnabled && IsBotRuleMerged(AiBot))
-            {
-                tasks.Add(Task.Factory.StartNew(() => aiTrades = AiBot.RefreshAll()));
+                tasks.Add(Task.Factory.StartNew(() => aoTrades = AoBot.RefreshAll()));
             }
 
             Task.WaitAll(tasks.ToArray());

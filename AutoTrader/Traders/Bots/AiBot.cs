@@ -37,7 +37,6 @@ namespace AutoTrader.Traders.Bots
                 Ema24 = GetValue(c.Get<ExponentialMovingAverage>(24)[c.Index].Tick) / (float)c.Close,
                 Ema48 = GetValue(c.Get<ExponentialMovingAverage>(48)[c.Index].Tick) / (float)c.Close,
                 Ema100 = GetValue(c.Get<ExponentialMovingAverage>(100)[c.Index].Tick) / (float)c.Close,
-                StoIndex = GetValue(c.Get<StochasticsMomentumIndex>(14, 3, 3)[c.Index].Tick) / 100
             };
         }
 
