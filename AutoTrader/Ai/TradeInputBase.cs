@@ -46,5 +46,9 @@ namespace AutoTrader.Ai
 
         [LoadColumn(10)]
         public float StoIndex { get; set; }
+
+        [LoadColumn(11)]
+        public float IsAboveSmaSlow { get; set; }
+
     }
 }

@@ -21,8 +21,6 @@ namespace AutoTrader
     {
         private const string VERSION = "0.3";
 
-        private const int FAKE_CYCLE = 1000;
-
         private const int COLLECTOR_WAIT = 1 * 60 * 1000;
         private const int TRADE_WAIT = 5 * 1000;
         private const string FIAT = "HUF";
@@ -132,7 +130,7 @@ namespace AutoTrader
 
         }
 
-        public void ExportTraindData(string exportPath)
+        public void ExportTraindData(string exportPath, int count)
         {
             //NiceHashApi niceHashApi = GetNiceHashApi();
             //Logger.Info("NiceHash AutoTrader Train data exporter " + VERSION);
@@ -142,12 +140,12 @@ namespace AutoTrader
 
             // CreateTraders(niceHashApi);
 
-            BuildTrainData(exportPath);
+            BuildTrainData(exportPath, count);
 
             Logger.Info("Done");
         }
 
-        private void BuildTrainData(string exportPath)
+        private void BuildTrainData(string exportPath, int count)
         {
             string buyDataPath = Path.Combine(exportPath, "BuyTrainingData.txt");
             if (File.Exists(buyDataPath))
@@ -161,12 +159,12 @@ namespace AutoTrader
                 File.Delete(sellDataPath);
             }
 
-            for (int i = 0; i < FAKE_CYCLE; i++)
+            for (int i = 0; i < count; i++)
             {
                 var buyBuilder = new StringBuilder();
                 var sellBuilder = new StringBuilder();
 
-                Logger.Info($"Writing FAKE #{i}/{FAKE_CYCLE}...");
+                Logger.Info($"Writing FAKE #{i}/{count}...");
                 var prices = new FakeNiceHashImporter().Import(string.Empty, DateTime.Now.AddMonths(-1), DateTime.Now);
                 CollectPrices(buyBuilder, sellBuilder, prices);
 
@@ -258,7 +256,9 @@ namespace AutoTrader
                                 ema24[i].Tick / price.Close,
                                 ema48[i].Tick / price.Close, 
                                 ema100[i].Tick / price.Close,
-                                stoIndex[i].Tick / 100};
+                                stoIndex[i].Tick / 100,
+                                price.Close > smaSlow[i].Tick ? 1 : 0
+                                };
 
                 //decimal?[] values = new decimal?[] { price.Close };
 
