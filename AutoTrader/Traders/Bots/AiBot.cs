@@ -31,7 +31,7 @@ namespace AutoTrader.Traders.Bots
                 Close = (float)(c.Low / c.Close),
                 Low = (float)(c.Low / c.High),
                 High = (float)(c.High / c.Close),
-                SmaSlow = GetValue(c.Get<SimpleMovingAverage>(5)[c.Index].Tick) / (float)c.Close,
+                SmaSlow = GetValue(c.Get<SimpleMovingAverage>(64)[c.Index].Tick) / (float)c.Close,
                 SmaFast = GetValue(c.Get<SimpleMovingAverage>(9)[c.Index].Tick) / (float)c.Close,
                 Rsi = GetValue(c.Get<RelativeStrengthIndex>(14)[c.Index].Tick) / 100,
                 Ema24 = GetValue(c.Get<ExponentialMovingAverage>(24)[c.Index].Tick) / (float)c.Close,

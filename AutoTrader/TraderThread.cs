@@ -198,7 +198,7 @@ namespace AutoTrader
 
         private static void CollectPrices(StringBuilder buyBuilder, StringBuilder sellBuilder, IList<IOhlcv> Prices)
         {
-            SimpleMovingAverage smaSlow = new SimpleMovingAverage(Prices, 5);
+            SimpleMovingAverage smaSlow = new SimpleMovingAverage(Prices, 64);
             SimpleMovingAverage smaFast = new SimpleMovingAverage(Prices, 9);
 
             SimpleMovingAverageOscillator ao = new SimpleMovingAverageOscillator(Prices, 5, 9);
