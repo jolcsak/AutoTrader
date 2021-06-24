@@ -216,9 +216,10 @@ namespace AutoTrader
             decimal highPrice = decimal.MinValue;
             int sellIndex = -1;
 
-            for (int j = Prices.Count - 2; j > 0; j--)
+            for (int j = Prices.Count - 3; j > 1; j--)
             {
                 decimal prevPrice = Prices[j - 1].Close;
+                decimal prevPrevPrice = Prices[j - 2].Close;
                 decimal currentPrice = Prices[j].Close;
                 decimal nextPrice = Prices[j + 1].Close;
 
@@ -229,7 +230,7 @@ namespace AutoTrader
                 }
                 else
                 {
-                    if (nextPrice > currentPrice && prevPrice > currentPrice && highPrice > currentPrice * 1.05M)
+                    if (nextPrice > currentPrice && prevPrice > currentPrice && prevPrevPrice > currentPrice  && highPrice > currentPrice * 1.1M)
                     {
                         buys[j] = true;
                         if (sellIndex > -1)
@@ -256,8 +257,7 @@ namespace AutoTrader
                                 ema24[i].Tick / price.Close,
                                 ema48[i].Tick / price.Close, 
                                 ema100[i].Tick / price.Close,
-                                stoIndex[i].Tick / 100,
-                                price.Close > smaSlow[i].Tick ? 1 : 0
+                                stoIndex[i].Tick / 100
                                 };
 
                 //decimal?[] values = new decimal?[] { price.Close };
@@ -279,7 +279,7 @@ namespace AutoTrader
         {
             foreach (var value in values)
             {
-                builder.Append(value.HasValue ? value.Value.ToString("N9", cultureInfo) : "N/A").Append(";");
+                builder.Append(value.HasValue ? value.Value.ToString("N20", cultureInfo) : "N/A").Append(";");
             }
             return builder;
         }

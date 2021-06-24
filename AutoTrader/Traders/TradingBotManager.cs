@@ -63,6 +63,8 @@ namespace AutoTrader.Traders
         public DateProvider DateProvider { get; private set; }
         public TradeItem LastTrade { get; set; }
 
+        private List<ITradingBot> bots;
+
         public TradingBotManager(ITrader trader)
         {
             this.trader = trader;
@@ -96,47 +98,27 @@ namespace AutoTrader.Traders
             BtcBalances = storedBalances.Select(b => b.BtcBalance).ToList();
 
             Trades = new List<TradeItem>();
-            List<TradeItem> aoTrades = new List<TradeItem>();
-            List<TradeItem> rsiTrades = new List<TradeItem>();
-            List<TradeItem> macdTrades = new List<TradeItem>();
-            List<TradeItem> spikeTrades = new List<TradeItem>();
-            List<TradeItem> aiTrades = new List<TradeItem>();
-
             buyRule = Rule.Create(c => false);
             sellRule = Rule.Create(c => false);
-
             tempBuyRule = Rule.Create(c => false);
             tempSellRule = Rule.Create(c => false);
 
-            var tasks = new List<Task>();
-            if (TradeSettings.RsiBotEnabled && IsBotRuleMerged(RsiBot))
+            if (bots == null || new Random().Next(30) == 10)
             {
-                tasks.Add(Task.Factory.StartNew(() => rsiTrades = RsiBot.RefreshAll()));
-            }
-            if (TradeSettings.AiBotEnabled && IsBotRuleMerged(AiBot))
-            {
-                tasks.Add(Task.Factory.StartNew(() => aiTrades = AiBot.RefreshAll()));
-            }
-            if (TradeSettings.SpikeBotEnabled && IsBotRuleMerged(SpikeBot))
-            {
-                tasks.Add(Task.Factory.StartNew(() => spikeTrades = SpikeBot.RefreshAll()));
-            }
-            if (TradeSettings.MacdBotEnabled && IsBotRuleMerged(MacdBot))
-            {
-                tasks.Add(Task.Factory.StartNew(() => macdTrades = MacdBot.RefreshAll()));
-            }
-            if (TradeSettings.SmaBotEnabled && IsBotRuleMerged(AoBot))
-            {
-                tasks.Add(Task.Factory.StartNew(() => aoTrades = AoBot.RefreshAll()));
+                bots = GetEnabledBots();
+
+                var permutations = Permutations(bots).Distinct();
+                var selectedCombinations = permutations.Select(p => new { Income = GetIncome(p), Bots = p.ToList() }).OrderByDescending(p => p.Income).ToList();
+
+                var selectedCombination = selectedCombinations.FirstOrDefault();
+                if (selectedCombination != null)
+                {
+                    bots = selectedCombination.Bots;
+                }
             }
 
-            Task.WaitAll(tasks.ToArray());
+            MergeBotRules(bots);
 
-            Trades.AddRange(aoTrades);
-            Trades.AddRange(rsiTrades);
-            Trades.AddRange(macdTrades);
-            Trades.AddRange(spikeTrades);
-            Trades.AddRange(aiTrades);
             Trades = Trades.OrderBy(t => t.Date).ToList();
 
             if (lastCandleStick != null && Trades.Any())
@@ -145,6 +127,54 @@ namespace AutoTrader.Traders
             }
 
             return lastCandleStick;
+        }
+
+        public static ICollection<ICollection<T>> Permutations<T>(ICollection<T> list)
+        {
+            var result = new List<ICollection<T>>();
+            if (list.Count == 1)
+            { // If only one possible permutation
+                result.Add(list); // Add it and return it
+                return result;
+            }
+            foreach (var element in list)
+            { // For each element in that list
+                var remainingList = new List<T>(list);
+                remainingList.Remove(element); // Get a list containing everything except of chosen element
+                foreach (var permutation in Permutations<T>(remainingList))
+                { // Get all possible sub-permutations
+                    permutation.Add(element); // Add that element
+                    result.Add(permutation);
+                }
+            }
+            return result;
+        }
+
+        private List<ITradingBot> GetEnabledBots()
+        {
+            List<ITradingBot> bots = new List<ITradingBot>();
+
+            if (TradeSettings.RsiBotEnabled)
+            {
+                bots.Add(RsiBot);
+            }
+            if (TradeSettings.SpikeBotEnabled)
+            {
+                bots.Add(SpikeBot);
+            }
+            if (TradeSettings.MacdBotEnabled)
+            {
+                bots.Add(MacdBot);
+            }
+            if (TradeSettings.AiBotEnabled)
+            {
+                bots.Add(AiBot);
+            }
+            if (TradeSettings.SmaBotEnabled)
+            {
+                bots.Add(AoBot);
+            }
+            return bots;
         }
 
         private bool IsBotRuleMerged(ITradingBot bot)
@@ -157,6 +187,40 @@ namespace AutoTrader.Traders
                 return MergeBotRule(bot);
             }
             return false;
+        }
+
+        private double GetIncome(ICollection<ITradingBot> bots)
+        {
+            Predicate<IIndexedOhlcv> buyRule = Rule.Create(c => false);
+            Predicate<IIndexedOhlcv> sellRule = Rule.Create(c => false);
+            tempBuyRule = Rule.Create(c => false);
+            tempSellRule = Rule.Create(c => false);
+
+            double income = 0;
+            foreach (var bot in bots)
+            {
+                tempBuyRule = Rule.Or(bot.BuyRule, buyRule);
+                tempSellRule = Rule.Or(bot.SellRule, sellRule);
+                if (GetProjectedIncome(tempBuyRule, tempSellRule) > income)
+                {
+                    buyRule = Rule.Or(bot.BuyRule, buyRule);
+                    sellRule = Rule.Or(bot.SellRule, sellRule);
+                    income = GetProjectedIncome(buyRule, sellRule);
+                }
+            }
+            return income;
+        }
+
+        private  void MergeBotRules(ICollection<ITradingBot> tradingBots)
+        {
+            foreach(var bot in tradingBots)
+            {
+                if (IsBotRuleMerged(bot))
+                {
+                }
+
+                Trades.AddRange(bot.RefreshAll());
+            }
         }
 
         private bool MergeBotRule(ITradingBot bot)

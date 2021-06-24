@@ -9,7 +9,7 @@ namespace AutoTrader.Ai
         {
             get
             {
-                var members = typeof(BuyInput).GetProperties().Where(p => p.CanWrite).Select(m => m.Name).Where(n => n != "IsBuy").ToArray();
+                var members = typeof(BuyInput).GetProperties().Where(p => p.CanWrite).Select(m => m.Name).Where(n => n != "IsBuy" && n!="IsSell").ToArray();
                 return members;
             }
         }
@@ -46,9 +46,6 @@ namespace AutoTrader.Ai
 
         [LoadColumn(10)]
         public float StoIndex { get; set; }
-
-        [LoadColumn(11)]
-        public float IsAboveSmaSlow { get; set; }
 
     }
 }

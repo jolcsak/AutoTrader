@@ -4,7 +4,7 @@ namespace AutoTrader.Ai
 {
     public class SellInput : TradeInputBase
     {
-        [LoadColumn(12)]
+        [LoadColumn(11)]
         public bool IsSell { get; set; }
     }
 }
