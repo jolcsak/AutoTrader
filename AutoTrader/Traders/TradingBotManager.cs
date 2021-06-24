@@ -107,7 +107,7 @@ namespace AutoTrader.Traders
             {
                 bots = GetEnabledBots();
 
-                var permutations = Permutations(bots).Distinct();
+                var permutations = Permutations(bots);
                 var selectedCombinations = permutations.AsParallel().WithDegreeOfParallelism(6).Select(p => new { Income = GetIncome(p), Bots = p.ToList() }).OrderByDescending(p => p.Income).ToList();
 
                 var selectedCombination = selectedCombinations.FirstOrDefault();
@@ -278,7 +278,7 @@ namespace AutoTrader.Traders
                     .Buy(buyRule)
                     .Sell(sellRule)
                     .BuyWithAllAvailableCash()
-                    .FlatExchangeFeeRate(0.001m)
+                    .FlatExchangeFeeRate(0.004m)
                     .Premium(1)
                     .Build();
 
