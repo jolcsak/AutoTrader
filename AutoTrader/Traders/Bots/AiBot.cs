@@ -51,7 +51,7 @@ namespace AutoTrader.Traders.Bots
         }
 
 
-        public AiBot(TradingBotManager botManager) : base(botManager, TradePeriod.Short, COOLDOWN_IN_MINUTES)
+        public AiBot(TradingBotManager botManager) : base(botManager, TradePeriod.Long, COOLDOWN_IN_MINUTES)
         {
             this.botManager = botManager;
         }
