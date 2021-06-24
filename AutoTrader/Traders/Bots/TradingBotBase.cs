@@ -8,11 +8,13 @@ namespace AutoTrader.Traders.Bots
 {
     public class TradingBotBase : ITradingBot
     {
-        protected static int ShortStopLossPercentage = -2;
+        protected static int ShortStopLossPercentage = -4;
 
-        protected static int LongStopLossPercentage = -5;
+        protected static int LongStopLossPercentage = -6;
 
         protected static int ShortTradeMaxAgeInHours = 24;
+
+        protected static int LongTradeMinAgeInHours = 4;
 
         protected static int LongTradeMaxAgeInHours = 24 * 14;
 
@@ -89,7 +91,10 @@ namespace AutoTrader.Traders.Bots
                 bool isLongSell = tradeOrder.Period == TradePeriod.Long && (tradeOrder.ActualYield < LongStopLossPercentage || tradeOrder.BuyDate.AddHours(LongTradeMaxAgeInHours) < DateTime.Now);
                 if (isShortSell || isLongSell)
                 {
-                    return SellType.Loss;
+                    if (tradeOrder.BuyDate.AddHours(LongTradeMinAgeInHours) < DateTime.Now)
+                    {
+                        return SellType.Loss;
+                    }
                 }
             }
 

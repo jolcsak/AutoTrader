@@ -85,6 +85,7 @@ namespace AutoTrader.Db.Entities
                 NotifyPropertyChanged(nameof(FiatProfit));
             }
             State = tradeOrder.State;
+            SellOrderId = tradeOrder.SellOrderId;
             NotifyPropertyChanged(nameof(State));
             NotifyPropertyChanged(nameof(IsEntered));
         }

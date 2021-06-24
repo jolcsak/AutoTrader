@@ -108,7 +108,7 @@ namespace AutoTrader.Traders
                 bots = GetEnabledBots();
 
                 var permutations = Permutations(bots).Distinct();
-                var selectedCombinations = permutations.Select(p => new { Income = GetIncome(p), Bots = p.ToList() }).OrderByDescending(p => p.Income).ToList();
+                var selectedCombinations = permutations.AsParallel().WithDegreeOfParallelism(6).Select(p => new { Income = GetIncome(p), Bots = p.ToList() }).OrderByDescending(p => p.Income).ToList();
 
                 var selectedCombination = selectedCombinations.FirstOrDefault();
                 if (selectedCombination != null)
