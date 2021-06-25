@@ -164,7 +164,7 @@ namespace AutoTrader.Traders
                 if (state == TradeOrderState.ENTERED || state == TradeOrderState.OPEN_ENTERED)
                 {
                     DateTime tradeDate = state == TradeOrderState.OPEN_ENTERED ? tradeOrder.BuyDate : tradeOrder.SellDate;
-                    if (tradeDate.AddHours(1) < DateTime.Now)
+                    if (tradeDate.AddHours(1) < DateTime.Now || (state == TradeOrderState.ENTERED && tradeOrder.ActualYield > -5))
                     {
                         TradeOrderState cancelState = state == TradeOrderState.OPEN_ENTERED ? TradeOrderState.CANCELLED : TradeOrderState.OPEN;
                         Logger.Warn($"Cancel order : {tradeOrder}");
