@@ -121,16 +121,27 @@ namespace AutoTrader.Traders
             Logger.Info($"{TargetCurrency + BTC} fully processed summary: {orderResponse.orderId} <=> {r.id}, qty={r.qty}, fee={r.fee}, sndQty={r.sndQty}, r.price={r.price}");
             if (r != null)
             {
-                tradeOrder.TargetAmount = r.qty;
-                tradeOrder.Fee = r.fee;
+                tradeOrder.Fee += r.fee;
                 tradeOrder.State = state;
 
-                tradeOrder.SellBtcAmount = orderResponse.executedSndQty;
-                tradeOrder.SellPrice = r.price;
-                tradeOrder.SellDate = DateTime.Now;
+                string tradeType = "SELL";
+                if (tradeOrder.State == TradeOrderState.ENTERED)
+                {
+                    tradeOrder.SellBtcAmount = orderResponse.executedSndQty;
+                    tradeOrder.SellPrice = r.price;
+                    tradeOrder.SellDate = DateTime.Now;
+                    tradeOrder.TargetAmount = r.qty;
+                }
+                if (tradeOrder.State == TradeOrderState.OPEN_ENTERED)
+                {
+                    tradeType = "BUY";
+                    tradeOrder.Amount = r.qty;
+                    tradeOrder.Price = r.price;
+                    tradeOrder.BuyDate = DateTime.Now;
+                }
 
                 Store.OrderBooks.SaveOrUpdate(tradeOrder);
-                Logger.Info($"LIMIT BUY EXECUTED -> {TargetCurrency} : Price={r.price}, Amount={tradeOrder.SellBtcAmount}, Qty={r.qty}, SecQty={r.sndQty}");
+                Logger.Info($"LIMIT {tradeType} EXECUTED -> {TargetCurrency} : Price={r.price}, Amount={tradeOrder.SellBtcAmount}, Qty={r.qty}, SecQty={r.sndQty}");
                 return true;
             }
             else
