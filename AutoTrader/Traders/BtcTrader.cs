@@ -164,7 +164,13 @@ namespace AutoTrader.Traders
                 if (state == TradeOrderState.ENTERED || state == TradeOrderState.OPEN_ENTERED)
                 {
                     DateTime tradeDate = state == TradeOrderState.OPEN_ENTERED ? tradeOrder.BuyDate : tradeOrder.SellDate;
-                    if (tradeDate.AddHours(1) < DateTime.Now || (state == TradeOrderState.ENTERED && tradeOrder.ActualYield > -5) || tradeOrder.IsBuyPriceLowered(actualPrice) || tradeOrder.IsSellPriceUppered(actualPrice))
+                    
+                    bool isOlder = tradeDate.AddHours(1) < DateTime.Now;
+                    bool isSellBelowLossLimit = state == TradeOrderState.ENTERED && tradeOrder.ActualYield > -5;
+                    bool isBuyPriceLowered = tradeOrder.SellPrice == 0 && tradeOrder.IsBuyPriceLowered(actualPrice);
+                    bool isSellPriceUppered = tradeOrder.IsSellPriceUppered(actualPrice);
+
+                    if (isOlder || isSellBelowLossLimit || isBuyPriceLowered || isSellPriceUppered)
                     {
                         TradeOrderState cancelState = state == TradeOrderState.OPEN_ENTERED ? TradeOrderState.CANCELLED : TradeOrderState.OPEN;
                         Logger.Warn($"Cancel order : {tradeOrder}");
