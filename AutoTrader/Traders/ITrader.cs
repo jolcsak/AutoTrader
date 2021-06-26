@@ -35,8 +35,6 @@ namespace AutoTrader.Traders
 
         ActualPrice GetAndStoreCurrentOrders();
 
-        IList<Price> GetAllPastPrices();
-
         TradeResult Buy(double amount, ActualPrice actualPrice, TradePeriod period, string botName);
 
         TradeResult Sell(double actualPrice, TradeOrder tradeOrder, bool isMarket);

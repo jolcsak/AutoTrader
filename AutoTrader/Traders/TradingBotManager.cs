@@ -204,11 +204,11 @@ namespace AutoTrader.Traders
             {
                 tempBuyRule = Rule.Or(bot.BuyRule, buyRule);
                 tempSellRule = Rule.Or(bot.SellRule, sellRule);
-                if (GetProjectedIncome(tempBuyRule, tempSellRule) > income)
+                if (GetProjectedIncome(tempBuyRule, tempSellRule, isHalf: true) > income)
                 {
                     buyRule = Rule.Or(bot.BuyRule, buyRule);
                     sellRule = Rule.Or(bot.SellRule, sellRule);
-                    income = GetProjectedIncome(buyRule, sellRule);
+                    income = GetProjectedIncome(buyRule, sellRule, isHalf: true);
                 }
             }
             return income;
@@ -272,12 +272,12 @@ namespace AutoTrader.Traders
             return lastCandleStick;
         }
 
-        private double GetProjectedIncome(Predicate<IIndexedOhlcv> buyRule, Predicate<IIndexedOhlcv> sellRule)
+        private double GetProjectedIncome(Predicate<IIndexedOhlcv> buyRule, Predicate<IIndexedOhlcv> sellRule, bool isHalf = false)
         {
             if (Prices?.Count > 0)
             {
                 var runner = new Builder()
-                    .Add(Prices)
+                    .Add(isHalf ? Prices.Skip(Prices.Count / 2) : Prices)
                     .Buy(buyRule)
                     .Sell(sellRule)
                     .BuyWithAllAvailableCash()

@@ -43,7 +43,6 @@ namespace AutoTrader.Traders
 
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 
-
         public NiceHashTraderBase()
         {
             BotManager = new TradingBotManager(this);
@@ -192,11 +191,6 @@ namespace AutoTrader.Traders
             RefreshBalance();
             Logger.LogTradeOrders(AllTradeOrders);
             Logger.Warn($"All orders are sold.");
-        }
-
-        public IList<Price> GetAllPastPrices()
-        {
-            return Store.Prices.GetPricesForTrader(this, int.MaxValue);
         }
 
         protected abstract double GetBalance();
