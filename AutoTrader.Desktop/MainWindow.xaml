@@ -43,8 +43,6 @@
                     <CheckBox x:Name="canBuy" FontWeight="SemiBold" VerticalAlignment="Center" Checked="CanBuy_Checked" Unchecked="CanBuy_Unchecked" Grid.Column="4" Height="16">
                         Buy
                     </CheckBox>
-                    <Label Content="Ao Ratio:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="5" Height="26" VerticalAlignment="Center"/>
-                    <Slider x:Name="aoRatio" VerticalAlignment="Center" Grid.Column="6" Minimum="0" Maximum="2" Grid.ColumnSpan="2" Height="18" Margin="0,0,3,0" ValueChanged="aoRatio_ValueChanged" Value="0.1" AutoToolTipPlacement="BottomRight" TickPlacement="BottomRight" LargeChange="0.1" SmallChange="0.01" TickFrequency="0.01" AutoToolTipPrecision="3" IsEnabled="false"/>
                     <Label Content="Minimum Yield:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="9"/>
                     <TextBox x:Name="minYield" TextWrapping="Wrap" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" TextChanged="MinYield_TextChanged" Grid.Column="10" Height="18"/>
                     <Button x:Name="showLog" Content="Show Log" Grid.Column="11" Click="showLog_Click"/>
