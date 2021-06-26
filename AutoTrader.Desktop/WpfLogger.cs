@@ -335,14 +335,14 @@ namespace AutoTrader.Desktop
 
                 new DateGraph(graph, dateProvider, botManager.Dates).Draw();
 
-                if (botManager.FiatBalances.Count > 0)
+                if (TradingBotManager.FiatBalances.Count > 0)
                 {
                     if (TradeSettings.BalanceGraphVisible)
                     {
-                        new Graph(graph, "Total FIAT balance", botManager.FiatBalances, Colors.Olive, showPoints: false, "N0", 3).Draw();
-                        new Graph(graph, "Total BTC balance", botManager.BtcBalances, Colors.DarkOliveGreen, showPoints: false, "N8", 2).Draw();
+                        new Graph(graph, "Total FIAT balance", TradingBotManager.FiatBalances, Colors.Olive, showPoints: false, "N0", 3).Draw();
+                        new Graph(graph, "Total BTC balance", TradingBotManager.BtcBalances, Colors.DarkOliveGreen, showPoints: false, "N8", 2).Draw();
                     }
-                    Dispatcher?.BeginInvoke(() => totalBalanceText.Content = botManager.FiatBalances.Last().ToString("N1") + " HUF");
+                    Dispatcher?.BeginInvoke(() => totalBalanceText.Content = TradingBotManager.FiatBalances.Last().ToString("N1") + " HUF");
                 }
                 else
                 {

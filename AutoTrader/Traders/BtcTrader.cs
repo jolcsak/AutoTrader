@@ -96,7 +96,7 @@ namespace AutoTrader.Traders
             }
 
             Sell(ActualPrice);
-            HandleLimitOrders();
+            HandleLimitOrders(ActualPrice);
 
             SaveOrderBooksPrices();
 
@@ -145,7 +145,7 @@ namespace AutoTrader.Traders
             return true;
         }
 
-        public void HandleLimitOrders()
+        public void HandleLimitOrders(ActualPrice actualPrice)
         {
             foreach (TradeOrder tradeOrder in TradeOrders.Where(o => o.State == TradeOrderState.ENTERED || o.State == TradeOrderState.OPEN_ENTERED))
             {
@@ -164,7 +164,7 @@ namespace AutoTrader.Traders
                 if (state == TradeOrderState.ENTERED || state == TradeOrderState.OPEN_ENTERED)
                 {
                     DateTime tradeDate = state == TradeOrderState.OPEN_ENTERED ? tradeOrder.BuyDate : tradeOrder.SellDate;
-                    if (tradeDate.AddHours(1) < DateTime.Now || (state == TradeOrderState.ENTERED && tradeOrder.ActualYield > -5))
+                    if (tradeDate.AddHours(1) < DateTime.Now || (state == TradeOrderState.ENTERED && tradeOrder.ActualYield > -5) || tradeOrder.IsBuyPriceLowered(actualPrice) || tradeOrder.IsSellPriceUppered(actualPrice))
                     {
                         TradeOrderState cancelState = state == TradeOrderState.OPEN_ENTERED ? TradeOrderState.CANCELLED : TradeOrderState.OPEN;
                         Logger.Warn($"Cancel order : {tradeOrder}");

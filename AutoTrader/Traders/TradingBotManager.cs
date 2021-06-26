@@ -34,9 +34,9 @@ namespace AutoTrader.Traders
 
         public IList<DateTime> Dates { get; set; }  
 
-        public IList<double> FiatBalances { get; set; }
+        public static IList<double> FiatBalances { get; set; }
 
-        public IList<double> BtcBalances { get; set; }
+        public static IList<double> BtcBalances { get; set; }
 
         public List<TradeItem> Trades { get; private set; }
 
@@ -92,11 +92,6 @@ namespace AutoTrader.Traders
 
             CandleStick lastCandleStick = RefreshPrices(add);
 
-            var storedBalances = Store.TotalBalances.GetTotalBalances(trader).Where(tb => tb.FiatBalance > 1).ToList();
-
-            FiatBalances = storedBalances.Select(b => b.FiatBalance).ToList();
-            BtcBalances = storedBalances.Select(b => b.BtcBalance).ToList();
-
             Trades = new List<TradeItem>();
             buyRule = Rule.Create(c => false);
             sellRule = Rule.Create(c => false);
@@ -127,6 +122,14 @@ namespace AutoTrader.Traders
             }
 
             return lastCandleStick;
+        }
+
+        public static void RefreshBalanceHistory()
+        {
+            var storedBalances = Store.TotalBalances.GetTotalBalances().Where(tb => tb.FiatBalance > 1).ToList();
+
+            FiatBalances = storedBalances.Select(b => b.FiatBalance).ToList();
+            BtcBalances = storedBalances.Select(b => b.BtcBalance).ToList();
         }
 
         public static ICollection<ICollection<T>> Permutations<T>(ICollection<T> list)

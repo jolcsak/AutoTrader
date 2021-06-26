@@ -22,7 +22,7 @@ namespace AutoTrader
         private const string VERSION = "0.3";
 
         private const int COLLECTOR_WAIT = 1 * 60 * 1000;
-        private const int TRADE_WAIT = 5 * 1000;
+        private const int TRADE_WAIT = 100;
         private const string FIAT = "HUF";
         private const bool collectPrices = false;
 
@@ -71,6 +71,7 @@ namespace AutoTrader
             do
             {
                 NiceHashTraderBase.FiatRate = TradingBotManager.GetTotalFiatBalance().Item2;
+                TradingBotManager.RefreshBalanceHistory();
 
                 foreach (ITrader trader in Traders.OrderByDescending(t => t.Order).ToList())
                 {

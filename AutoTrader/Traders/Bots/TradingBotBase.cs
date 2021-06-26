@@ -10,7 +10,7 @@ namespace AutoTrader.Traders.Bots
     {
         protected static int ShortStopLossPercentage = -4;
 
-        protected static int LongStopLossPercentage = -6;
+        protected static int LongStopLossPercentage = -8;
 
         protected static int ShortTradeMaxAgeInHours = 24;
 

@@ -13,7 +13,7 @@ namespace AutoTrader.Db
         {
         }
 
-        public IList<TotalBalance> GetTotalBalances(ITrader trader)
+        public IList<TotalBalance> GetTotalBalances()
         {
             var balances = Table.OrderBy(R.Desc("Date")).Limit(RECORD_LIMIT).RunResult<IList<TotalBalance>>(conn);
             return balances.Reverse().ToList();

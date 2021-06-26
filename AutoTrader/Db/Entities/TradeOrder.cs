@@ -37,6 +37,10 @@ namespace AutoTrader.Db.Entities
 
         public string BotName { get; set; }
 
+        public bool IsBuyPriceLowered(ActualPrice actualPrice) => Price != 0 && actualPrice.SellPrice < Price;
+
+        public bool IsSellPriceUppered(ActualPrice actualPrice) => SellPrice != 0 && actualPrice.BuyPrice > SellPrice;
+
         public double FiatProfit
         {
             get
