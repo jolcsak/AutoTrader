@@ -84,7 +84,7 @@ namespace AutoTrader.Traders.Bots
 
         public virtual SellType ShouldSell(ActualPrice actualPrice, TradeOrder tradeOrder, TradeItem lastTrade)
         {
-            if (actualPrice.BuyPrice >= (tradeOrder.Price * TradeSettings.MinSellYield))
+            if (actualPrice.BuyPrice >= (tradeOrder.Price * TradeSettings.MinSellYield) && tradeOrder.FiatProfit > 0)
             {
                 if (tradeOrder.Period == TradePeriod.Short || (tradeOrder.Period == TradePeriod.Long && (lastTrade?.Type == TradeType.Sell || tradeOrder.BuyDate.AddHours(LongTradeSellAgeInHours) < DateTime.Now)))
                 {

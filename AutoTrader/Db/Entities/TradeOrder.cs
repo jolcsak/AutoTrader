@@ -48,7 +48,7 @@ namespace AutoTrader.Db.Entities
                 double fiatRate = NiceHashTraderBase.FiatRate;
                 if (State == TradeOrderState.ENTERED || State == TradeOrderState.OPEN_ENTERED || State == TradeOrderState.OPEN)
                 {
-                    return  fiatRate * (ActualPrice * (TargetAmount - Fee) - Amount);
+                    return  fiatRate * (ActualPrice * (TargetAmount - (2*Fee)) - Amount);
                 }
                 if (State == TradeOrderState.CLOSED)
                 {
