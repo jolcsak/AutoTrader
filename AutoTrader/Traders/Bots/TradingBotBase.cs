@@ -2,15 +2,16 @@
 using System;
 using System.Collections.Generic;
 using Trady.Analysis;
+using Trady.Analysis.Extension;
 using Trady.Core.Infrastructure;
 
 namespace AutoTrader.Traders.Bots
 {
     public class TradingBotBase : ITradingBot
     {
-        protected static int ShortStopLossPercentage = -4;
+        protected static int ShortStopLossPercentage = -3;
 
-        protected static int LongStopLossPercentage = -8;
+        protected static int LongStopLossPercentage = -4;
 
         protected static int ShortTradeMaxAgeInHours = 24;
 
@@ -35,6 +36,8 @@ namespace AutoTrader.Traders.Bots
         protected int coolDownInMinutes;
 
         protected TradePeriod tradePeriod;
+
+        protected bool IsRsiOverSold { get; set; } = false;
 
         internal TradingBotBase(TradingBotManager botManager, TradePeriod tradePeriod, int coolDownInMinutes = 120)
         {
@@ -72,6 +75,9 @@ namespace AutoTrader.Traders.Bots
                     }
                     i++;
                 }
+
+                var lastIndexedCandle = new IndexedCandle(botManager.Prices, botManager.Prices.Count - 1);
+                IsRsiOverSold = lastIndexedCandle.IsRsiOversold();
             }
             return tradeItems;
         }
@@ -91,7 +97,7 @@ namespace AutoTrader.Traders.Bots
                 bool isLongSell = tradeOrder.Period == TradePeriod.Long && (tradeOrder.ActualYield < LongStopLossPercentage || tradeOrder.BuyDate.AddHours(LongTradeMaxAgeInHours) < DateTime.Now);
                 if (isShortSell || isLongSell)
                 {
-                    if (tradeOrder.BuyDate.AddHours(LongTradeMinAgeInHours) < DateTime.Now)
+                    if (!IsRsiOverSold && tradeOrder.BuyDate.AddHours(LongTradeMinAgeInHours) < DateTime.Now)
                     {
                         return SellType.Loss;
                     }

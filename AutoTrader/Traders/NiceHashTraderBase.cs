@@ -154,7 +154,7 @@ namespace AutoTrader.Traders
         {
             string msg = $" at price {actualPrice}, amount: {tradeOrder.TargetAmount}, buy price: {tradeOrder.Price}, sell price: {actualPrice}, yield: {actualPrice / tradeOrder.Price * 100}%";
             Logger.Info("Try to sell" + msg);
-            OrderTrade orderResponse = NiceHashApi.Order(tradeOrder.Currency + BTC, isBuy: false, tradeOrder.TargetAmount - tradeOrder.Fee, tradeOrder.Price, isMarket);
+            OrderTrade orderResponse = NiceHashApi.Order(tradeOrder.Currency + BTC, isBuy: false, tradeOrder.TargetAmount - tradeOrder.Fee, actualPrice, isMarket);
             string state = orderResponse?.state;
             if (state == FULL || state == ENTERED)
             {
