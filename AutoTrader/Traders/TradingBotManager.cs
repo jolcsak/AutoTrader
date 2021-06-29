@@ -116,6 +116,7 @@ namespace AutoTrader.Traders
 
             Trades = Trades.OrderBy(t => t.Date).ToList();
 
+            LastTrade = null;
             if (lastCandleStick != null && Trades.Any())
             {
                 LastTrade = Trades.FirstOrDefault(t => t.Date.Equals(lastCandleStick.Date));

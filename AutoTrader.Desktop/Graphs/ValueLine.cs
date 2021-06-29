@@ -219,10 +219,10 @@ namespace AutoTrader.Desktop
                 var orderLine = new Line { Stroke = currentBrush, StrokeThickness = lineWeight, X1 = currentX, Y1 = ly, X2 = currentX, Y2 = ly - 20, ToolTip = orderTooltip };
                 graph.Children.Add(orderLine);
 
-                //OutlinedText textBlock = new OutlinedText { Text = prefix, Stroke = pointOutlineBrush, Fill = currentBrush, StrokeThickness = 1, FontSize = 14, Bold = true, ToolTip = orderTooltip };
-                //Canvas.SetLeft(textBlock, currentX - 5);
-                //Canvas.SetTop(textBlock, ly - 30);
-                //graph.Children.Add(textBlock);
+                OutlinedText textBlock = new OutlinedText { Text = prefix, Stroke = pointOutlineBrush, Fill = currentBrush, StrokeThickness = 1, FontSize = 14, Bold = true, ToolTip = orderTooltip };
+                Canvas.SetLeft(textBlock, currentX - 5);
+                Canvas.SetTop(textBlock, ly - 30);
+                graph.Children.Add(textBlock);
             }
         }
     }
