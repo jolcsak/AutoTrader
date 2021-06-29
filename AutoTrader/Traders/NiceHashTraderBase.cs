@@ -121,7 +121,6 @@ namespace AutoTrader.Traders
             if (r != null)
             {
                 tradeOrder.Fee += r.fee;
-                tradeOrder.State = state;
 
                 string tradeType = "SELL";
                 if (tradeOrder.State == TradeOrderState.ENTERED)
@@ -138,6 +137,8 @@ namespace AutoTrader.Traders
                     tradeOrder.Price = r.price;
                     tradeOrder.BuyDate = DateTime.Now;
                 }
+
+                tradeOrder.State = state;
 
                 Store.OrderBooks.SaveOrUpdate(tradeOrder);
                 Logger.Info($"LIMIT {tradeType} EXECUTED -> {TargetCurrency} : Price={r.price}, Amount={tradeOrder.SellBtcAmount}, Qty={r.qty}, SecQty={r.sndQty}");
