@@ -57,13 +57,10 @@ namespace AutoTrader.Traders
 
         public override void Trade(bool canBuy)
         {
-            OrderBooks orderBooks = NiceHashApi.GetOrderBook(TargetCurrency, BTC);
-            if (orderBooks == null)
+            if (!IsActualPricesUpdated())
             {
                 return;
             }
-
-            ActualPrice = new ActualPrice(TargetCurrency, orderBooks);
 
             LastPriceDate = DateTime.Now;
 

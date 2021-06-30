@@ -31,6 +31,8 @@ namespace AutoTrader.Traders
 
         public TradingBotManager BotManager { get; }
 
+        public void Init();
+
         public void Trade(bool canBuy);
 
         ActualPrice GetAndStoreCurrentOrders();

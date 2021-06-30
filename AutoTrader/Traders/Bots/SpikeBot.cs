@@ -21,13 +21,11 @@ namespace AutoTrader.Traders.Bots
         public override string Name => nameof(SpikeBot);
         public override Predicate<IIndexedOhlcv> BuyRule =>
             Rule.Create(c => c.Index > 1).
-            And(c => (c.ClosePricePercentageChange() <= -PRICE_PERCENTAGE_CHANGE && c.IsBearish()) || (c.IsSmaBullish(100) && c.IsSmaBullish(24) && c.IsSmaBearishCross(9, 16)) ).
-            And(c => c.IsSmaBullish(4)).
-            And(c => c.Get<RateOfChange>(8)[c.Index].Tick > MinRateOfChange);
+            And(c => (c.ClosePricePercentageChange() <= -PRICE_PERCENTAGE_CHANGE));
 
         public override Predicate<IIndexedOhlcv> SellRule => 
             Rule.Create(c => c.Index > 1).
-            And(c => c.ClosePricePercentageChange() >= PRICE_PERCENTAGE_CHANGE || c.IsBreakingHighestClose(24) || c.IsBreakingHistoricalHighestClose() || c.IsSmaBullishCross(9, 16));
+            And(c => c.ClosePricePercentageChange() >= PRICE_PERCENTAGE_CHANGE || c.IsBreakingHighestClose(24) || c.IsBreakingHistoricalHighestClose());
 
         public SpikeBot(TradingBotManager botManager) : base(botManager, TradePeriod.Short, COOLDOWN_IN_MINUTES)
         {

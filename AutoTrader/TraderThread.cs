@@ -67,6 +67,11 @@ namespace AutoTrader
 
             CreateTraders(niceHashApi);
 
+            foreach (ITrader trader in Traders)
+            {
+                trader.Init();
+            }
+
             bool first = true;
             do
             {
@@ -77,7 +82,7 @@ namespace AutoTrader
                 {
                     try
                     {
-                        trader.Trade(trader.Order > 0 && !first);
+                        trader.Trade(trader.Order >= 10 && !first);
                     }
                     catch (Exception ex)
                     {

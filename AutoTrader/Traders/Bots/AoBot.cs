@@ -16,16 +16,22 @@ namespace AutoTrader.Traders.Bots
 
         public override string Name => nameof(AoBot);
 
+        public override Predicate<IIndexedOhlcv> SellRule =>
+                        Rule.Create(c => c.Index > 0).
+                        And(c => c.Get<ExponentialMovingAverage>(5)[c.Index].Tick > c.Get<ExponentialMovingAverage>(20)[c.Index].Tick).
+                        And(c => c.Get<ExponentialMovingAverage>(5)[c.Index].Tick > c.Get<SimpleMovingAverage>(20)[c.Index].Tick);
+                        //And(c => c.IsMacdBullishCross());
+
+        //public override Predicate<IIndexedOhlcv> SellRule =>
+        //    Rule.Create(c => c.Index > 0 && (c.IsBreakingHighestClose(32) || c.IsBreakingHistoricalLowestClose())).
+        //    And(c => c.IsRsiOverbought(RSI_PERIOD)).And(c => c.Get<RateOfChange>(4)[c.Index].Tick > MinRateOfChange);
 
         public override Predicate<IIndexedOhlcv> BuyRule =>
-                        Rule.Create(c => c.Index > 0 && (c.IsBreakingLowestClose(32) || c.IsBreakingHistoricalHighestClose())).
-                        And(c => c.IsRsiOversold(RSI_PERIOD)).
-                        And(c => c.Get<RateOfChange>(4)[c.Index].Tick > MinRateOfChange);
-
-
-        public override Predicate<IIndexedOhlcv> SellRule =>
-            Rule.Create(c => c.Index > 0 && (c.IsBreakingHighestClose(32) || c.IsBreakingHistoricalLowestClose())).
-            And(c => c.IsRsiOverbought(RSI_PERIOD)).And(c => c.Get<RateOfChange>(4)[c.Index].Tick > MinRateOfChange);
+                Rule.Create(c => c.Index > 0).
+                And(c => c.Get<ExponentialMovingAverage>(5)[c.Index].Tick < c.Get<ExponentialMovingAverage>(20)[c.Index].Tick).
+                And(c => c.Get<ExponentialMovingAverage>(5)[c.Index].Tick < c.Get<SimpleMovingAverage>(20)[c.Index].Tick).
+                And(c => c.IsMacdBearishCross()).
+                And(c => c.IsRsiOversold(4));
 
 
         //public override Predicate<IIndexedOhlcv> BuyRule =>

@@ -6,6 +6,7 @@ using AutoTrader.Db;
 using AutoTrader.Db.Entities;
 using AutoTrader.Log;
 using AutoTrader.Traders.Bots;
+using OrderBooks = AutoTrader.Api.OrderBooks;
 
 namespace AutoTrader.Traders
 {
@@ -55,6 +56,26 @@ namespace AutoTrader.Traders
         public virtual ActualPrice GetAndStoreCurrentOrders()
         {
             return null;
+        }
+
+        protected bool IsActualPricesUpdated()
+        {
+            OrderBooks orderBooks = NiceHashApi.GetOrderBook(TargetCurrency, BTC);
+            if (orderBooks == null)
+            {
+                return false;
+            }
+            ActualPrice = new ActualPrice(TargetCurrency, orderBooks);
+            return true;
+        }
+
+        public void Init()
+        {
+            if (!IsActualPricesUpdated())
+            {
+                return;
+            }
+            Logger.LogCurrency(this, ActualPrice);
         }
 
         public void StoreTradeOrder(TradeOrderType type, string orderId, double price, double amount, double targetAmount, double fee, string currency, TradePeriod period, string botName, TradeOrderState orderState)

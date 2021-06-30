@@ -254,7 +254,7 @@ namespace AutoTrader.Desktop
 
         public void RefreshGraph(ITrader trader)
         {
-            if (trader == null)
+            if (trader?.BotManager?.DateProvider == null || trader?.BotManager?.Prices == null)
             {
                 return;
             }

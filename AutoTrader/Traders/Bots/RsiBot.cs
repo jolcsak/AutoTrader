@@ -13,11 +13,11 @@ namespace AutoTrader.Traders.Bots
 
         public override string Name => nameof(RsiBot);
         public override Predicate<IIndexedOhlcv> BuyRule => 
-            Rule.Create(c => c.IsRsiOversold(2)).
-            And(c => c.IsObvBullish() && c.IsEmaBullish(50)).
+            Rule.Create(c => c.IsRsiOversold(4)).
+            And(c => c.IsEmaBullish(50)).
             And(c => c.Get<RateOfChange>(24)[c.Index].Tick > MinRateOfChange);
         public override Predicate<IIndexedOhlcv> SellRule =>
-            Rule.Create(c => c.IsRsiOverbought());
+            Rule.Create(c => c.IsRsiOverbought(4));
             //And(c => c.Get<RateOfChange>(12)[c.Index].Tick > MinRateOfChange);
 
         public RsiBot(TradingBotManager botManager) : base(botManager, TradePeriod.Long)
