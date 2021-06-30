@@ -127,13 +127,13 @@ namespace AutoTrader.Traders
                 {
                     tradeOrder.SellBtcAmount = orderResponse.executedSndQty;
                     tradeOrder.SellPrice = r.price;
-                    tradeOrder.TargetAmount = r.qty;
                     tradeOrder.SellDate = DateTime.Now;
                 }
                 if (tradeOrder.State == TradeOrderState.OPEN_ENTERED)
                 {
                     tradeType = "BUY";
-                    tradeOrder.Amount = r.qty;
+                    tradeOrder.Amount = r.sndQty;
+                    tradeOrder.TargetAmount = r.qty;
                     tradeOrder.Price = r.price;
                     tradeOrder.BuyDate = DateTime.Now;
                 }
