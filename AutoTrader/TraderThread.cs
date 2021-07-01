@@ -23,17 +23,12 @@ namespace AutoTrader
         public void Trade()
         {
             NiceHashApi niceHashApi = GetNiceHashApi();
-            Logger.Info("NiceHash AutoTrader " + VERSION);
+            Logger.Info($"NiceHash AutoTrader {VERSION}");
 
             niceHashApi.QueryServerTime();
             Logger.Info("Server time:" + niceHashApi.ServerTime);
 
-            CreateTraders(niceHashApi);
-
-            foreach (ITrader trader in Traders)
-            {
-                trader.Init();
-            }
+            CreateTraders(niceHashApi, shouldInit: true);
 
             bool first = true;
             do

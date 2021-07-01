@@ -24,7 +24,7 @@ namespace AutoTrader
 
         public static List<ITrader> Traders { get; } = new List<ITrader>();
 
-        protected static void CreateTraders(NiceHashApi niceHashApi)
+        protected static void CreateTraders(NiceHashApi niceHashApi, bool shouldInit = false)
         {
             Traders.Clear();
 
@@ -34,7 +34,12 @@ namespace AutoTrader
             {
                 if (!Traders.Any(t => t.TargetCurrency == symbol.baseAsset))
                 {
-                    Traders.Add(new BtcTrader(symbol.baseAsset));
+                    ITrader trader = new BtcTrader(symbol.baseAsset);
+                    if (shouldInit)
+                    {
+                        trader.Init();
+                    }
+                    Traders.Add(trader);
                 }
             }
         }
