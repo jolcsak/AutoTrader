@@ -77,7 +77,8 @@ namespace AutoTrader.Traders
 
         public CandleStick Refresh(bool add = false)
         {
-            if (Prices == null)
+            bool isPricesEmpty = Prices == null;
+            if (isPricesEmpty)
             {
                 DateProvider = new DateProvider(DateTime.UtcNow.AddMonths(LastMonths), DateTime.UtcNow);
                 Prices = new NiceHashImporter().Import(trader.TargetCurrency, DateProvider.MinDate, DateProvider.MaxDate);
@@ -85,40 +86,41 @@ namespace AutoTrader.Traders
                 if (Prices.Count > 0)
                 {
                     DateProvider.MinDate = Prices.First().DateTime.DateTime;
-                    Dates = new List<DateTime>(Prices.Select(cs => cs.DateTime.DateTime));
+                    Dates = Prices.Select(cs => cs.DateTime.DateTime).ToList();
                 }
             }
-
-            CandleStick lastCandleStick = RefreshPrices(add);
-
-            Trades = new List<TradeItem>();
-            buyRule = Rule.Create(c => false);
-            sellRule = Rule.Create(c => false);
-            tempBuyRule = Rule.Create(c => false);
-            tempSellRule = Rule.Create(c => false);
-
-            if (bots == null || new Random().Next(30) == 10)
-            {
-                bots = GetEnabledBots();
-
-                var permutations = Permutations(bots);
-                var selectedCombinations = permutations.AsParallel().WithDegreeOfParallelism(6).Select(p => new { Income = GetIncome(p), Bots = p.ToList() }).OrderByDescending(p => p.Income).ToList();
-
-                var selectedCombination = selectedCombinations.FirstOrDefault();
-                if (selectedCombination != null)
-                {
-                    bots = selectedCombination.Bots;
-                }
-            }
-
-            MergeBotRules(bots);
-
-            Trades = Trades.OrderBy(t => t.Date).ToList();
 
             LastTrade = null;
-            if (lastCandleStick != null && Trades.Any())
+            CandleStick lastCandleStick = RefreshPrices(add);
+
+            if (lastCandleStick != null || isPricesEmpty)
             {
-                LastTrade = Trades.FirstOrDefault(t => t.Date.Equals(lastCandleStick.Date));
+                Trades = new List<TradeItem>();
+                buyRule = Rule.Create(c => false);
+                sellRule = Rule.Create(c => false);
+                tempBuyRule = Rule.Create(c => false);
+                tempSellRule = Rule.Create(c => false);
+
+                if (bots == null || new Random().Next(30) == 10)
+                {
+                    bots = GetEnabledBots();
+
+                    var permutations = Permutations(bots);
+                    var selectedCombinations = permutations.AsParallel().WithDegreeOfParallelism(6).Select(p => new { Income = GetIncome(p), Bots = p.ToList() }).OrderByDescending(p => p.Income).ToList();
+
+                    var selectedCombination = selectedCombinations.FirstOrDefault();
+                    if (selectedCombination != null)
+                    {
+                        bots = selectedCombination.Bots;
+                    }
+                }
+
+                MergeBotRules(bots);
+
+                if (lastCandleStick != null)
+                {
+                    LastTrade = Trades.FirstOrDefault(t => t.Date.Equals(lastCandleStick.Date));
+                }
             }
 
             return lastCandleStick;
@@ -274,7 +276,7 @@ namespace AutoTrader.Traders
 
         private double GetProjectedIncome(Predicate<IIndexedOhlcv> buyRule, Predicate<IIndexedOhlcv> sellRule, bool isHalf = false)
         {
-            if (Prices?.Count > 0)
+            if (Prices?.Count > 0 && buyRule != null && sellRule != null)
             {
                 var runner = new Builder()
                     .Add(isHalf ? Prices.Skip(Prices.Count / 2) : Prices)
