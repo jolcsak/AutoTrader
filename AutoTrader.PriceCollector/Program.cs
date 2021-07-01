@@ -6,7 +6,7 @@ namespace AutoTrader.PriceCollector
         static void Main(string[] args)
         {
             ConsoleLogger.Init();
-            new TraderThread().GetCollectorThread().Start();
+            new HistoicalPriceCollector().GetCollectorThread().Start();
         }
     }
 }

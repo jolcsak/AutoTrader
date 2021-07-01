@@ -10,6 +10,8 @@ namespace AutoTrader.Traders
         public double SellAmount { get; set; }
         public double BuyAmount { get; set; }
 
+        public ActualPrice() { }
+
         public ActualPrice(string targetCurrency, OrderBooks orderBooks)
         {
             Currency = targetCurrency;
