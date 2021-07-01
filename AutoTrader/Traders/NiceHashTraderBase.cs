@@ -16,7 +16,7 @@ namespace AutoTrader.Traders
         private const string FULL = "FULL";
         private const string CANCELLED = "CANCELLED";
         private const string PARTIAL = "PARTIAL";
-        private const string BTC = "BTC";
+        private static string BTC = NiceHashApi.BTC;
 
         protected static NiceHashApi NiceHashApi => NiceHashApi.Instance;
 

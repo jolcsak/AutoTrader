@@ -9,7 +9,7 @@ namespace AutoTrader.Traders
 {
     public class BtcTrader : NiceHashTraderBase
     {
-        public const string BTC = "BTC";
+        public static string BTC = NiceHashApi.BTC;
 
         protected DateTime lastUpdate = DateTime.MinValue;
 

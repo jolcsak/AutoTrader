@@ -246,7 +246,7 @@ namespace AutoTrader.Traders
 
         private CandleStick RefreshPrices(bool add)
         {
-            CandleStick[] candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + "BTC", DateTime.UtcNow.AddHours(-1), DateTime.UtcNow, 1);
+            CandleStick[] candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + BtcTrader.BTC, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow, 1);
             CandleStick lastCandleStick = candleSticks.LastOrDefault();
             if (lastCandleStick != null)
             {

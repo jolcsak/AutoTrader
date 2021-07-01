@@ -76,8 +76,15 @@ namespace AutoTrader.Traders.Bots
                     i++;
                 }
 
-                var lastIndexedCandle = new IndexedCandle(botManager.Prices, botManager.Prices.Count - 1);
-                IsRsiOverSold = lastIndexedCandle.IsRsiOversold();
+                if (botManager.Prices.Count > 0)
+                {
+                    var lastIndexedCandle = new IndexedCandle(botManager.Prices, botManager.Prices.Count - 1);
+                    IsRsiOverSold = lastIndexedCandle.IsRsiOversold();
+                }
+                else
+                {
+                    IsRsiOverSold = false;
+                }
             }
             return tradeItems;
         }

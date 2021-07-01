@@ -6,5 +6,7 @@
         string ApiKey { get; }
         string ApiSecret { get; } 
         bool IsProd { get; }
+
+        string BTC { get; }
     }
 }

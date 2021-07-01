@@ -27,9 +27,9 @@ namespace AutoTrader.Db.Entities
         public double SellBtcAmount { get; set; }
 
         public TradePeriod Period {get; set;}
-        public double ActualYield => ActualPrice > 0 ? ((ActualPrice / Price) * 100) - 100 : 0;
+        public double ActualYield => ActualPrice > 0 && Price > 0 ? (ActualPrice / Price * 100) - 100 : 0;
 
-        public double Yield => Price > 0 ? ((SellBtcAmount / Amount) * 100) - 100 : 0;
+        public double Yield => SellBtcAmount > 0 && Amount > 0 ? (SellBtcAmount / Amount * 100) - 100 : 0;
 
         public bool IsEntered => State == TradeOrderState.ENTERED || State == TradeOrderState.OPEN_ENTERED;
 
@@ -81,12 +81,19 @@ namespace AutoTrader.Db.Entities
 
         public void RefreshFrom(TradeOrder tradeOrder)
         {
-            if (tradeOrder.ActualPrice != ActualPrice)
+            if (tradeOrder.ActualPrice != ActualPrice || tradeOrder.Price != Price || tradeOrder.Amount != Amount || tradeOrder.Fee != tradeOrder.Fee)
             {
                 ActualPrice = tradeOrder.ActualPrice;
+                Price = tradeOrder.Price;
+                Amount = tradeOrder.Amount;
+                Fee = tradeOrder.Fee;
                 NotifyPropertyChanged(nameof(ActualPrice));
                 NotifyPropertyChanged(nameof(ActualYield));
                 NotifyPropertyChanged(nameof(FiatProfit));
+
+                NotifyPropertyChanged(nameof(Price));
+                NotifyPropertyChanged(nameof(Amount));
+                NotifyPropertyChanged(nameof(Fee));
             }
             State = tradeOrder.State;
             SellOrderId = tradeOrder.SellOrderId;

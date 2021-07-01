@@ -14,6 +14,7 @@ namespace AutoTrader.Api
         private static string PROD_URL_ROOT = "https://api2.nicehash.com";
 
         private static readonly long unixStartTicks = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).Ticks;
+        public static string BTC { get; private set; }
 
         private const int RETRY_PERIOD = 10;
         private string URL_ROOT;
@@ -27,6 +28,7 @@ namespace AutoTrader.Api
             URL_ROOT = config.IsProd ? PROD_URL_ROOT : TEST_URL_ROOT;
             api = new NiceHashConnectApi(URL_ROOT, config.OrgId, config.ApiKey, config.ApiSecret);
             Instance = this;
+            BTC = config.BTC;
         }
 
         public static NiceHashApi Create(IConfig config)
@@ -133,7 +135,7 @@ namespace AutoTrader.Api
 
         public OrderTrade GetOrder(string market, string orderId)
         {
-            return Get<OrderTrade>($"/exchange/api/v2/info/myOrder?market={market + "BTC"}&orderId={orderId}", true, ServerTime);
+            return Get<OrderTrade>($"/exchange/api/v2/info/myOrder?market={market + BTC}&orderId={orderId}", true, ServerTime);
         }
 
         public OrderTrade CancelOrder(string market, string orderId)

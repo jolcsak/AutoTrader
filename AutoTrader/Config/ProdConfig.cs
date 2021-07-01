@@ -11,5 +11,7 @@
         public bool IsProd => true;
 
         public static IConfig Instance => new ProdConfig();
+
+        public string BTC => "BTC";
     }
 }

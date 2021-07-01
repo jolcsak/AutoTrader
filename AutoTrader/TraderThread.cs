@@ -20,6 +20,7 @@ namespace AutoTrader
     public class TraderThread
     {
         private const string VERSION = "0.3";
+        private const bool IsProd = true;
 
         private const int COLLECTOR_WAIT = 1 * 60 * 1000;
         private const int TRADE_WAIT = 100;
@@ -111,7 +112,7 @@ namespace AutoTrader
                 var totalBalance = GetTotalFiatBalance(niceHashApi);
                 if (totalBalance.Item1 != previousTotalBalance.Item1 || totalBalance.Item2 != previousTotalBalance.Item2)
                 {
-                    Logger.Info($"Balance changed: {totalBalance.Item1:N8} BTC => {totalBalance.Item2:N1} HUF");
+                    Logger.Info($"Balance changed: {totalBalance.Item1:N8} {NiceHashApi.BTC} => {totalBalance.Item2:N1} HUF");
                     Store.Instance.TotalBalances.Save(new TotalBalance { BtcBalance = totalBalance.Item1, FiatBalance = totalBalance.Item1 * totalBalance.Item2, Date = DateTime.Now });
                     previousTotalBalance = totalBalance;
                 }
@@ -319,7 +320,7 @@ namespace AutoTrader
         private static NiceHashApi GetNiceHashApi()
         {
             Store.Connect();
-            return NiceHashApi.Create(ProdConfig.Instance);
+            return NiceHashApi.Create(IsProd ? ProdConfig.Instance : TestConfig.Instance);
         }
     }
 }

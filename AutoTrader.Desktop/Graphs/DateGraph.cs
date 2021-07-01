@@ -32,7 +32,7 @@ namespace AutoTrader.Desktop
         public DateGraph(Canvas graph, DateProvider dateProvider, IList<DateTime> values)
         {
             this.graph = graph;
-            this.values = values.ToList();
+            this.values = (values ?? new List<DateTime>()).ToList();
             this.dateProvider = dateProvider;
         }
 
