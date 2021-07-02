@@ -92,22 +92,19 @@ namespace AutoTrader.Traders
                 string state = orderResponse?.state;
                 Logger.Info($"State : {state}");
 
-                if (state == FULL || state == ENTERED || state == PARTIAL)
+                if (state == FULL || state == PARTIAL)
                 {
-                    if (state == FULL || state == PARTIAL)
+                    bool isFull = state == FULL;
+                    if (StoreBuyFull(amount, period, bot, orderResponse, isFull? TradeOrderState.OPEN : TradeOrderState.OPEN_ENTERED))
                     {
-                        bool isFull = state == FULL;
-                        if (StoreBuyFull(amount, period, bot, orderResponse, isFull? TradeOrderState.OPEN : TradeOrderState.OPEN_ENTERED))
-                        {
-                            return isFull ? TradeResult.DONE : TradeResult.LIMIT;
-                        }
+                        return isFull ? TradeResult.DONE : TradeResult.LIMIT;
                     }
-                    else if (state == ENTERED)
-                    {
-                        StoreTradeOrder(TradeOrderType.LIMIT, orderResponse.orderId, 0 , amount, 0, 0, TargetCurrency, period, bot, TradeOrderState.OPEN_ENTERED);
-                        Logger.Info($"LIMIT BUY PLACED {TargetCurrency} : BTC Amount={amount}");
-                        return TradeResult.LIMIT;
-                    }
+                }
+                else if (state == ENTERED)
+                {
+                    StoreTradeOrder(TradeOrderType.LIMIT, orderResponse.orderId, 0 , amount, 0, 0, TargetCurrency, period, bot, TradeOrderState.OPEN_ENTERED);
+                    Logger.Info($"LIMIT BUY PLACED {TargetCurrency} : BTC Amount={amount}");
+                    return TradeResult.LIMIT;
                 }
             }
             else
@@ -175,7 +172,7 @@ namespace AutoTrader.Traders
         public TradeResult Sell(double actualPrice, TradeOrder tradeOrder, bool isMarket = false)
         {
             string msg = $" at price {actualPrice}, amount: {tradeOrder.TargetAmount}, buy price: {tradeOrder.Price}, sell price: {actualPrice}, yield: {actualPrice / tradeOrder.Price * 100}%";
-            Logger.Info("Try to sell" + msg);
+            Logger.Info($"Try to sell {msg}");
             OrderTrade orderResponse = NiceHashApi.Order(tradeOrder.Currency + BTC, isBuy: false, tradeOrder.TargetAmount - tradeOrder.Fee, actualPrice, isMarket);
             string state = orderResponse?.state;
             if (state == FULL || state == ENTERED)

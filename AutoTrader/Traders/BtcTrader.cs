@@ -19,7 +19,6 @@ namespace AutoTrader.Traders
 
         protected static ISeller seller = new Seller();
 
-
         public BtcTrader(string targetCurrency) : base()
         {
             TargetCurrency = targetCurrency;
