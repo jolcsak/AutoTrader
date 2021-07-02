@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -52,6 +51,8 @@ namespace AutoTrader.Desktop
         private static Label dailyFiatProfitLabel;
         private static Label weeklyFiatProfitLabel;
         private static Label monthlyFiatProfitLabel;
+
+        private static Label benchmarkIterationLabel;
 
 
         private static readonly ObservableCollection<Currency> currencyList = new ObservableCollection<Currency>();
@@ -113,7 +114,8 @@ namespace AutoTrader.Desktop
         public static void Init(TextBox consoleInstance, ScrollViewer consoleScrollInstance, DataGrid openedOrdersInstance, DataGrid closedOrdersInstance, Label balanceInstance, 
                                 DataGrid currenciesInstance, Canvas graphInstance, Label selectedCurrencyInst, Label totalBalanceInstance, Label projectedIncome,
                                 Label dailyProfit, Label weeklyProfit, Label monthlyProfit,
-                                Label dailyFiatProfit, Label weeklyFiatProfit, Label monthlyFiatProfit
+                                Label dailyFiatProfit, Label weeklyFiatProfit, Label monthlyFiatProfit,
+                                Label benchmarkIteration
                                 )
         {
             TradeLogManager.Init(new WpfLogger(string.Empty));
@@ -139,6 +141,8 @@ namespace AutoTrader.Desktop
             dailyFiatProfitLabel = dailyFiatProfit;
             weeklyFiatProfitLabel = weeklyFiatProfit;
             monthlyFiatProfitLabel = monthlyFiatProfit;
+
+            benchmarkIterationLabel = benchmarkIteration;
         }
 
         public static void SetConsole(TextBox consoleInstance)
@@ -386,6 +390,11 @@ namespace AutoTrader.Desktop
                 weeklyFiatProfitLabel.Content = weekly.ToString("N0") + " HUF";
                 monthlyFiatProfitLabel.Content = monthly.ToString("N0") + " HUF";
             });
+        }
+
+        public void LogBenchmarkIteration(int iteration)
+        {
+            Dispatcher.BeginInvoke(() => benchmarkIterationLabel.Content = iteration.ToString());
         }
     }
 }

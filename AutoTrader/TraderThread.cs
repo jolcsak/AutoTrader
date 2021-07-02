@@ -33,6 +33,12 @@ namespace AutoTrader
             bool first = true;
             do
             {
+                if (TradingBotManager.IsBenchmarking)
+                {
+                    TradingBotManager.BenchmarkIteration++;
+                }
+                Logger.LogBenchmarkIteration(TradingBotManager.BenchmarkIteration);
+
                 NiceHashTraderBase.FiatRate = TradingBotManager.GetTotalFiatBalance().Item2;
                 TradingBotManager.RefreshBalanceHistory();
 

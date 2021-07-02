@@ -67,7 +67,7 @@ namespace AutoTrader.Traders
 
             if (PreviousPrice?.SellPrice != ActualPrice?.SellPrice || PreviousPrice?.BuyPrice != ActualPrice?.BuyPrice || isNewPeriod)
             {
-                double btcBalance = RefreshBalance();
+                double btcBalance = TradingBotManager.IsBenchmarking ? 0 : RefreshBalance();
 
                 BotManager.Refresh(isNewPeriod);
 

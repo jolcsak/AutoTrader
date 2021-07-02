@@ -46,7 +46,8 @@ namespace AutoTrader.Desktop
         protected override void OnInitialized(EventArgs e)
         {
             WpfLogger.Init(logWindow.Console, null, openedOrders, closedOrders, balance, currencies, graph, selectedCurrency, totalBalance, projectedIncome, 
-                dailyProfit, weeklyProfit, monthlyProfit, dailyFiatProfit, weeklyFiatProfit, monthlyFiatProfit
+                dailyProfit, weeklyProfit, monthlyProfit, dailyFiatProfit, weeklyFiatProfit, monthlyFiatProfit,
+                benchmarkIteration
                 );
             
             Store.Connect();
@@ -498,11 +499,13 @@ namespace AutoTrader.Desktop
 
         private void benchMarkMode_Checked(object sender, RoutedEventArgs e)
         {
+            TradingBotManager.BenchmarkIteration = 0;
             TradingBotManager.IsBenchmarking = true;
         }
 
         private void benchMarkMode_Unchecked(object sender, RoutedEventArgs e)
         {
+            TradingBotManager.BenchmarkIteration = 0;
             TradingBotManager.IsBenchmarking = false;
         }
     }

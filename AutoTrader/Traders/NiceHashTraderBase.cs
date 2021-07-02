@@ -60,6 +60,12 @@ namespace AutoTrader.Traders
 
         protected bool IsActualPricesUpdated()
         {
+            if (TradingBotManager.IsBenchmarking)
+            {
+                ActualPrice = new ActualPrice();
+                return true;
+            }
+
             OrderBooks orderBooks = NiceHashApi.GetOrderBook(TargetCurrency, BTC);
             if (orderBooks == null)
             {

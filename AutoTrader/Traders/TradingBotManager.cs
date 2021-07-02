@@ -22,6 +22,8 @@ namespace AutoTrader.Traders
 
         public static bool IsBenchmarking { get; set; } = false;
 
+        public static int BenchmarkIteration { get; set; } = 0;
+
         private ITrader trader;
 
         protected virtual ITradeLogger Logger => TradeLogManager.GetLogger(GetType());
