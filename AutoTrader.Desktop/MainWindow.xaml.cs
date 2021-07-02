@@ -495,5 +495,15 @@ namespace AutoTrader.Desktop
             Store.SaveSettings();
             Logger.RefreshGraph(CurrentTrader);
         }
+
+        private void benchMarkMode_Checked(object sender, RoutedEventArgs e)
+        {
+            TradingBotManager.IsBenchmarking = true;
+        }
+
+        private void benchMarkMode_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TradingBotManager.IsBenchmarking = false;
+        }
     }
 }

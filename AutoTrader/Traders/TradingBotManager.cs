@@ -20,6 +20,8 @@ namespace AutoTrader.Traders
 
         public static int LastMonths { get; set; } = -1;
 
+        public static bool IsBenchmarking { get; set; } = false;
+
         private ITrader trader;
 
         protected virtual ITradeLogger Logger => TradeLogManager.GetLogger(GetType());
@@ -49,6 +51,8 @@ namespace AutoTrader.Traders
 
         public ITradingBot AiBot { get; set; }
 
+        public ITradingBot BenchmarkBot { get; set; }
+
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 
         protected Predicate<IIndexedOhlcv> buyRule;
@@ -73,6 +77,7 @@ namespace AutoTrader.Traders
             MacdBot = new MacdBot(this);
             SpikeBot = new SpikeBot(this);
             AiBot = new AiBot(this);
+            BenchmarkBot = new BenchmarkBot(this);
         }
 
         public CandleStick Refresh(bool add = false)
@@ -91,36 +96,46 @@ namespace AutoTrader.Traders
             }
 
             LastTrade = null;
-            CandleStick lastCandleStick = RefreshPrices(add);
-
-            if (lastCandleStick != null || isPricesEmpty)
+            CandleStick lastCandleStick = null;
+            if (!IsBenchmarking)
             {
-                Trades = new List<TradeItem>();
-                buyRule = Rule.Create(c => false);
-                sellRule = Rule.Create(c => false);
-                tempBuyRule = Rule.Create(c => false);
-                tempSellRule = Rule.Create(c => false);
+                lastCandleStick = RefreshPrices(add);
 
-                if (bots == null || new Random().Next(30) == 10)
+                if (lastCandleStick != null || isPricesEmpty)
                 {
-                    bots = GetEnabledBots();
+                    Trades = new List<TradeItem>();
+                    buyRule = Rule.Create(c => false);
+                    sellRule = Rule.Create(c => false);
+                    tempBuyRule = Rule.Create(c => false);
+                    tempSellRule = Rule.Create(c => false);
 
-                    var permutations = Permutations(bots);
-                    var selectedCombinations = permutations.AsParallel().WithDegreeOfParallelism(6).Select(p => new { Income = GetIncome(p), Bots = p.ToList() }).OrderByDescending(p => p.Income).ToList();
-
-                    var selectedCombination = selectedCombinations.FirstOrDefault();
-                    if (selectedCombination != null)
+                    if (bots == null || new Random().Next(30) == 10)
                     {
-                        bots = selectedCombination.Bots;
+                        bots = GetEnabledBots();
+
+                        var permutations = Permutations(bots);
+                        var selectedCombinations = permutations.AsParallel().WithDegreeOfParallelism(6).Select(p => new { Income = GetIncome(p), Bots = p.ToList() }).OrderByDescending(p => p.Income).ToList();
+
+                        var selectedCombination = selectedCombinations.FirstOrDefault();
+                        if (selectedCombination != null)
+                        {
+                            bots = selectedCombination.Bots;
+                        }
+                    }
+
+                    MergeBotRules(bots);
+
+                    if (lastCandleStick != null)
+                    {
+                        LastTrade = Trades.FirstOrDefault(t => t.Date.Equals(lastCandleStick.Date));
                     }
                 }
-
-                MergeBotRules(bots);
-
-                if (lastCandleStick != null)
-                {
-                    LastTrade = Trades.FirstOrDefault(t => t.Date.Equals(lastCandleStick.Date));
-                }
+            }
+            else
+            {
+                buyRule = BenchmarkBot.BuyRule;
+                sellRule = BenchmarkBot.SellRule;
+                Trades = BenchmarkBot.RefreshAll();
             }
 
             return lastCandleStick;

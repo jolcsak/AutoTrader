@@ -35,6 +35,7 @@
                         <ColumnDefinition Width="96"/>
                         <ColumnDefinition Width="135"/>
                         <ColumnDefinition Width="96"/>
+                        <ColumnDefinition Width="116"/>
                     </Grid.ColumnDefinitions>
                     <Label Content="Total balance:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="0"/>
                     <Label x:Name="totalBalance" FontWeight="ExtraBold" Grid.Column="1"/>
@@ -46,6 +47,7 @@
                     <Label Content="Minimum Yield:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="9"/>
                     <TextBox x:Name="minYield" TextWrapping="Wrap" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" TextChanged="MinYield_TextChanged" Grid.Column="10" Height="18"/>
                     <Button x:Name="showLog" Content="Show Log" Grid.Column="11" Click="showLog_Click"/>
+                    <CheckBox x:Name="benchMarkMode" Content="Benchmarking" Grid.Column="12" VerticalAlignment="Center" FontWeight="ExtraBold" Margin="10,0,0,0" Checked="benchMarkMode_Checked" Unchecked="benchMarkMode_Unchecked"/>
                 </Grid>
             </DockPanel>
             <Grid Margin="4,4,4,4">
