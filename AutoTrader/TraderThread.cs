@@ -12,6 +12,8 @@ namespace AutoTrader
     {
         private const int TRADE_WAIT = 100;
 
+        public static ITrader CurrentTrader { get; set; }
+
         public Thread GetTraderThread(string appName = null)
         {
             if (appName != null)
@@ -36,6 +38,7 @@ namespace AutoTrader
             {
                 if (TradingBotManager.IsBenchmarking)
                 {
+                    BenchmarkBot.GenerateRules();
                     TradingBotManager.BenchmarkIteration++;
                 }
 
@@ -64,6 +67,7 @@ namespace AutoTrader
                         BenchmarkBot.MaxBenchProfit = sumProfit;
                     }
                     Logger.LogBenchmarkIteration(TradingBotManager.BenchmarkIteration, BenchmarkBot.MaxBenchProfit);
+                    Logger.RefreshGraph(CurrentTrader);
                 }
 
                 first = false;

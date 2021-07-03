@@ -397,7 +397,7 @@ namespace AutoTrader.Desktop
         public void LogBenchmarkIteration(int iteration, double benchProfit)
         {
             Dispatcher.BeginInvoke(() => benchmarkIterationLabel.Content = iteration.ToString());
-            Dispatcher.BeginInvoke(() => benchProfitLabel.Content = benchProfit.ToString());
+            Dispatcher.BeginInvoke(() => benchProfitLabel.Content = benchProfit.ToString("N2"));
         }
     }
 }

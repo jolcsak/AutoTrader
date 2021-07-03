@@ -33,7 +33,9 @@ namespace AutoTrader.Desktop
             get
             {
                 var selectedCurrency = currencies?.SelectedItem as Currency;
-                return selectedCurrency != null ? traderThread.GetTrader(selectedCurrency.Name) : null;
+                var currentTrader = selectedCurrency != null ? traderThread.GetTrader(selectedCurrency.Name) : null;
+                TraderThread.CurrentTrader = currentTrader;
+                return currentTrader;
             }
         }
 
