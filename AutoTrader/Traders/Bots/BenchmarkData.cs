@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Trady.Core.Infrastructure;
@@ -21,16 +22,17 @@ namespace AutoTrader.Traders.Bots
     {
         private Random rnd = new Random();
 
-        public IDictionary<string, int> Sequence { get; set; } = new Dictionary<string, int>();
+        public ConcurrentDictionary<string, int> Sequence { get; set; } = new ConcurrentDictionary<string, int>();
         
         public int Next(int high, string callerName)
         {
-            if (!Sequence.ContainsKey(callerName))
+            int next;
+            while (!Sequence.TryGetValue(callerName, out next))
             {
-                int next = high >= 0 ? rnd.Next(high - 1) + 1 : -1;
-                Sequence.Add(callerName, next);
+                next = high >= 0 ? rnd.Next(high - 1) + 1 : -1;
+                Sequence.TryAdd(callerName, next);
             }
-            return Sequence[callerName];
+            return next;
         }
 
         public Predicate<IIndexedOhlcv> Next(Predicate<IIndexedOhlcv> subRule, string callerName)
