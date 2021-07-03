@@ -68,9 +68,9 @@ namespace AutoTrader
                     if (sumProfit > BenchmarkBot.MaxBenchProfit)
                     {
                         BenchmarkBot.MaxBenchProfit = sumProfit;
+                        BenchmarkBot.MaxBenchProfitData = BenchmarkBot.Data;
                     }
                     Logger.LogBenchmarkIteration(TradingBotManager.BenchmarkIteration, BenchmarkBot.MaxBenchProfit);
-                    Logger.RefreshGraph(CurrentTrader);
                 }
 
                 first = false;

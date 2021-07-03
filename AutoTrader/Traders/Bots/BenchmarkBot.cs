@@ -10,6 +10,10 @@ namespace AutoTrader.Traders.Bots
     {
         public static double MaxBenchProfit { get; set; } = double.MinValue;
 
+        public static BenchmarkData MaxBenchProfitData { get; set; }
+
+        public static BenchmarkData Data => data;
+
         protected static BenchmarkData data;
 
         protected static Predicate<IIndexedOhlcv>[] subRules;

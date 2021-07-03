@@ -95,7 +95,6 @@ namespace AutoTrader.Traders
             }
             else
             {
-
                 Sell(ActualPrice);
                 HandleLimitOrders(ActualPrice);
 
@@ -104,10 +103,10 @@ namespace AutoTrader.Traders
                 PreviousPrice = ActualPrice;
 
                 Logger.LogTradeOrders(AllTradeOrders);
+                LogProfit();
             }
 
             Logger.LogCurrency(this, ActualPrice);
-            LogProfit();
         }
 
         private void LogProfit()

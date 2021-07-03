@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,6 +9,8 @@ using AutoTrader.Db.Entities;
 using AutoTrader.Log;
 using AutoTrader.Traders;
 using AutoTrader.Traders.Bots;
+using Microsoft.Win32;
+using Newtonsoft.Json;
 
 namespace AutoTrader.Desktop
 {
@@ -509,6 +512,15 @@ namespace AutoTrader.Desktop
         {
             TradingBotManager.BenchmarkIteration = 0;
             TradingBotManager.IsBenchmarking = false;
+        }
+
+        private void saveBenchmarkData_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            if (saveFileDialog.ShowDialog())
+            {
+                File.WriteAllText(saveFileDialog.FileName, JsonConvert.SerializeObject(BenchmarkBot.MaxBenchProfitData));
+            }
         }
     }
 }
