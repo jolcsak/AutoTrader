@@ -84,9 +84,11 @@ namespace AutoTrader.Traders
 
         public CandleStick Refresh(bool add = false)
         {
+            pricesChanged = false;
             bool isPricesEmpty = Prices == null;
             if (isPricesEmpty)
             {
+                pricesChanged = true;
                 DateProvider = new DateProvider(DateTime.UtcNow.AddMonths(LastMonths), DateTime.UtcNow);
                 Prices = new NiceHashImporter().Import(trader.TargetCurrency, DateProvider.MinDate, DateProvider.MaxDate);
 
@@ -135,6 +137,7 @@ namespace AutoTrader.Traders
             }
             else
             {
+                pricesChanged = true;
                 buyRule = BenchmarkBot.BuyRule;
                 sellRule = BenchmarkBot.SellRule;
                 Trades = BenchmarkBot.RefreshAll();
@@ -269,6 +272,7 @@ namespace AutoTrader.Traders
             CandleStick lastCandleStick = candleSticks.LastOrDefault();
             if (lastCandleStick != null)
             {
+                pricesChanged = true;
                 if (!add && Prices.Count > 0)
                 {
                     Prices.RemoveAt(Prices.Count - 1);
@@ -291,21 +295,28 @@ namespace AutoTrader.Traders
             return lastCandleStick;
         }
 
+        private double lastIncome = 0;
+        private bool pricesChanged = false;
+
         private double GetProjectedIncome(Predicate<IIndexedOhlcv> buyRule, Predicate<IIndexedOhlcv> sellRule, bool isHalf = false)
         {
             if (Prices?.Count > 0 && buyRule != null && sellRule != null)
             {
-                var runner = new Builder()
-                    .Add(isHalf ? Prices.Skip(Prices.Count / 2) : Prices)
-                    .Buy(buyRule)
-                    .Sell(sellRule)
-                    .BuyWithAllAvailableCash()
-                    .FlatExchangeFeeRate(0.004m)
-                    .Premium(1)
-                    .Build();
+                if (pricesChanged)
+                {
+                    var runner = new Builder()
+                        .Add(isHalf ? Prices.Skip(Prices.Count / 2) : Prices)
+                        .Buy(buyRule)
+                        .Sell(sellRule)
+                        .BuyWithAllAvailableCash()
+                        .FlatExchangeFeeRate(0.004m)
+                        .Premium(1)
+                        .Build();
 
-                var result = runner.Run(100, DateProvider.MinDate, DateProvider.MaxDate);
-                return (double)result.TotalCorrectedBalance - 100;
+                    var result = runner.Run(100, DateProvider.MinDate, DateProvider.MaxDate);
+                    lastIncome = (double)result.TotalCorrectedBalance - 100;
+                }
+                return lastIncome;
             }
             return 0;
         }

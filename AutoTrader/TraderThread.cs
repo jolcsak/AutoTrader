@@ -4,6 +4,7 @@ using System.Threading;
 using AutoTrader.Traders;
 using AutoTrader.Api;
 using AutoTrader.Log;
+using AutoTrader.Traders.Bots;
 
 namespace AutoTrader
 {
@@ -37,10 +38,11 @@ namespace AutoTrader
                 {
                     TradingBotManager.BenchmarkIteration++;
                 }
-                Logger.LogBenchmarkIteration(TradingBotManager.BenchmarkIteration);
 
                 NiceHashTraderBase.FiatRate = TradingBotManager.GetTotalFiatBalance().Item2;
                 TradingBotManager.RefreshBalanceHistory();
+
+                bool isBenchMarking = TradingBotManager.IsBenchmarking;
 
                 foreach (ITrader trader in Traders.OrderByDescending(t => t.Order).ToList())
                 {
@@ -53,6 +55,17 @@ namespace AutoTrader
                         Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
                     }
                 }
+
+                if (isBenchMarking && TradingBotManager.IsBenchmarking)
+                {
+                    double sumProfit = Traders.Sum(t => t.Order);
+                    if (sumProfit > BenchmarkBot.MaxBenchProfit)
+                    {
+                        BenchmarkBot.MaxBenchProfit = sumProfit;
+                    }
+                    Logger.LogBenchmarkIteration(TradingBotManager.BenchmarkIteration, BenchmarkBot.MaxBenchProfit);
+                }
+
                 first = false;
                 Thread.Sleep(TRADE_WAIT);
             } while (true);

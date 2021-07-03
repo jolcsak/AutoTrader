@@ -47,7 +47,7 @@ namespace AutoTrader.Desktop
         {
             WpfLogger.Init(logWindow.Console, null, openedOrders, closedOrders, balance, currencies, graph, selectedCurrency, totalBalance, projectedIncome, 
                 dailyProfit, weeklyProfit, monthlyProfit, dailyFiatProfit, weeklyFiatProfit, monthlyFiatProfit,
-                benchmarkIteration
+                benchmarkIteration, maxBProfit
                 );
             
             Store.Connect();

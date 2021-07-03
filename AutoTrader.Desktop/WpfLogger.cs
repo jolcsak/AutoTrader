@@ -53,6 +53,7 @@ namespace AutoTrader.Desktop
         private static Label monthlyFiatProfitLabel;
 
         private static Label benchmarkIterationLabel;
+        private static Label benchProfitLabel;
 
 
         private static readonly ObservableCollection<Currency> currencyList = new ObservableCollection<Currency>();
@@ -115,7 +116,7 @@ namespace AutoTrader.Desktop
                                 DataGrid currenciesInstance, Canvas graphInstance, Label selectedCurrencyInst, Label totalBalanceInstance, Label projectedIncome,
                                 Label dailyProfit, Label weeklyProfit, Label monthlyProfit,
                                 Label dailyFiatProfit, Label weeklyFiatProfit, Label monthlyFiatProfit,
-                                Label benchmarkIteration
+                                Label benchmarkIteration, Label benchProfit
                                 )
         {
             TradeLogManager.Init(new WpfLogger(string.Empty));
@@ -143,6 +144,7 @@ namespace AutoTrader.Desktop
             monthlyFiatProfitLabel = monthlyFiatProfit;
 
             benchmarkIterationLabel = benchmarkIteration;
+            benchProfitLabel = benchProfit;
         }
 
         public static void SetConsole(TextBox consoleInstance)
@@ -392,9 +394,10 @@ namespace AutoTrader.Desktop
             });
         }
 
-        public void LogBenchmarkIteration(int iteration)
+        public void LogBenchmarkIteration(int iteration, double benchProfit)
         {
             Dispatcher.BeginInvoke(() => benchmarkIterationLabel.Content = iteration.ToString());
+            Dispatcher.BeginInvoke(() => benchProfitLabel.Content = benchProfit.ToString());
         }
     }
 }

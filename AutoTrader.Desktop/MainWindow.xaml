@@ -36,8 +36,10 @@
                         <ColumnDefinition Width="135"/>
                         <ColumnDefinition Width="96"/>
                         <ColumnDefinition Width="116"/>
-                        <ColumnDefinition Width="116"/>
-                        <ColumnDefinition Width="116"/>                        
+                        <ColumnDefinition Width="58"/>
+                        <ColumnDefinition Width="66"/>
+                        <ColumnDefinition Width="82"/>
+                        <ColumnDefinition Width="66"/>
                     </Grid.ColumnDefinitions>
                     <Label Content="Total balance:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="0"/>
                     <Label x:Name="totalBalance" FontWeight="ExtraBold" Grid.Column="1"/>
@@ -52,6 +54,8 @@
                     <CheckBox x:Name="benchMarkMode" Content="Benchmarking" Grid.Column="12" VerticalAlignment="Center" FontWeight="ExtraBold" Margin="10,0,0,0" Checked="benchMarkMode_Checked" Unchecked="benchMarkMode_Unchecked"/>
                     <Label Content="Iteration:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="13"/>
                     <Label x:Name="benchmarkIteration" Content="-" DockPanel.Dock="Top" FontWeight="SemiBold" HorizontalAlignment="Left" Grid.Column="14"/>
+                    <Label Content="Max B. Profit:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="15"/>
+                    <Label x:Name="maxBProfit" Content="-" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="16"/>
                 </Grid>
             </DockPanel>
             <Grid Margin="4,4,4,4">
@@ -89,7 +93,7 @@
                                         <Button Click="BuyShort">Buy Short</Button>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>                            
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
@@ -129,7 +133,7 @@
                                     <DataGridTextColumn Binding="{Binding BuyDate}" Header="BuyDate" />
                                     <DataGridTextColumn Binding="{Binding Currency}" Header="Currency" />
                                     <DataGridTextColumn Binding="{Binding Type}" Header="Type" />
-                                    <DataGridTextColumn Binding="{Binding State}" Header="State" />                                    
+                                    <DataGridTextColumn Binding="{Binding State}" Header="State" />
                                     <DataGridTextColumn Binding="{Binding Price, StringFormat={}{0:N8}}" Header="Buy Price" />
                                     <DataGridTextColumn Binding="{Binding ActualPrice, StringFormat={}{0:N8}}" Header="Actual Price" FontWeight="DemiBold"/>
                                     <DataGridTextColumn Binding="{Binding ActualYield, StringFormat={}{0:N2}%}" Header="Actual Yield" FontWeight="DemiBold"/>
@@ -172,7 +176,7 @@
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
-                                                    </Button.Style>                                                    
+                                                    </Button.Style>
                                                 </Button>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
@@ -191,7 +195,7 @@
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
-                                                    </Button.Style>                                                    
+                                                    </Button.Style>
                                                 </Button>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
@@ -219,7 +223,7 @@
                                 <Label x:Name="weeklyFiatProfit" Content="-" DockPanel.Dock="Left" FontWeight="SemiBold"/>
                                 <Label Content="Monthly FIAT profit:" DockPanel.Dock="Left" FontWeight="SemiBold"/>
                                 <Label x:Name="monthlyFiatProfit" Content="-" DockPanel.Dock="Left" FontWeight="SemiBold"/>
-                            </DockPanel>                            
+                            </DockPanel>
                             <DataGrid x:Name="closedOrders" AutoGenerateColumns="False" AlternationCount="2" AlternatingRowBackground="#F3F3F3" IsReadOnly="True" ScrollViewer.IsDeferredScrollingEnabled="True" CanUserDeleteRows="False" SelectedCellsChanged="closedOrders_SelectedCellsChanged">
                                 <DataGrid.Resources>
                                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkGray"/>
@@ -239,7 +243,7 @@
                                     <DataGridTextColumn Binding="{Binding Yield, StringFormat={}{0:N2}%}" Header="Yield" />
                                     <DataGridTextColumn Binding="{Binding FiatProfit, StringFormat={}{0:N0} HUF}" Header="Profit" FontWeight="Bold" />
                                     <DataGridTextColumn Binding="{Binding Period}" Header="Period" />
-                                    <DataGridTextColumn Binding="{Binding BotName}" Header="Bot" />                                    
+                                    <DataGridTextColumn Binding="{Binding BotName}" Header="Bot" />
                                 </DataGrid.Columns>
                             </DataGrid>
                         </DockPanel>
