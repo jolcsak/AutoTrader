@@ -517,7 +517,7 @@ namespace AutoTrader.Desktop
         private void saveBenchmarkData_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            if (saveFileDialog.ShowDialog())
+            if (saveFileDialog.ShowDialog() == true)
             {
                 File.WriteAllText(saveFileDialog.FileName, JsonConvert.SerializeObject(BenchmarkBot.MaxBenchProfitData));
             }
