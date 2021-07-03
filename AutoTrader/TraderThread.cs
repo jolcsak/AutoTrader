@@ -42,16 +42,19 @@ namespace AutoTrader
                     TradingBotManager.BenchmarkIteration++;
                 }
 
-                NiceHashTraderBase.FiatRate = TradingBotManager.GetTotalFiatBalance().Item2;
-                TradingBotManager.RefreshBalanceHistory();
-
                 bool isBenchMarking = TradingBotManager.IsBenchmarking;
+
+                if (!isBenchMarking)
+                {
+                    NiceHashTraderBase.FiatRate = TradingBotManager.GetTotalFiatBalance().Item2;
+                    TradingBotManager.RefreshBalanceHistory();
+                }
 
                 foreach (ITrader trader in Traders.OrderByDescending(t => t.Order).ToList())
                 {
                     try
                     {
-                        trader.Trade(trader.Order >= 10 && !first);
+                        trader.Trade((TradingBotManager.IsBenchmarking || trader.Order >= 10) && !first);
                     }
                     catch (Exception ex)
                     {

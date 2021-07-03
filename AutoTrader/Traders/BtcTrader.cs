@@ -69,8 +69,6 @@ namespace AutoTrader.Traders
             {
                 double btcBalance = TradingBotManager.IsBenchmarking ? 0 : RefreshBalance();
 
-                BotManager.Refresh(isNewPeriod);
-
                 if (isNewPeriod)
                 {
                     lastUpdate = DateTime.Now;
@@ -91,16 +89,25 @@ namespace AutoTrader.Traders
                 }
             }
 
-            Sell(ActualPrice);
-            HandleLimitOrders(ActualPrice);
+            if (TradingBotManager.IsBenchmarking)
+            {
+                BotManager.Refresh(isNewPeriod);
+            }
+            else
+            {
 
-            SaveOrderBooksPrices();
+                Sell(ActualPrice);
+                HandleLimitOrders(ActualPrice);
 
-            PreviousPrice = ActualPrice;
+                SaveOrderBooksPrices();
 
-            Logger.LogTradeOrders(AllTradeOrders);
-            LogProfit();
+                PreviousPrice = ActualPrice;
+
+                Logger.LogTradeOrders(AllTradeOrders);
+            }
+
             Logger.LogCurrency(this, ActualPrice);
+            LogProfit();
         }
 
         private void LogProfit()
