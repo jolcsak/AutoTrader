@@ -36,13 +36,13 @@ namespace AutoTrader
             bool first = true;
             do
             {
-                if (TradingBotManager.IsBenchmarking)
+                bool isBenchMarking = TradingBotManager.IsBenchmarking;
+
+                if (isBenchMarking)
                 {
                     BenchmarkBot.GenerateRules();
                     TradingBotManager.BenchmarkIteration++;
                 }
-
-                bool isBenchMarking = TradingBotManager.IsBenchmarking;
 
                 if (!isBenchMarking)
                 {
