@@ -69,6 +69,11 @@ namespace AutoTrader.Traders
             {
                 double btcBalance = TradingBotManager.IsBenchmarking ? 0 : RefreshBalance();
 
+                if (!TradingBotManager.IsBenchmarking)
+                {
+                    BotManager.Refresh(isNewPeriod);
+                }
+
                 if (isNewPeriod)
                 {
                     lastUpdate = DateTime.Now;

@@ -117,14 +117,14 @@ namespace AutoTrader.Traders
                     {
                         bots = GetEnabledBots();
 
-                        var permutations = Permutations(bots);
-                        var selectedCombinations = permutations.AsParallel().WithDegreeOfParallelism(6).Select(p => new { Income = GetIncome(p), Bots = p.ToList() }).OrderByDescending(p => p.Income).ToList();
+                        //var permutations = Permutations(bots);
+                        //var selectedCombinations = permutations.AsParallel().WithDegreeOfParallelism(6).Select(p => new { Income = GetIncome(p), Bots = p.ToList() }).OrderByDescending(p => p.Income).ToList();
 
-                        var selectedCombination = selectedCombinations.FirstOrDefault();
-                        if (selectedCombination != null)
-                        {
-                            bots = selectedCombination.Bots;
-                        }
+                        //var selectedCombination = selectedCombinations.FirstOrDefault();
+                        //if (selectedCombination != null)
+                        //{
+                        //    bots = selectedCombination.Bots;
+                        //}
                     }
 
                     MergeBotRules(bots);
@@ -199,6 +199,11 @@ namespace AutoTrader.Traders
             {
                 bots.Add(AoBot);
             }
+            if (TradeSettings.BBotEnabled)
+            {
+                bots.Add(BenchmarkBot);
+            }
+
             return bots;
         }
 

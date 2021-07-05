@@ -62,15 +62,20 @@ namespace AutoTrader
                     }
                 }
 
+                double sumProfit = Traders.Sum(t => t.Order);
+
                 if (isBenchMarking && TradingBotManager.IsBenchmarking)
                 {
-                    double sumProfit = Traders.Sum(t => t.Order);
                     if (sumProfit > BenchmarkBot.MaxBenchProfit)
                     {
                         BenchmarkBot.MaxBenchProfit = sumProfit;
                         BenchmarkBot.MaxBenchProfitData = BenchmarkBot.Data;
                     }
                     Logger.LogBenchmarkIteration(TradingBotManager.BenchmarkIteration, BenchmarkBot.MaxBenchProfit);
+                }
+                else
+                {
+                    Logger.LogBenchmarkIteration(0, sumProfit);
                 }
 
                 first = false;

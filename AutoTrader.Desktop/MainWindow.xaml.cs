@@ -86,6 +86,7 @@ namespace AutoTrader.Desktop
             macdBotEnabled.IsChecked = TradeSettings.MacdBotEnabled;
             spikeBotEnabled.IsChecked = TradeSettings.SpikeBotEnabled;
             aiBotEnabled.IsChecked = TradeSettings.AiBotEnabled;
+            bBotEnabled.IsChecked = TradeSettings.BBotEnabled;
 
             TradeSettings.SetCanSave(true);
         }
@@ -384,6 +385,18 @@ namespace AutoTrader.Desktop
             RefreshAllTraders();
         }
 
+        private void bBotEnabled_Checked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.BBotEnabled = true;
+            RefreshAllTraders();
+        }
+
+        private void bBotEnabled_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TradeSettings.BBotEnabled = false;
+            RefreshAllTraders();
+        }
+
         private void RefreshAllTraders()
         {
             Store.SaveSettings();
@@ -506,12 +519,14 @@ namespace AutoTrader.Desktop
         {
             TradingBotManager.BenchmarkIteration = 0;
             TradingBotManager.IsBenchmarking = true;
+            BenchmarkBot.Clear();
         }
 
         private void benchMarkMode_Unchecked(object sender, RoutedEventArgs e)
         {
             TradingBotManager.BenchmarkIteration = 0;
             TradingBotManager.IsBenchmarking = false;
+            BenchmarkBot.Clear();
         }
 
         private void saveBenchmarkData_Click(object sender, RoutedEventArgs e)

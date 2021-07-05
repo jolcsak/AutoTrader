@@ -55,24 +55,24 @@ namespace AutoTrader.Traders.Bots
                         c => data.Next(c => c.IsBearish(), "IsBearish")(c),
                         c => c.IsBelowBbLow(data.Next(100, "IsBelowBbLow_1"), data.Next(100, "IsBelowBbLow_2")),
                         c => c.IsAboveBbUp(data.Next(100, "IsAboveBbUp_1"), data.Next(100, "IsAboveBbUp_2")),
-                        c => c.IsFastStoBearishCross(data.Next(100, "IsFastStoBearishCross_1"), data.Next(100, "IsFastStoBearishCross_2")),
-                        c => c.IsFastStoBullishCross(data.Next(100, "IsFastStoBullishCross_1"), data.Next(100, "IsFastStoBullishCross_2")),
-                        c => c.IsFastStoOscBearish(data.Next(100, "IsFastStoOscBearish_1"), data.Next(100, "IsFastStoOscBearish_2")),
-                        c => c.IsFastStoOscBullish(data.Next(100, "IsFastStoOscBullish_1"), data.Next(100, "IsFastStoOscBullish_2")),
-                        c => c.IsFastStoOverbought(data.Next(100, "IsFastStoOverbought_1"), data.Next(100, "IsFastStoOverbought_2")),
-                        c => c.IsFastStoOversold(data.Next(100, "IsFastStoOversold_1"), data.Next(100, "IsFastStoOversold_2")),
-                        c => c.IsSlowStoBearishCross(data.Next(100, "IsSlowStoBearishCross_1"), data.Next(100, "IsSlowStoBearishCross_2")),
-                        c => c.IsSlowStoBullishCross(data.Next(100, "IsSlowStoBullishCross_1"), data.Next(100, "IsSlowStoBullishCross_2")),
-                        c => c.IsSlowStoOscBearish(data.Next(100, "IsSlowStoOscBearish_1"), data.Next(100, "IsSlowStoOscBearish_2")),
-                        c => c.IsSlowStoOscBullish(data.Next(100, "IsSlowStoOscBullish_1"), data.Next(100, "IsSlowStoOscBullish_2")),
-                        c => c.IsSlowStoOverbought(data.Next(100, "IsSlowStoOverbought_1"), data.Next(100, "IsSlowStoOverbought_2")),
-                        c => c.IsSlowStoOversold(data.Next(100, "IsSlowStoOversold_1"), data.Next(100, "IsSlowStoOversold_2")),
-                        c => c.IsFullStoBearishCross(data.Next(100, "IsFullStoBearishCross_1"), data.Next(100, "IsFullStoBearishCross_2"), data.Next(100, "IsFullStoBearishCross_3")),
-                        c => c.IsFullStoBullishCross(data.Next(100, "IsFullStoBullishCross_1"), data.Next(100, "IsFullStoBullishCross_2"), data.Next(100, "IsFullStoBullishCross_3")),
-                        c => c.IsFullStoOscBearish(data.Next(100, "IsFullStoOscBearish_1"), data.Next(100, "IsFullStoOscBearish_2"), data.Next(100, "IsFullStoOscBearish_3")),
-                        c => c.IsFullStoOscBullish(data.Next(100, "IsFullStoOscBullish_1"), data.Next(100, "IsFullStoOscBullish_2"), data.Next(100, "IsFullStoOscBullish_3")),
-                        c => c.IsFullStoOverbought(data.Next(100, "IsFullStoOverbought_1"), data.Next(100, "IsFullStoOverbought_2"), data.Next(100, "IsFullStoOverbought_3")),
-                        c => c.IsFullStoOversold(data.Next(100, "IsFullStoOversold_1"), data.Next(100, "IsFullStoOversold_2"), data.Next(100, "IsFullStoOversold_3")),
+                        //c => c.IsFastStoBearishCross(data.Next(100, "IsFastStoBearishCross_1"), data.Next(100, "IsFastStoBearishCross_2")),
+                        //c => c.IsFastStoBullishCross(data.Next(100, "IsFastStoBullishCross_1"), data.Next(100, "IsFastStoBullishCross_2")),
+                        //c => c.IsFastStoOscBearish(data.Next(100, "IsFastStoOscBearish_1"), data.Next(100, "IsFastStoOscBearish_2")),
+                        //c => c.IsFastStoOscBullish(data.Next(100, "IsFastStoOscBullish_1"), data.Next(100, "IsFastStoOscBullish_2")),
+                        //c => c.IsFastStoOverbought(data.Next(100, "IsFastStoOverbought_1"), data.Next(100, "IsFastStoOverbought_2")),
+//                        c => c.IsFastStoOversold(data.Next(100, "IsFastStoOversold_1"), data.Next(100, "IsFastStoOversold_2")),
+                        //c => c.IsSlowStoBearishCross(data.Next(100, "IsSlowStoBearishCross_1"), data.Next(100, "IsSlowStoBearishCross_2")),
+                        //c => c.IsSlowStoBullishCross(data.Next(100, "IsSlowStoBullishCross_1"), data.Next(100, "IsSlowStoBullishCross_2")),
+                        //c => c.IsSlowStoOscBearish(data.Next(100, "IsSlowStoOscBearish_1"), data.Next(100, "IsSlowStoOscBearish_2")),
+                        //c => c.IsSlowStoOscBullish(data.Next(100, "IsSlowStoOscBullish_1"), data.Next(100, "IsSlowStoOscBullish_2")),
+                        //c => c.IsSlowStoOverbought(data.Next(100, "IsSlowStoOverbought_1"), data.Next(100, "IsSlowStoOverbought_2")),
+                        //c => c.IsSlowStoOversold(data.Next(100, "IsSlowStoOversold_1"), data.Next(100, "IsSlowStoOversold_2")),
+                        //c => c.IsFullStoBearishCross(data.Next(100, "IsFullStoBearishCross_1"), data.Next(100, "IsFullStoBearishCross_2"), data.Next(100, "IsFullStoBearishCross_3")),
+                        //c => c.IsFullStoBullishCross(data.Next(100, "IsFullStoBullishCross_1"), data.Next(100, "IsFullStoBullishCross_2"), data.Next(100, "IsFullStoBullishCross_3")),
+                        //c => c.IsFullStoOscBearish(data.Next(100, "IsFullStoOscBearish_1"), data.Next(100, "IsFullStoOscBearish_2"), data.Next(100, "IsFullStoOscBearish_3")),
+                        //c => c.IsFullStoOscBullish(data.Next(100, "IsFullStoOscBullish_1"), data.Next(100, "IsFullStoOscBullish_2"), data.Next(100, "IsFullStoOscBullish_3")),
+                        //c => c.IsFullStoOverbought(data.Next(100, "IsFullStoOverbought_1"), data.Next(100, "IsFullStoOverbought_2"), data.Next(100, "IsFullStoOverbought_3")),
+                        //c => c.IsFullStoOversold(data.Next(100, "IsFullStoOversold_1"), data.Next(100, "IsFullStoOversold_2"), data.Next(100, "IsFullStoOversold_3")),
                         c => c.IsInBbRange(data.Next(100, "IsInBbRange_1"), data.Next(100, "IsInBbRange_2")),
                         c => c.IsMacdBearishCross(data.Next(100, "IsMacdBearishCross_1"), data.Next(100, "IsMacdBearishCross_2"), data.Next(100, "IsMacdBearishCross_3")),
                         c => c.IsMacdBullishCross(data.Next(100, "IsMacdBullishCross_1"), data.Next(100, "IsMacdBullishCross_2"), data.Next(100, "IsMacdBullishCross_3")),
@@ -91,6 +91,13 @@ namespace AutoTrader.Traders.Bots
         {
         }
 
+        public static void Clear()
+        {
+            buyRule = null;
+            sellRule = null;
+            data = null;
+        }
+
         public static void GenerateRules()
         {
             data = new BenchmarkData();
@@ -100,11 +107,27 @@ namespace AutoTrader.Traders.Bots
             buyRule = Rule.Create(c => c.Index > 0);
             sellRule = Rule.Create(c => c.Index > 0);
 
-            int numberOfRules = data.Next(6, "NumberOfRules");
+            int numberOfRules = data.Next(10, "NumberOfRules");
             for (int i = 0; i < numberOfRules; i++)
             {
                 buyRule = buyRule.And(subRules[data.Next(subRuleCount - 1, "BuySubRule_" + i)]);
                 sellRule = sellRule.And(subRules[data.Next(subRuleCount - 1, "SellSubRule_" + i)]);
+            }
+        }
+
+        public static void LoadBechmarkRule()
+        {
+            buyRule = Rule.Create(c => c.Index > 0);
+            sellRule = Rule.Create(c => c.Index > 0);
+
+            if (MaxBenchProfitData != null)
+            {
+                int numberOfRules = MaxBenchProfitData.Sequence["NumberOfRules"];
+                for (int i = 0; i < numberOfRules; i++)
+                {
+                    buyRule = buyRule.And(subRules[MaxBenchProfitData.Next(numberOfRules - 1, "BuySubRule_" + i)]);
+                    sellRule = sellRule.And(subRules[MaxBenchProfitData.Next(numberOfRules - 1, "SellSubRule_" + i)]);
+                }
             }
         }
 
@@ -115,7 +138,14 @@ namespace AutoTrader.Traders.Bots
             {
                 if (buyRule == null)
                 {
-                    GenerateRules();
+                    if (TradingBotManager.IsBenchmarking)
+                    {
+                        GenerateRules();
+                    }
+                    else
+                    {
+                        LoadBechmarkRule();
+                    }
                 }
                 return buyRule;
             }
@@ -126,7 +156,14 @@ namespace AutoTrader.Traders.Bots
             {
                 if (sellRule == null)
                 {
-                    GenerateRules();
+                    if (TradingBotManager.IsBenchmarking)
+                    {
+                        GenerateRules();
+                    }
+                    else
+                    {
+                        LoadBechmarkRule();
+                    }
                 }
                 return sellRule;
             }            

@@ -55,7 +55,7 @@
                     <CheckBox x:Name="benchMarkMode" Content="Benchmarking" Grid.Column="12" VerticalAlignment="Center" FontWeight="ExtraBold" Margin="10,0,0,0" Checked="benchMarkMode_Checked" Unchecked="benchMarkMode_Unchecked"/>
                     <Label Content="Iteration:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="13"/>
                     <Label x:Name="benchmarkIteration" Content="-" DockPanel.Dock="Top" FontWeight="SemiBold" HorizontalAlignment="Left" Grid.Column="14"/>
-                    <Label Content="Max B. Profit:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="15"/>
+                    <Label Content="Max profit:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="15"/>
                     <Label x:Name="maxBProfit" Content="-" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="16"/>
                     <Button x:Name="saveBenchmarkData" Content="Save BD" Grid.Column="17" Click="saveBenchmarkData_Click"/>
                 </Grid>
@@ -278,6 +278,7 @@
                     <CheckBox Content="RSI" x:Name="rsiBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="RsiBotEnabled_Checked" Unchecked="RsiBotEnabled_Unchecked"/>
                     <CheckBox Content="SMA" x:Name="smaBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="SmaBotEnabled_Checked" Unchecked="SmaBotEnabled_Unchecked"/>
                     <CheckBox Content="AI" x:Name="aiBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="AiBotEnabled_Checked" Unchecked="AiBotEnabled_Unchecked" />
+                    <CheckBox Content="BB" x:Name="bBotEnabled" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="4,0,4,0" FontWeight="ExtraBold" Checked="bBotEnabled_Checked" Unchecked="bBotEnabled_Unchecked" />
                     <Image Source="/bot.png" Margin="0,0,5,0" ToolTip="Bot Signals" DockPanel.Dock="Right"/>
                     <Label x:Name="projectedIncome" FontWeight="SemiBold" Grid.Column="0" DockPanel.Dock="Right"/>
                     <Label Content="Projected Income:" FontWeight="SemiBold" Grid.Column="0" DockPanel.Dock="Right"/>

@@ -46,6 +46,8 @@ namespace AutoTrader
         public bool SpikeBotEnabled { get; set; }
         public bool AiBotEnabled { get; set; }
 
+        public bool BBotEnabled { get; set; }
+
         public void SetCanSave(bool canSave)
         {
             this.canSave = canSave;
