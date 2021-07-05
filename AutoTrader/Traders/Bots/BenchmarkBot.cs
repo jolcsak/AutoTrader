@@ -104,8 +104,8 @@ namespace AutoTrader.Traders.Bots
 
             int subRuleCount = subRules.Length;
 
-            buyRule = Rule.Create(c => c.Index > 0);
-            sellRule = Rule.Create(c => c.Index > 0);
+            buyRule = Rule.Create(c => c.Index > 0 && data != null);
+            sellRule = Rule.Create(c => c.Index > 0 && data != null);
 
             int numberOfRules = data.Next(10, "NumberOfRules");
             for (int i = 0; i < numberOfRules; i++)
@@ -119,8 +119,8 @@ namespace AutoTrader.Traders.Bots
         {
             data = MaxBenchProfitData;
 
-            buyRule = Rule.Create(c => c.Index > 0);
-            sellRule = Rule.Create(c => c.Index > 0);
+            buyRule = Rule.Create(c => c.Index > 0 && data != null);
+            sellRule = Rule.Create(c => c.Index > 0 && data != null);
 
             if (data != null)
             {

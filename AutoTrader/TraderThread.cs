@@ -62,7 +62,7 @@ namespace AutoTrader
                     }
                 }
 
-                double sumProfit = Traders.Sum(t => t.Order);
+                double sumProfit = Traders.Where(t => t.Order > 0).Sum(t => t.Order);
 
                 if (isBenchMarking && TradingBotManager.IsBenchmarking)
                 {
