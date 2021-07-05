@@ -117,18 +117,20 @@ namespace AutoTrader.Traders.Bots
 
         public static void LoadBechmarkRule()
         {
+            data = MaxBenchProfitData;
+
             buyRule = Rule.Create(c => c.Index > 0);
             sellRule = Rule.Create(c => c.Index > 0);
 
-            if (MaxBenchProfitData != null)
+            if (data != null)
             {
-                int numberOfRules = MaxBenchProfitData.Sequence["NumberOfRules"];
+                int numberOfRules = data.Sequence["NumberOfRules"];
                 for (int i = 0; i < numberOfRules; i++)
                 {
-                    buyRule = buyRule.And(subRules[MaxBenchProfitData.Next(numberOfRules - 1, "BuySubRule_" + i)]);
-                    sellRule = sellRule.And(subRules[MaxBenchProfitData.Next(numberOfRules - 1, "SellSubRule_" + i)]);
+                    buyRule = buyRule.And(subRules[data.Next(numberOfRules - 1, "BuySubRule_" + i)]);
+                    sellRule = sellRule.And(subRules[data.Next(numberOfRules - 1, "SellSubRule_" + i)]);
                 }
-            }
+            } 
         }
 
         public override string Name => nameof(BenchmarkBot);
