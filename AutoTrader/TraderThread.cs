@@ -25,18 +25,18 @@ namespace AutoTrader
 
         public void Trade()
         {
-            try
+            NiceHashApi niceHashApi = GetNiceHashApi();
+            Logger.Info($"NiceHash AutoTrader {VERSION}");
+
+            niceHashApi.QueryServerTime();
+            Logger.Info("Server time:" + niceHashApi.ServerTime);
+
+            CreateTraders(niceHashApi, shouldInit: true);
+
+            bool first = true;
+            do
             {
-                NiceHashApi niceHashApi = GetNiceHashApi();
-                Logger.Info($"NiceHash AutoTrader {VERSION}");
-
-                niceHashApi.QueryServerTime();
-                Logger.Info("Server time:" + niceHashApi.ServerTime);
-
-                CreateTraders(niceHashApi, shouldInit: true);
-
-                bool first = true;
-                do
+                try
                 {
                     bool isBenchMarking = TradingBotManager.IsBenchmarking;
 
@@ -82,11 +82,11 @@ namespace AutoTrader
 
                     first = false;
                     Thread.Sleep(TRADE_WAIT);
-                } while (true);
-            } catch (Exception ex)
-            {
-                Logger.Err(ex.Message + " " + ex.StackTrace);
-            }
+                } catch (Exception ex)
+                {
+                    Logger.Err(ex.Message + " " + ex.StackTrace);
+                }
+            } while (true);
         }
     }
 }
