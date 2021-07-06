@@ -63,6 +63,8 @@ namespace AutoTrader.Desktop
             traderThread = new TraderThread();
             Task.Run(traderThread.Trade);
 
+            while (true);
+
             base.OnInitialized(e);
         }
 

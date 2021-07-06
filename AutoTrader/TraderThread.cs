@@ -25,62 +25,68 @@ namespace AutoTrader
 
         public void Trade()
         {
-            NiceHashApi niceHashApi = GetNiceHashApi();
-            Logger.Info($"NiceHash AutoTrader {VERSION}");
-
-            niceHashApi.QueryServerTime();
-            Logger.Info("Server time:" + niceHashApi.ServerTime);
-
-            CreateTraders(niceHashApi, shouldInit: true);
-
-            bool first = true;
-            do
+            try
             {
-                bool isBenchMarking = TradingBotManager.IsBenchmarking;
+                NiceHashApi niceHashApi = GetNiceHashApi();
+                Logger.Info($"NiceHash AutoTrader {VERSION}");
 
-                if (isBenchMarking)
-                {
-                    BenchmarkBot.GenerateRules();
-                    TradingBotManager.BenchmarkIteration++;
-                }
+                niceHashApi.QueryServerTime();
+                Logger.Info("Server time:" + niceHashApi.ServerTime);
 
-                if (!isBenchMarking)
-                {
-                    NiceHashTraderBase.FiatRate = TradingBotManager.GetTotalFiatBalance().Item2;
-                    TradingBotManager.RefreshBalanceHistory();
-                }
+                CreateTraders(niceHashApi, shouldInit: true);
 
-                foreach (ITrader trader in Traders.OrderByDescending(t => t.Order).ToList())
+                bool first = true;
+                do
                 {
-                    try
+                    bool isBenchMarking = TradingBotManager.IsBenchmarking;
+
+                    if (isBenchMarking)
                     {
-                        trader.Trade((TradingBotManager.IsBenchmarking || trader.Order >= 10) && !first);
+                        BenchmarkBot.GenerateRules(new BenchmarkData());
+                        TradingBotManager.BenchmarkIteration++;
                     }
-                    catch (Exception ex)
+
+                    if (!isBenchMarking)
                     {
-                        Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
+                        NiceHashTraderBase.FiatRate = TradingBotManager.GetTotalFiatBalance().Item2;
+                        TradingBotManager.RefreshBalanceHistory();
                     }
-                }
 
-                double sumProfit = Traders.Where(t => t.Order > 0).Sum(t => t.Order);
-
-                if (isBenchMarking && TradingBotManager.IsBenchmarking)
-                {
-                    if (sumProfit > BenchmarkBot.MaxBenchProfit)
+                    foreach (ITrader trader in Traders.OrderByDescending(t => t.Order).ToList())
                     {
-                        BenchmarkBot.MaxBenchProfit = sumProfit;
-                        BenchmarkBot.MaxBenchProfitData = BenchmarkBot.Data;
+                        try
+                        {
+                            trader.Trade((TradingBotManager.IsBenchmarking || trader.Order >= 10) && !first);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
+                        }
                     }
-                    Logger.LogBenchmarkIteration(TradingBotManager.BenchmarkIteration, BenchmarkBot.MaxBenchProfit);
-                }
-                else
-                {
-                    Logger.LogBenchmarkIteration(0, sumProfit);
-                }
 
-                first = false;
-                Thread.Sleep(TRADE_WAIT);
-            } while (true);
+                    double sumProfit = Traders.Where(t => t.Order > 0).Sum(t => t.Order);
+
+                    if (isBenchMarking && TradingBotManager.IsBenchmarking)
+                    {
+                        if (sumProfit > BenchmarkBot.MaxBenchProfit)
+                        {
+                            BenchmarkBot.MaxBenchProfit = sumProfit;
+                            BenchmarkBot.MaxBenchProfitData = BenchmarkBot.Data;
+                        }
+                        Logger.LogBenchmarkIteration(TradingBotManager.BenchmarkIteration, BenchmarkBot.MaxBenchProfit);
+                    }
+                    else
+                    {
+                        Logger.LogBenchmarkIteration(0, sumProfit);
+                    }
+
+                    first = false;
+                    Thread.Sleep(TRADE_WAIT);
+                } while (true);
+            } catch (Exception ex)
+            {
+                Logger.Err(ex.Message + " " + ex.StackTrace);
+            }
         }
     }
 }

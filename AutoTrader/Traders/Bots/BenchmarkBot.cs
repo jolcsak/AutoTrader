@@ -98,39 +98,35 @@ namespace AutoTrader.Traders.Bots
             data = null;
         }
 
-        public static void GenerateRules()
+        public static void GenerateRules(BenchmarkData bData)
         {
-            data = new BenchmarkData();
-
-            int subRuleCount = subRules.Length;
-
-            buyRule = Rule.Create(c => c.Index > 0 && data != null);
-            sellRule = Rule.Create(c => c.Index > 0 && data != null);
-
-            int numberOfRules = data.Next(10, "NumberOfRules");
-            for (int i = 0; i < numberOfRules; i++)
-            {
-                buyRule = buyRule.And(subRules[data.Next(subRuleCount - 1, "BuySubRule_" + i)]);
-                sellRule = sellRule.And(subRules[data.Next(subRuleCount - 1, "SellSubRule_" + i)]);
-            }
-        }
-
-        public static void LoadBechmarkRule()
-        {
-            data = MaxBenchProfitData;
+            data = bData;
 
             buyRule = Rule.Create(c => c.Index > 0 && data != null);
             sellRule = Rule.Create(c => c.Index > 0 && data != null);
 
             if (data != null)
             {
-                int numberOfRules = data.Sequence["NumberOfRules"];
-                for (int i = 0; i < numberOfRules; i++)
+                int subRuleCount = subRules.Length;
+
+                int numberOfRules = data.Next(10, "NumberOfRules");
+
+                buyRule = subRules[data.Next(numberOfRules - 1, "BuySubRule_" + 0)];
+                sellRule = subRules[data.Next(numberOfRules - 1, "SellSubRule_" + 0)];
+
+                for (int i = 1; i < numberOfRules; i++)
                 {
-                    buyRule = buyRule.And(subRules[data.Next(numberOfRules - 1, "BuySubRule_" + i)]);
-                    sellRule = sellRule.And(subRules[data.Next(numberOfRules - 1, "SellSubRule_" + i)]);
+                    bool isAndBuy = data.Next(5, "isAndBuy_" + i) != 1;
+                    bool isAndSell = data.Next(5, "isAndSell_" + i) != 1;
+                    var buySubRule = subRules[data.Next(subRuleCount - 1, "BuySubRule_" + i)];
+                    var sellSubRule = subRules[data.Next(subRuleCount - 1, "SellSubRule_" + i)];
+                    buyRule = isAndBuy ? buyRule.And(buySubRule) : buyRule.Or(buySubRule);
+                    sellRule = isAndSell ? sellRule.And(sellRule) : sellRule.Or(sellRule);
                 }
-            } 
+
+                buyRule = Rule.Create(c => c.Index > 0 && data != null).And(buyRule);
+                sellRule = Rule.Create(c => c.Index > 0 && data != null).And(sellRule);
+            }
         }
 
         public override string Name => nameof(BenchmarkBot);
@@ -142,11 +138,11 @@ namespace AutoTrader.Traders.Bots
                 {
                     if (TradingBotManager.IsBenchmarking)
                     {
-                        GenerateRules();
+                        GenerateRules(new BenchmarkData());
                     }
                     else
                     {
-                        LoadBechmarkRule();
+                        GenerateRules(MaxBenchProfitData);
                     }
                 }
                 return buyRule;
@@ -160,11 +156,11 @@ namespace AutoTrader.Traders.Bots
                 {
                     if (TradingBotManager.IsBenchmarking)
                     {
-                        GenerateRules();
+                        GenerateRules(new BenchmarkData());
                     }
                     else
                     {
-                        LoadBechmarkRule();
+                        GenerateRules(MaxBenchProfitData);
                     }
                 }
                 return sellRule;
