@@ -19,8 +19,7 @@ namespace AutoTrader.Traders.Bots
         public override Predicate<IIndexedOhlcv> SellRule =>
                         Rule.Create(c => c.Index > 0).
                         And(c => c.Get<ExponentialMovingAverage>(5)[c.Index].Tick > c.Get<ExponentialMovingAverage>(20)[c.Index].Tick).
-                        And(c => c.Get<ExponentialMovingAverage>(5)[c.Index].Tick > c.Get<SimpleMovingAverage>(20)[c.Index].Tick).
-                        And(c => c.IsEmaBullish(24));
+                        And(c => c.Get<ExponentialMovingAverage>(5)[c.Index].Tick > c.Get<SimpleMovingAverage>(20)[c.Index].Tick);
                         //And(c => c.IsMacdBullishCross());
 
         //public override Predicate<IIndexedOhlcv> SellRule =>
@@ -32,7 +31,8 @@ namespace AutoTrader.Traders.Bots
                 And(c => c.Get<ExponentialMovingAverage>(5)[c.Index].Tick < c.Get<ExponentialMovingAverage>(20)[c.Index].Tick).
                 And(c => c.Get<ExponentialMovingAverage>(5)[c.Index].Tick < c.Get<SimpleMovingAverage>(20)[c.Index].Tick).
                 And(c => c.IsMacdBearishCross()).
-                And(c => c.IsRsiOversold(4));
+                And(c => c.IsRsiOversold(4)).
+                And(c => c.IsEmaBullish(24));
 
 
         //public override Predicate<IIndexedOhlcv> BuyRule =>

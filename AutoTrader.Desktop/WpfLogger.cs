@@ -356,7 +356,7 @@ namespace AutoTrader.Desktop
 
                 if (SelectedTradeOrder != null)
                 {
-                    new PriceLine(graph, "Selected price", prices.Select(pp => pp.Close), (decimal)SelectedTradeOrder.Price, Colors.Brown).Draw();
+                    //new PriceLine(graph, "Selected price", prices.Select(pp => pp.Close), (decimal)SelectedTradeOrder.Price, Colors.Brown).Draw();
                 }
             }
         }

@@ -56,7 +56,7 @@ namespace AutoTrader
                     {
                         try
                         {
-                            trader.Trade((TradingBotManager.IsBenchmarking || trader.Order >= 10) && !first);
+                            trader.Trade((TradingBotManager.IsBenchmarking || trader.Order > 0) && !first);
                         }
                         catch (Exception ex)
                         {
