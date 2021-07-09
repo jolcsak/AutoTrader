@@ -82,7 +82,7 @@ namespace AutoTrader.Traders
             BenchmarkBot = new BenchmarkBot(this);
         }
 
-        public CandleStick Refresh(bool add = false)
+        public CandleStick Refresh(ActualPrice actualPrice, bool add = false)
         {
             pricesChanged = false;
             bool isPricesEmpty = Prices == null;
@@ -103,7 +103,7 @@ namespace AutoTrader.Traders
             CandleStick lastCandleStick = null;
             if (!IsBenchmarking)
             {
-                lastCandleStick = RefreshPrices(add);
+                lastCandleStick = RefreshPrices(add, actualPrice);
 
                 if (lastCandleStick != null || isPricesEmpty)
                 {
@@ -250,7 +250,7 @@ namespace AutoTrader.Traders
             return new Tuple<double, double>(0, 0);
         }
 
-        private CandleStick RefreshPrices(bool add)
+        private CandleStick RefreshPrices(bool add, ActualPrice actualPrice)
         {
             CandleStick[] candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + BtcTrader.BTC, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow, 1);
             CandleStick lastCandleStick = candleSticks.LastOrDefault();
@@ -262,7 +262,7 @@ namespace AutoTrader.Traders
                     Prices.RemoveAt(Prices.Count - 1);
                 }
 
-                Prices.Add(new Candle(lastCandleStick.Date, (decimal)lastCandleStick.open, (decimal)lastCandleStick.high, (decimal)lastCandleStick.low, (decimal)lastCandleStick.close, (decimal)lastCandleStick.volume));
+                Prices.Add(new Candle(lastCandleStick.Date, (decimal)lastCandleStick.open, (decimal)lastCandleStick.high, (decimal)lastCandleStick.low, (decimal)(actualPrice?.SellPrice??lastCandleStick.close), (decimal)lastCandleStick.volume));
                 DateProvider.MaxDate = lastCandleStick.Date;
                 Dates.Add(DateProvider.MaxDate);
                 if (add) {

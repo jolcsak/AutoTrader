@@ -138,18 +138,6 @@ namespace AutoTrader.Desktop
             }
         }
 
-        private void aoRatio_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            //AoBot.Ratio = e.NewValue;
-            if (CurrentTrader != null)
-            {
-                foreach (ITrader trader in TraderThread.Traders) {
-                    trader.BotManager.Refresh();
-                }
-                currencies_SelectedCellsChanged(sender, null);
-            }
-        }
-
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             currencies_SelectedCellsChanged(sender, null);
@@ -400,7 +388,7 @@ namespace AutoTrader.Desktop
         private void RefreshAllTraders()
         {
             Store.SaveSettings();
-            CurrentTrader?.BotManager.Refresh();
+            CurrentTrader?.BotManager.Refresh(null);
             Logger.RefreshGraph(CurrentTrader);
             Logger.LogProjectedIncome(CurrentTrader);
         }

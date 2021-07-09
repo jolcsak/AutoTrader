@@ -71,7 +71,7 @@ namespace AutoTrader.Traders
 
                 if (!TradingBotManager.IsBenchmarking)
                 {
-                    BotManager.Refresh(isNewPeriod);
+                    BotManager.Refresh(ActualPrice, isNewPeriod);
                 }
 
                 if (isNewPeriod)
@@ -87,6 +87,8 @@ namespace AutoTrader.Traders
                         {
                             Logger.Info($"{TargetCurrency}: Buy at {DateTime.Now} : prev={PreviousPrice},curr={ActualPrice}");
                             Logger.Info(BotManager.LastTrade.ToString());
+
+                            /// TODO: ActualPrice != BotManager.LastTrade.Price!!!!
                             Buy(MinBtcTradeAmount, ActualPrice, BotManager.LastTrade.Period, BotManager.LastTrade.Bot);
                             lastBuy = BotManager.LastTrade.Date;
                         }
@@ -96,7 +98,7 @@ namespace AutoTrader.Traders
 
             if (TradingBotManager.IsBenchmarking)
             {
-                BotManager.Refresh(isNewPeriod);
+                BotManager.Refresh(ActualPrice, isNewPeriod);
             }
             else
             {

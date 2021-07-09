@@ -15,7 +15,7 @@ namespace AutoTrader.Traders.Bots
         private const int PRICE_PERCENTAGE_CHANGE = 2;
 
         private const int STOP_PLOSS_PERCENTAGE = -8;
-        private const int MAX_AGE_IN_HOURS = 16;
+        private const int MAX_AGE_IN_HOURS = 4;
 
         public override string Name => nameof(SpikeBot);
         public override Predicate<IIndexedOhlcv> BuyRule =>
