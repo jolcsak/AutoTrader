@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Net;
 using AutoTrader.Log;
 using RestSharp;
+using Newtonsoft.Json;
 
 namespace AutoTrader.Api
 {
@@ -151,7 +152,7 @@ namespace AutoTrader.Api
                 
                 if (!response.IsSuccessful)
                 {
-                    if (logErrors)
+                    if (logErrors && response.StatusCode != HttpStatusCode.PreconditionFailed)
                     {
                         Logger.Err($"Request failed: Status={response.StatusCode}, URL={response.ResponseUri}, RespStatus={response.ResponseStatus}, Error={response.ErrorMessage}, Desc={response.StatusDescription}, Content={response.Content}");
                     }
