@@ -74,6 +74,11 @@ namespace AutoTrader.Api
             return Get<CandleStick[]>($"/exchange/api/v2/info/candlesticks?market={market}&from={fromSec}&to={toSec}&resolution={resolution}");
         }
 
+        public Activity[] GetActivities(string currency, ActivityType activityType, int limit=100)
+        {
+            return Get<Activity[]>($"/main/api/v2/accounting/activity/{currency}?limit={limit}&stage={activityType.ToString().ToUpper()}");
+        }
+
         public static DateTime UnixTimestampToDateTime(long unixTime)
         {
             long unixTimeStampInTicks = unixTime * TimeSpan.TicksPerSecond;

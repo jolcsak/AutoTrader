@@ -105,6 +105,7 @@ namespace AutoTrader.Traders
                 Sell(ActualPrice);
                 HandleLimitOrders(ActualPrice);
 
+                RefreshTrades();
                 SaveOrderBooksPrices();
 
                 PreviousPrice = ActualPrice;
@@ -114,6 +115,38 @@ namespace AutoTrader.Traders
             }
 
             Logger.LogCurrency(this, ActualPrice);
+        }
+
+        private void RefreshTrades()
+        {
+            foreach(var tradeOrder in TradeOrders.Where(to => to.State == TradeOrderState.ENTERED || to.State == TradeOrderState.OPEN || to.State == TradeOrderState.OPEN_ENTERED))
+            {
+                OrderTrade orderTrade = null;
+                switch (tradeOrder.State)
+                {
+                    case TradeOrderState.OPEN_ENTERED:
+                    case TradeOrderState.OPEN:
+                        orderTrade = NiceHashApi.GetOrder(TargetCurrency, tradeOrder.BuyOrderId);
+                        break;
+                    case TradeOrderState.ENTERED:
+                        orderTrade = NiceHashApi.GetOrder(TargetCurrency, tradeOrder.SellOrderId);
+                        break;
+                }
+                if (orderTrade != null)
+                {
+                    switch (orderTrade.state)
+                    {
+                        case "CANCELLED":
+                            tradeOrder.State = TradeOrderState.CANCELLED;
+                            Store.OrderBooks.SaveOrUpdate(tradeOrder);
+                            break;
+                        case "FULL":
+                            tradeOrder.State = TradeOrderState.CLOSED;
+                            Store.OrderBooks.SaveOrUpdate(tradeOrder);
+                            break;
+                    }
+                }
+            }
         }
 
         private void LogProfit()
