@@ -45,6 +45,7 @@ namespace AutoTrader.Desktop
 
         public MainWindow()
         {
+            //this.SetValue(RenderOptions.EdgeModeProperty, EdgeMode.Aliased);
             logWindow = new LogWindow(this);
             InitializeComponent();
         }
