@@ -52,17 +52,7 @@ namespace AutoTrader
                         TradingBotManager.RefreshBalanceHistory();
                     }
 
-                    foreach (ITrader trader in Traders.OrderByDescending(t => t.Order).ToList())
-                    {
-                        try
-                        {
-                            trader.Trade((TradingBotManager.IsBenchmarking || trader.Order > 0) && !first);
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
-                        }
-                    }
+                    Traders.OrderByDescending(t => t.Order).AsParallel().ForAll(t => Trade(first, t));
 
                     double sumProfit = Traders.Where(t => t.Order > 0).Sum(t => t.Order);
 
@@ -87,6 +77,18 @@ namespace AutoTrader
                     Logger.Err(ex.Message + " " + ex.StackTrace);
                 }
             } while (true);
+        }
+
+        private void Trade(bool first, ITrader trader)
+        {
+            try
+            {
+                trader.Trade((TradingBotManager.IsBenchmarking || trader.Order > 0) && !first);
+            }
+            catch (Exception ex)
+            {
+                Logger.Err($"Error in trader: {trader.TraderId}, ex: {ex.Message} {ex.StackTrace ?? string.Empty}");
+            }
         }
     }
 }
