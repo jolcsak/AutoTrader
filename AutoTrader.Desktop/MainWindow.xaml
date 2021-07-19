@@ -39,7 +39,7 @@
                         <ColumnDefinition Width="58"/>
                         <ColumnDefinition Width="66"/>
                         <ColumnDefinition Width="82"/>
-                        <ColumnDefinition Width="66"/>
+                        <ColumnDefinition Width="166"/>
                         <ColumnDefinition Width="66"/>
                     </Grid.ColumnDefinitions>
                     <Label Content="Total balance:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="0"/>

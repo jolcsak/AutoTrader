@@ -430,10 +430,10 @@ namespace AutoTrader.Desktop
             });
         }
 
-        public void LogBenchmarkIteration(int iteration, double benchProfit)
+        public void LogBenchmarkIteration(int iteration, double benchProfit, double storedProfit)
         {
             Dispatcher.BeginInvoke(() => benchmarkIterationLabel.Content = iteration.ToString());
-            Dispatcher.BeginInvoke(() => benchProfitLabel.Content = benchProfit.ToString("N2"));
+            Dispatcher.BeginInvoke(() => benchProfitLabel.Content = $"{benchProfit.ToString("N0")} ({storedProfit.ToString("N0")})");
         }
     }
 }

@@ -59,11 +59,11 @@ namespace AutoTrader
 
                     if (isBenchMarking && TradingBotManager.IsBenchmarking)
                     {
+                        var benchmarkData = Store.BenchmarkDataList.GetBenchmarkData();
                         if (sumProfit > BenchmarkBot.MaxBenchProfit)
                         {
                             BenchmarkBot.MaxBenchProfit = sumProfit;
                             BenchmarkBot.MaxBenchProfitData = BenchmarkBot.Data;
-                            var benchmarkData = Store.BenchmarkDataList.GetBenchmarkData();
                             if (benchmarkData.Profit < sumProfit)
                             {
                                 benchmarkData.Profit = sumProfit;
@@ -71,11 +71,11 @@ namespace AutoTrader
                                 Store.BenchmarkDataList.SaveOrUpdate(benchmarkData);
                             }
                         }
-                        Logger.LogBenchmarkIteration(TradingBotManager.BenchmarkIteration, BenchmarkBot.MaxBenchProfit);
+                        Logger.LogBenchmarkIteration(TradingBotManager.BenchmarkIteration, BenchmarkBot.MaxBenchProfit, benchmarkData.Profit);
                     }
                     else
                     {
-                        Logger.LogBenchmarkIteration(0, sumProfit);
+                        Logger.LogBenchmarkIteration(0, sumProfit, sumProfit);
                     }
 
                     first = false;
