@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +17,10 @@ namespace AutoTrader.Desktop
 {
     public class WpfLogger : ITradeLogger
     {
+        private const string LogPath = @"C:\Temp";
+        private const string LogFolder = "AutoTrader";
+        private const string LogFile = "AutoTrader.Log";
+
         private const string INFO = "INFO";
         private const string WARN = "WARNING";
         private const string ERR = "ERROR";
@@ -55,10 +60,11 @@ namespace AutoTrader.Desktop
         private static Label benchmarkIterationLabel;
         private static Label benchProfitLabel;
 
-
         private static readonly ObservableCollection<Currency> currencyList = new ObservableCollection<Currency>();
         private static readonly ObservableCollection<TradeOrder> openedOrdersData = new ObservableCollection<TradeOrder>();
         private static readonly ObservableCollection<TradeOrder> closedOrdersData = new ObservableCollection<TradeOrder>();
+
+        private static string LogFilePath;
 
         public SimpleMovingAverage SmaSlow { get; private set; }
         public SimpleMovingAverage SmaFast { get; private set; }
@@ -145,6 +151,34 @@ namespace AutoTrader.Desktop
 
             benchmarkIterationLabel = benchmarkIteration;
             benchProfitLabel = benchProfit;
+
+            InitLogFile();
+        }
+
+        private static void InitLogFile()
+        {
+            if (Directory.Exists(LogPath))
+            {
+                string fullLogPath = Path.Combine(LogPath, LogFolder);
+                if (!Directory.Exists(fullLogPath))
+                {
+                    Directory.CreateDirectory(fullLogPath);
+                }
+                LogFilePath = Path.Combine(fullLogPath, LogFile);
+                WriteToLogFile("-----------------------------------------------------------------------------------------------------------------");
+            }
+        }
+
+        private static void WriteToLogFile(string message)
+        {
+            if (LogFilePath != null)
+            {
+                try
+                {
+                    File.AppendAllText(LogFilePath, message);
+                }
+                catch { }
+            }
         }
 
         public static void SetConsole(TextBox consoleInstance)
@@ -169,6 +203,7 @@ namespace AutoTrader.Desktop
                 Dispatcher?.BeginInvoke(() => console.AppendText(GetFormattedString(ERR, msg)));
                 ScrollToEnd();
             }
+            WriteToLogFile(msg);
         }
 
         public void Info(string msg)
@@ -178,6 +213,7 @@ namespace AutoTrader.Desktop
                 Dispatcher?.BeginInvoke(() => console.AppendText(GetFormattedString(INFO, msg)));
                 ScrollToEnd();
             }
+            WriteToLogFile(msg);
         }
 
         public void Warn(string msg)
@@ -187,6 +223,7 @@ namespace AutoTrader.Desktop
                 Dispatcher?.BeginInvoke(() => console.AppendText(GetFormattedString(WARN, msg)));
                 ScrollToEnd();
             }
+            WriteToLogFile(msg);
         }
 
         private string GetFormattedString(string level, string message)

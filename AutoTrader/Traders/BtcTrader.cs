@@ -140,10 +140,6 @@ namespace AutoTrader.Traders
                             tradeOrder.State = TradeOrderState.CANCELLED;
                             Store.OrderBooks.SaveOrUpdate(tradeOrder);
                             break;
-                        case "FULL":
-                            tradeOrder.State = TradeOrderState.CLOSED;
-                            Store.OrderBooks.SaveOrUpdate(tradeOrder);
-                            break;
                     }
                 }
             }
@@ -179,7 +175,7 @@ namespace AutoTrader.Traders
                     SellType sellType = seller.ShouldSell(actualPrice, tradeOrder, BotManager.LastTrade);
                     if (sellType != SellType.None)
                     {
-                        Logger.Info($"{TargetCurrency}: {sellType} sell at price {actualPrice}, yield: {tradeOrder.ActualYield}");
+                        Logger.Info($"{TargetCurrency}: {sellType} sell at price {actualPrice.BuyPrice}, yield: {tradeOrder.ActualYield}");
                         Sell(actualPrice, tradeOrder);
                     }
                 }
