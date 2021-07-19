@@ -165,7 +165,6 @@ namespace AutoTrader.Desktop
                     Directory.CreateDirectory(fullLogPath);
                 }
                 LogFilePath = Path.Combine(fullLogPath, LogFile);
-                WriteToLogFile("-----------------------------------------------------------------------------------------------------------------" + Environment.NewLine);
             }
         }
 
@@ -175,7 +174,7 @@ namespace AutoTrader.Desktop
             {
                 try
                 {
-                    File.AppendAllText(LogFilePath, message);
+                    File.AppendAllText(LogFilePath, message + Environment.NewLine);
                 }
                 catch { }
             }
