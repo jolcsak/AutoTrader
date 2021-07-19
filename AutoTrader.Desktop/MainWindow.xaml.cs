@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -388,7 +389,9 @@ namespace AutoTrader.Desktop
         private void RefreshAllTraders()
         {
             Store.SaveSettings();
-            CurrentTrader?.BotManager.Refresh(null);
+
+            TraderCollection.Traders.AsParallel().ForAll(t => t.BotManager.Refresh());
+
             Logger.RefreshGraph(CurrentTrader);
             Logger.LogProjectedIncome(CurrentTrader);
         }

@@ -146,6 +146,16 @@ namespace AutoTrader.Traders
             return lastCandleStick;
         }
 
+        public void Refresh()
+        {
+            if (Prices?.Count > 0)
+            {
+                bots = GetEnabledBots();
+                Trades = new List<TradeItem>();
+                MergeBotRules(bots);
+            }
+        }
+
         public static void RefreshBalanceHistory()
         {
             var storedBalances = Store.TotalBalances.GetTotalBalances().Where(tb => tb.FiatBalance > 1).ToList();
@@ -253,7 +263,7 @@ namespace AutoTrader.Traders
         private CandleStick RefreshPrices(bool add, ActualPrice actualPrice)
         {
             CandleStick[] candleSticks = NiceHashApi.GetCandleSticks(trader.TargetCurrency + BtcTrader.BTC, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow, 1);
-            CandleStick lastCandleStick = candleSticks.LastOrDefault();
+            CandleStick lastCandleStick = candleSticks?.LastOrDefault();
             if (lastCandleStick != null)
             {
                 pricesChanged = true;
