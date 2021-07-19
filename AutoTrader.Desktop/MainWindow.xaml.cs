@@ -377,6 +377,13 @@ namespace AutoTrader.Desktop
         private void bBotEnabled_Checked(object sender, RoutedEventArgs e)
         {
             TradeSettings.BBotEnabled = true;
+
+            var benchmarkData = Store.BenchmarkDataList.GetBenchmarkData();
+            if (!string.IsNullOrEmpty(benchmarkData?.Data))
+            {
+                BenchmarkBot.MaxBenchProfitData = JsonConvert.DeserializeObject<Traders.Bots.BenchmarkData>(benchmarkData.Data);
+            }
+
             RefreshAllTraders();
         }
 

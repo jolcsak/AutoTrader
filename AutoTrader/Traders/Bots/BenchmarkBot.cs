@@ -1,5 +1,4 @@
 ﻿using System;
-using AutoTrader.Db.Entities;
 using Trady.Analysis;
 using Trady.Analysis.Extension;
 using Trady.Core.Infrastructure;
@@ -87,7 +86,7 @@ namespace AutoTrader.Traders.Bots
                     };
         }
 
-        public BenchmarkBot(TradingBotManager botManager) : base(botManager, TradePeriod.Long)
+        public BenchmarkBot(TradingBotManager botManager) : base(botManager, TradePeriod.Short)
         {
         }
 
@@ -167,6 +166,6 @@ namespace AutoTrader.Traders.Bots
             }            
         }
 
-        public override SellType ShouldSell(ActualPrice actualPrice, TradeOrder tradeOrder, TradeItem lastTrade) => SellType.None;
+        //public override SellType ShouldSell(ActualPrice actualPrice, TradeOrder tradeOrder, TradeItem lastTrade) => SellType.None;
     }
 }

@@ -5,6 +5,7 @@ using AutoTrader.Traders;
 using AutoTrader.Api;
 using AutoTrader.Log;
 using AutoTrader.Traders.Bots;
+using Newtonsoft.Json;
 
 namespace AutoTrader
 {
@@ -62,6 +63,13 @@ namespace AutoTrader
                         {
                             BenchmarkBot.MaxBenchProfit = sumProfit;
                             BenchmarkBot.MaxBenchProfitData = BenchmarkBot.Data;
+                            var benchmarkData = Store.BenchmarkDataList.GetBenchmarkData();
+                            if (benchmarkData.Profit < sumProfit)
+                            {
+                                benchmarkData.Profit = sumProfit;
+                                benchmarkData.Data = JsonConvert.SerializeObject(BenchmarkBot.MaxBenchProfitData);
+                                Store.BenchmarkDataList.SaveOrUpdate(benchmarkData);
+                            }
                         }
                         Logger.LogBenchmarkIteration(TradingBotManager.BenchmarkIteration, BenchmarkBot.MaxBenchProfit);
                     }

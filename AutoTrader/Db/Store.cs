@@ -19,6 +19,8 @@ namespace AutoTrader.Db
 
         public TotalBalances TotalBalances { get; private set; }
 
+        public BenchmarkDataList BenchmarkDataList { get; private set; }
+
         public TradeSettings TradeSettings { get; private set; }
 
         public void SaveSettings()
@@ -36,7 +38,7 @@ namespace AutoTrader.Db
 
         private Store()
         {
-            Con = R.Connection().Hostname("jolcsak-nas").Port(32773).Timeout(20).Connect();
+            Con = R.Connection().Hostname("jolcsak-nas").Port(32773).Timeout(10).Connect();
 
             Instance = this;
 
@@ -45,11 +47,12 @@ namespace AutoTrader.Db
             LastPrices = new LastPrices();
             TotalBalances = new TotalBalances();
             TradeSettings = new TradeSettings();
+            BenchmarkDataList = new BenchmarkDataList();
         }
 
         public static Store Connect()
         {
-            return Store.Instance ?? new Store();
+            return Instance ?? new Store();
         }
 
         ~Store()
