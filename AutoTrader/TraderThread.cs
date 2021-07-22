@@ -6,6 +6,7 @@ using AutoTrader.Api;
 using AutoTrader.Log;
 using AutoTrader.Traders.Bots;
 using Newtonsoft.Json;
+using AutoTrader.Util;
 
 namespace AutoTrader
 {
@@ -53,7 +54,7 @@ namespace AutoTrader
                         TradingBotManager.RefreshBalanceHistory();
                     }
 
-                    Traders.OrderByDescending(t => t.Order).AsParallel().ForAll(t => Trade(first, t));
+                    Traders.OrderByDescending(t => t.Order).ForAll(t => Trade(first, t), isParallel: true);
 
                     double sumProfit = Traders.Where(t => t.Order > 0).Sum(t => t.Order);
 

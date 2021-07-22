@@ -181,21 +181,21 @@ namespace AutoTrader.Api
             {
                 if (int.TryParse(timeWindow, out var time))
                 {
-                    Logger.Info($"Waiting {time} seconds before retry...");
+                    //Logger.Info($"Waiting {time} seconds before retry...");
                     time *= 1000;
                     Thread.Sleep(time);
                 }
                 else
                 {
-                    Logger.Err($"retry_after ({timeWindow}) in header not a valid number!");
-                    Logger.Info($"Waiting the default {DEFAULT_TOO_MANY_REQUESTS_RETRY_TIME} seconds before retry...");
+                    //Logger.Err($"retry_after ({timeWindow}) in header not a valid number!");
+                    //Logger.Info($"Waiting the default {DEFAULT_TOO_MANY_REQUESTS_RETRY_TIME} seconds before retry...");
                     Thread.Sleep(DEFAULT_TOO_MANY_REQUESTS_RETRY_TIME);
                 }
             }
             else
             {
-                Logger.Err($"retry_after not found in header!");
-                Logger.Info($"Waiting the default {DEFAULT_TOO_MANY_REQUESTS_RETRY_TIME} seconds before retry...");
+                //Logger.Err($"retry_after not found in header!");
+                //Logger.Info($"Waiting the default {DEFAULT_TOO_MANY_REQUESTS_RETRY_TIME} seconds before retry...");
                 Thread.Sleep(DEFAULT_TOO_MANY_REQUESTS_RETRY_TIME);
             }
 

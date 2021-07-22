@@ -9,9 +9,9 @@ namespace AutoTrader.Traders.Bots
 {
     public class TradingBotBase : ITradingBot
     {
-        protected static int ShortStopLossPercentage = -1;
+        protected static int ShortStopLossPercentage = -5;
 
-        protected static int LongStopLossPercentage = -1;
+        protected static int LongStopLossPercentage = -5;
 
         protected static int ShortTradeMaxAgeInHours = 24;
 
@@ -21,7 +21,7 @@ namespace AutoTrader.Traders.Bots
 
         protected static int LongTradeSellAgeInHours = 24 * 4;
 
-        protected static decimal MinRateOfChange = 0.03M;
+        protected static decimal MinRateOfChange = 0.05M;
 
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 

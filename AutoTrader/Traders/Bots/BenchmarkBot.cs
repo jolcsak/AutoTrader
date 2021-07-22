@@ -144,6 +144,9 @@ namespace AutoTrader.Traders.Bots
                         GenerateRules(MaxBenchProfitData);
                     }
                 }
+
+                buyRule = buyRule.And(r => r.IsEmaBullish(24));
+
                 return buyRule;
             }
         }

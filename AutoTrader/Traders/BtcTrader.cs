@@ -125,7 +125,6 @@ namespace AutoTrader.Traders
                 switch (tradeOrder.State)
                 {
                     case TradeOrderState.OPEN_ENTERED:
-                    case TradeOrderState.OPEN:
                         orderTrade = NiceHashApi.GetOrder(TargetCurrency, tradeOrder.BuyOrderId);
                         break;
                     case TradeOrderState.ENTERED:
@@ -137,7 +136,11 @@ namespace AutoTrader.Traders
                     switch (orderTrade.state)
                     {
                         case "CANCELLED":
-                            tradeOrder.State = TradeOrderState.CANCELLED;
+                            tradeOrder.State = tradeOrder.State == TradeOrderState.OPEN_ENTERED ? TradeOrderState.OPEN : TradeOrderState.CANCELLED;
+                            Store.OrderBooks.SaveOrUpdate(tradeOrder);
+                            break;
+                        case "FULL":
+                            tradeOrder.State = tradeOrder.State == TradeOrderState.OPEN_ENTERED ? TradeOrderState.OPEN : TradeOrderState.CLOSED;
                             Store.OrderBooks.SaveOrUpdate(tradeOrder);
                             break;
                     }
