@@ -63,7 +63,8 @@ namespace AutoTrader
 
                     Traders.OrderByDescending(t => t.Order).ForAll(t => Trade(first, t), isParallel: true);
 
-                    double sumProfit = Traders.Where(t => t.Order > 0).Sum(t => t.Order);
+                    var profitableTraders = Traders.Where(t => t.Order > 0).ToList();
+                    double sumProfit = Traders.Count(t => t.Order > 0) > 5 ? profitableTraders.Sum(t => t.Order) : 0;
 
                     if (isBenchMarking && TradingBotManager.IsBenchmarking)
                     {
