@@ -100,8 +100,8 @@ namespace AutoTrader.Traders.Bots
             }
             else
             {
-                bool isShortSell = tradeOrder.Period == TradePeriod.Short && (tradeOrder.ActualYield < ShortStopLossPercentage || tradeOrder.BuyDate.AddHours(ShortTradeMaxAgeInHours) < DateTime.Now);
-                bool isLongSell = tradeOrder.Period == TradePeriod.Long && (tradeOrder.ActualYield < LongStopLossPercentage || tradeOrder.BuyDate.AddHours(LongTradeMaxAgeInHours) < DateTime.Now);
+                bool isShortSell = tradeOrder.Period == TradePeriod.Short && (lastTrade?.Type == TradeType.Sell || tradeOrder.BuyDate.AddHours(ShortTradeMaxAgeInHours) < DateTime.Now);
+                bool isLongSell = tradeOrder.Period == TradePeriod.Long && (lastTrade?.Type == TradeType.Sell || tradeOrder.BuyDate.AddHours(LongTradeMaxAgeInHours) < DateTime.Now);
                 if (isShortSell || isLongSell)
                 {
                     if (!IsRsiOverSold && tradeOrder.BuyDate.AddHours(LongTradeMinAgeInHours) < DateTime.Now)

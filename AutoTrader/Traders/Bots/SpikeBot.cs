@@ -43,7 +43,7 @@ namespace AutoTrader.Traders.Bots
             }
             else
             {
-                bool shouldShell = tradeOrder.ActualYield < STOP_PLOSS_PERCENTAGE || enoughOld;
+                bool shouldShell = lastTrade?.Type == TradeType.Sell && enoughOld;
                 if (shouldShell)
                 {
                     return SellType.Loss;
