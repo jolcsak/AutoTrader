@@ -113,15 +113,39 @@ namespace AutoTrader.Traders.Bots
                 buyRule = subRules[data.Next(numberOfRules - 1, "BuySubRule_" + 0)];
                 sellRule = subRules[data.Next(numberOfRules - 1, "SellSubRule_" + 0)];
 
+                Predicate<IIndexedOhlcv> buyOrRule = buyRule;
+                Predicate<IIndexedOhlcv> sellOrRule = sellRule;
+
                 for (int i = 1; i < numberOfRules; i++)
                 {
                     bool isAndBuy = data.Next(5, "isAndBuy_" + i) != 1;
                     bool isAndSell = data.Next(5, "isAndSell_" + i) != 1;
                     var buySubRule = subRules[data.Next(subRuleCount - 1, "BuySubRule_" + i)];
                     var sellSubRule = subRules[data.Next(subRuleCount - 1, "SellSubRule_" + i)];
-                    buyRule = isAndBuy ? buyRule.And(buySubRule) : buyRule.Or(buySubRule);
-                    sellRule = isAndSell ? sellRule.And(sellRule) : sellRule.Or(sellRule);
+                    
+                    if (isAndBuy)
+                    {
+                        buyOrRule = buyOrRule.And(buySubRule);
+                    }
+                    else
+                    {
+                        buyRule = buyRule.Or(buyOrRule);
+                        buyOrRule = buySubRule;
+                    }
+
+                    if (isAndSell)
+                    {
+                        sellOrRule = sellOrRule.And(sellSubRule);
+                    }
+                    else
+                    {
+                        sellRule = sellRule.Or(sellOrRule);
+                        sellOrRule = sellSubRule;
+                    }
                 }
+
+                buyRule = buyRule.Or(buyOrRule);
+                sellRule = sellRule.Or(sellOrRule);
 
                 buyRule = Rule.Create(c => c.Index > 0 && data != null).And(buyRule);
                 sellRule = Rule.Create(c => c.Index > 0 && data != null).And(sellRule);
