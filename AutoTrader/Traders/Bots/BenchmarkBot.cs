@@ -169,7 +169,7 @@ namespace AutoTrader.Traders.Bots
                     }
                 }
 
-                buyRule = buyRule.And(r => r.IsEmaBullish(24));
+                //buyRule = buyRule.And(r => r.IsEmaBullish(24));
 
                 return buyRule;
             }
@@ -192,6 +192,14 @@ namespace AutoTrader.Traders.Bots
                 return sellRule;
             }            
         }
+
+        public static void SwapRules()
+        {
+            var temp = buyRule;
+            buyRule = sellRule;
+            sellRule = temp;
+        }
+        
 
         //public override SellType ShouldSell(ActualPrice actualPrice, TradeOrder tradeOrder, TradeItem lastTrade) => SellType.None;
     }

@@ -527,12 +527,14 @@ namespace AutoTrader.Desktop
             BenchmarkBot.Clear();
         }
 
-        private void saveBenchmarkData_Click(object sender, RoutedEventArgs e)
+        private void clearBenchmarkData_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            if (saveFileDialog.ShowDialog() == true)
+            var benchmarkData = Store.BenchmarkDataList.GetBenchmarkData();
+            BenchmarkBot.MaxBenchProfit = 0;
+            if (benchmarkData.Profit != 0)
             {
-                File.WriteAllText(saveFileDialog.FileName, JsonConvert.SerializeObject(BenchmarkBot.MaxBenchProfitData));
+                benchmarkData.Profit = 0;
+                Store.BenchmarkDataList.SaveOrUpdate(benchmarkData);
             }
         }
     }

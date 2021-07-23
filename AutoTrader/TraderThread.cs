@@ -44,7 +44,14 @@ namespace AutoTrader
 
                     if (isBenchMarking)
                     {
-                        BenchmarkBot.GenerateRules(new BenchmarkData());
+                        if (TradingBotManager.BenchmarkIteration % 2 == 0)
+                        {
+                            BenchmarkBot.GenerateRules(new BenchmarkData());
+                        }
+                        else
+                        {
+                            BenchmarkBot.SwapRules();
+                        }
                         TradingBotManager.BenchmarkIteration++;
                     }
 

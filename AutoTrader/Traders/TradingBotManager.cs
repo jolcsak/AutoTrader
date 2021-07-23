@@ -299,7 +299,7 @@ namespace AutoTrader.Traders
                 if (pricesChanged)
                 {
                     var runner = new Builder()
-                        .Add(isHalf ? Prices.Skip(Prices.Count / 2) : Prices)
+                        .Add(Prices)
                         .Buy(buyRule)
                         .Sell(sellRule)
                         .BuyWithAllAvailableCash()

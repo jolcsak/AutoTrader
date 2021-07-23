@@ -57,7 +57,7 @@
                     <Label x:Name="benchmarkIteration" Content="-" DockPanel.Dock="Top" FontWeight="SemiBold" HorizontalAlignment="Left" Grid.Column="14"/>
                     <Label Content="Max profit:" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="15"/>
                     <Label x:Name="maxBProfit" Content="-" DockPanel.Dock="Top" FontWeight="SemiBold" Grid.Column="16"/>
-                    <Button x:Name="saveBenchmarkData" Content="Save BD" Grid.Column="17" Click="saveBenchmarkData_Click"/>
+                    <Button x:Name="saveBenchmarkData" Content="Clear" Grid.Column="17" Click="clearBenchmarkData_Click"/>
                 </Grid>
             </DockPanel>
             <Grid Margin="4,4,4,4">
