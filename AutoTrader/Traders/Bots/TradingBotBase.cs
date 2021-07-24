@@ -13,13 +13,13 @@ namespace AutoTrader.Traders.Bots
 
         protected static int LongStopLossPercentage = -5;
 
-        protected static int ShortTradeMaxAgeInHours = 24;
+        protected static int ShortTradeMaxAgeInHours = 8;
 
         protected static int LongTradeMinAgeInHours = 0;
 
-        protected static int LongTradeMaxAgeInHours = 24 * 14;
+        protected static int LongTradeMaxAgeInHours = 24;
 
-        protected static int LongTradeSellAgeInHours = 24 * 4;
+        protected static int LongTradeSellAgeInHours = 0;
 
         protected static decimal MinRateOfChange = 0.05M;
 
@@ -91,20 +91,22 @@ namespace AutoTrader.Traders.Bots
 
         public virtual SellType ShouldSell(ActualPrice actualPrice, TradeOrder tradeOrder, TradeItem lastTrade)
         {
+            bool isSell = lastTrade?.Type == TradeType.Sell;
+
             if (actualPrice.BuyPrice >= (tradeOrder.Price * TradeSettings.MinSellYield) && tradeOrder.FiatProfit > 0)
             {
-                if (tradeOrder.Period == TradePeriod.Short || (tradeOrder.Period == TradePeriod.Long && (lastTrade?.Type == TradeType.Sell || tradeOrder.BuyDate.AddHours(LongTradeSellAgeInHours) < DateTime.Now)))
+                if (tradeOrder.Period == TradePeriod.Short || (tradeOrder.Period == TradePeriod.Long && isSell))
                 {
                     return SellType.Profit;
                 }
             }
             else
             {
-                bool isShortSell = tradeOrder.Period == TradePeriod.Short && (lastTrade?.Type == TradeType.Sell || tradeOrder.BuyDate.AddHours(ShortTradeMaxAgeInHours) < DateTime.Now);
-                bool isLongSell = tradeOrder.Period == TradePeriod.Long && (lastTrade?.Type == TradeType.Sell || tradeOrder.BuyDate.AddHours(LongTradeMaxAgeInHours) < DateTime.Now);
-                if (isShortSell || isLongSell)
+                if (!IsRsiOverSold && isSell)
                 {
-                    if (!IsRsiOverSold && tradeOrder.BuyDate.AddHours(LongTradeMinAgeInHours) < DateTime.Now)
+                    bool isShortSell = tradeOrder.Period == TradePeriod.Short && tradeOrder.Age > ShortTradeMaxAgeInHours;
+                    bool isLongSell = tradeOrder.Period == TradePeriod.Long && tradeOrder.Age > LongTradeMaxAgeInHours;
+                    if (isShortSell || isLongSell)
                     {
                         return SellType.Loss;
                     }

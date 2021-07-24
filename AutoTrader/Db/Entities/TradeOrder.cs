@@ -19,6 +19,20 @@ namespace AutoTrader.Db.Entities
         public double Fee { get; set; }
         public double SellPrice { get; set; }
         public DateTime BuyDate { get; set; }
+
+        public int Age
+        {
+            get
+            {
+                if (BuyDate == null)
+                {
+                    return 0;
+                }
+                var age = DateTime.Now - BuyDate;
+                return age.Hours;
+            }
+        }
+
         public DateTime SellDate { get; set; }
         public TradeOrderType Type { get; set; }
         public TradeOrderState State { get; set; }
