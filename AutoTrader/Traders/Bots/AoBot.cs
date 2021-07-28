@@ -20,11 +20,6 @@ namespace AutoTrader.Traders.Bots
                         Rule.Create(c => c.Index > 0).
                         And(c => c.Get<ExponentialMovingAverage>(5)[c.Index].Tick > c.Get<ExponentialMovingAverage>(20)[c.Index].Tick).
                         And(c => c.Get<ExponentialMovingAverage>(5)[c.Index].Tick > c.Get<SimpleMovingAverage>(20)[c.Index].Tick);
-                        //And(c => c.IsMacdBullishCross());
-
-        //public override Predicate<IIndexedOhlcv> SellRule =>
-        //    Rule.Create(c => c.Index > 0 && (c.IsBreakingHighestClose(32) || c.IsBreakingHistoricalLowestClose())).
-        //    And(c => c.IsRsiOverbought(RSI_PERIOD)).And(c => c.Get<RateOfChange>(4)[c.Index].Tick > MinRateOfChange);
 
         public override Predicate<IIndexedOhlcv> BuyRule =>
                 Rule.Create(c => c.Index > 0).
@@ -33,21 +28,6 @@ namespace AutoTrader.Traders.Bots
                 And(c => c.IsMacdBearishCross()).
                 And(c => c.IsRsiOversold(4)).
                 And(c => c.IsEmaBullish(24));
-
-
-        //public override Predicate<IIndexedOhlcv> BuyRule =>
-        //                Rule.Create(c => c.Get<StochasticsMomentumIndex>(3, 3, 14)[c.Index].Tick.IsTrue(t => t > 50)).
-        //                And(c => c.Get<RelativeStrengthIndex>(RSI_PERIOD)[c.Index].Tick.IsTrue(t => t > 50)).
-        //                And(c => c.Get<MovingAverageConvergenceDivergence>(12, 26, 9)[c.Index].Tick.MacdLine > c.Get<MovingAverageConvergenceDivergence>(12, 26, 9)[c.Index].Tick.SignalLine).
-        //                And(c => !c.IsBreakingHighestClose(24)).
-        //                And(c => !c.IsRsiOversold());   
-
-
-        //public override Predicate<IIndexedOhlcv> SellRule =>
-        //    Rule.Create(c => c.Get<MovingAverageConvergenceDivergence>(12, 26, 9)[c.Index].Tick.MacdLine < c.Get<MovingAverageConvergenceDivergence>(12, 26, 9)[c.Index].Tick.SignalLine).
-        //    And(c => !c.IsBreakingLowestClose(24)).
-        //    And(c => !c.IsRsiOverbought()).
-        //    Or(c => c.IsBreakingHighestClose(72));
 
         static AoBot()
         {

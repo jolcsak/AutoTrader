@@ -13,9 +13,7 @@ namespace AutoTrader.Traders.Bots
             Rule.Create(c => c.Index > 10).
             And(c => c.IsSmaBearish(5) && c.IsSmaBullish(24) && c.IsAboveEma(96)).
             And(c => c.Get<MovingAverageConvergenceDivergence>(12, 26, 9)[c.Index].Tick.SignalLine > c.Get<MovingAverageConvergenceDivergence>(12, 26, 9)[c.Index].Tick.MacdLine).
-//            And(c => c.IsBreakingLowestClose(4) || c.IsBreakingLowestClose(12) || c.IsBreakingLowestClose(24) || c.IsBreakingHistoricalLowestClose()).
             And(c => c.Get<RelativeStrengthIndex>(12, 26, 9)[c.Index].Tick.Value >= c.Get<RelativeStrengthIndex>(12, 26, 9)[c.Index - 1].Tick.Value);
-            //And(c => c.Get<RateOfChange>(24)[c.Index].Tick > MinRateOfChange);
         public override Predicate<IIndexedOhlcv> SellRule =>
             Rule.Create(c => c.IsBullish() && c.IsEmaBullish(48) && c.IsEmaBullish(96) && c.IsSmaBullish(6)).
             And(c => c.IsAboveEma(24) && c.IsAboveEma(96)).
