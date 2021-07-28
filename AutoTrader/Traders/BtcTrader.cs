@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoTrader.Api;
 using AutoTrader.Db.Entities;
@@ -18,6 +19,8 @@ namespace AutoTrader.Traders
         protected DateTime lastBuy = DateTime.MinValue;
 
         protected static ISeller seller = new Seller();
+
+        protected IList<TradeItem> buyCandidates = new List<TradeItem>();
 
         public BtcTrader(string targetCurrency) : base()
         {
@@ -79,18 +82,39 @@ namespace AutoTrader.Traders
                     lastUpdate = DateTime.Now;
                 }
 
-                if (TradeSettings.CanBuy && canBuy && btcBalance >= MinBtcTradeAmount)
+                if (BotManager.LastTrade?.Type == TradeType.Sell)
                 {
-                    if (BotManager.LastTrade?.Type == TradeType.Buy)
-                    {
-                        if (BotManager.LastTrade.Date >= lastBuy.AddHours(1))
-                        {
-                            Logger.Info($"{TargetCurrency}: Buy at {DateTime.Now} : prev={PreviousPrice},curr={ActualPrice}");
-                            Logger.Info(BotManager.LastTrade.ToString());
+                    buyCandidates.Clear();
+                }
 
-                            /// TODO: ActualPrice != BotManager.LastTrade.Price!!!!
-                            Buy(MinBtcTradeAmount, ActualPrice, BotManager.LastTrade.Period, BotManager.LastTrade.Bot);
-                            lastBuy = BotManager.LastTrade.Date;
+                if (TradeSettings.CanBuy && canBuy)
+                {
+                    if (BotManager.LastTrade?.Type == TradeType.Buy && BotManager.LastTrade.Date >= lastBuy.AddHours(1))
+                    {
+                        Logger.Info("Buy singal received, a buy candidate added:" + BotManager.LastTrade);
+                        buyCandidates.Add(BotManager.LastTrade);
+                    }
+
+                    foreach (var buyCandidate in buyCandidates.ToList())
+                    {
+                        if (buyCandidate.Price * 1.004 < ActualPrice.SellPrice)
+                        {
+                            if (btcBalance >= MinBtcTradeAmount)
+                            {
+                                Logger.Info($"{TargetCurrency}: Buy at {DateTime.Now} : prev={PreviousPrice},curr={ActualPrice}");
+                                Logger.Info(BotManager.LastTrade.ToString());
+
+                                /// TODO: ActualPrice != BotManager.LastTrade.Price!!!!
+                                Buy(MinBtcTradeAmount, ActualPrice, BotManager.LastTrade.Period, BotManager.LastTrade.Bot);
+                                lastBuy = BotManager.LastTrade.Date;
+
+                                buyCandidates.Remove(buyCandidate);
+                                Logger.Info("Buy succeeded.");
+                            }
+                            else
+                            {
+                                Logger.Warn("Not enough balance.");
+                            }
                         }
                     }
                 }

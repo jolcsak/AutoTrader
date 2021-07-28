@@ -92,6 +92,7 @@ namespace AutoTrader.Traders.Bots
         public virtual SellType ShouldSell(ActualPrice actualPrice, TradeOrder tradeOrder, TradeItem lastTrade)
         {
             bool isSell = lastTrade?.Type == TradeType.Sell;
+        //    return tradeOrder.FiatProfit > 0 ? SellType.Profit : SellType.Loss;
 
             if (actualPrice.BuyPrice >= (tradeOrder.Price * TradeSettings.MinSellYield) && tradeOrder.FiatProfit > 0)
             {

@@ -141,19 +141,19 @@ namespace AutoTrader.Desktop
                     DateTime currenDate = value.DateTime.Value.DateTime;
                     RotateTransform currentTransform = null;
 
-                    var buyTradeOrder =
-                        value == lastValue ?                            
-                            tradeOrders?.FirstOrDefault(to => to.BuyDate >= previousDate && to.BuyDate > value.DateTime.Value.DateTime) :
-                            tradeOrders?.FirstOrDefault(to => to.BuyDate >= previousDate && to.BuyDate <= value.DateTime.Value.DateTime);
-
-                    DrawTradeOrder(height, currentX, (double)y, buyTradeOrder, isBuy: true);
-
                     var sellTradeOrder =
                         value == lastValue ?
                             tradeOrders?.FirstOrDefault(to => to.SellDate >= previousDate && to.SellDate > value.DateTime.Value.DateTime) :
                             tradeOrders?.FirstOrDefault(to => to.SellDate >= previousDate && to.SellDate <= value.DateTime.Value.DateTime);
 
                     DrawTradeOrder(height, currentX, (double)y, sellTradeOrder, isBuy: false);
+
+                    var buyTradeOrder =
+                        value == lastValue ?
+                            tradeOrders?.FirstOrDefault(to => to.BuyDate >= previousDate && to.BuyDate > value.DateTime.Value.DateTime) :
+                            tradeOrders?.FirstOrDefault(to => to.BuyDate >= previousDate && to.BuyDate <= value.DateTime.Value.DateTime);
+
+                    DrawTradeOrder(height, currentX, (double)y, buyTradeOrder, isBuy: true);
 
                     var tradeItem = trades?.FirstOrDefault(ti => ti.Date == value.DateTime.Value.DateTime);
                     if (tradeItem != null)
