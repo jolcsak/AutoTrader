@@ -20,6 +20,7 @@ namespace AutoTrader.Traders.Bots
         public override string Name => nameof(SpikeBot);
         public override Predicate<IIndexedOhlcv> BuyRule =>
             Rule.Create(c => c.Index > 1).
+            And(c => c.IsEmaBullish(48)).
             And(c => c.ClosePricePercentageChange() <= -PRICE_PERCENTAGE_CHANGE).
             And(c => c.IsEmaBullish(24) && c.IsEmaBullish(48) && c.IsEmaBullish(96));
 

@@ -16,6 +16,7 @@ namespace AutoTrader.Traders
 {
     public class TradingBotManager
     {
+        private const bool BOT_OPTIMIZATION = false;
         private const string FIAT = "HUF";
 
         public static int LastMonths { get; set; } = -1;
@@ -116,15 +117,17 @@ namespace AutoTrader.Traders
                     if (bots == null || new Random().Next(30) == 10)
                     {
                         bots = GetEnabledBots();
+                        if (BOT_OPTIMIZATION)
+                        {
+                            var permutations = bots.Permutations();
+                            var selectedCombinations = permutations.AsParallel().WithDegreeOfParallelism(6).Select(p => new { Income = GetIncome(p), Bots = p.ToList() }).OrderByDescending(p => p.Income).ToList();
 
-                        //var permutations = bots.Permutations();
-                        //var selectedCombinations = permutations.AsParallel().WithDegreeOfParallelism(6).Select(p => new { Income = GetIncome(p), Bots = p.ToList() }).OrderByDescending(p => p.Income).ToList();
-
-                        //var selectedCombination = selectedCombinations.FirstOrDefault();
-                        //if (selectedCombination != null)
-                        //{
-                        //    bots = selectedCombination.Bots;
-                        //}
+                            var selectedCombination = selectedCombinations.FirstOrDefault();
+                            if (selectedCombination != null)
+                            {
+                                bots = selectedCombination.Bots;
+                            }
+                        }
                     }
 
                     MergeBotRules(bots);
@@ -236,9 +239,8 @@ namespace AutoTrader.Traders
             {
                 if (IsBotRuleMerged(bot))
                 {
+                    Trades.AddRange(bot.RefreshAll());
                 }
-
-                Trades.AddRange(bot.RefreshAll());
             }
         }
 
@@ -299,7 +301,7 @@ namespace AutoTrader.Traders
                 if (pricesChanged)
                 {
                     var runner = new Builder()
-                        .Add(Prices)
+                        .Add(Prices.Skip(isHalf ? Prices.Count / 2 : 0))
                         .Buy(buyRule)
                         .Sell(sellRule)
                         .BuyWithAllAvailableCash()

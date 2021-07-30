@@ -11,7 +11,7 @@ namespace AutoTrader.Traders.Bots
         public override string Name => nameof(MacdBot);
         public override Predicate<IIndexedOhlcv> BuyRule =>
             Rule.Create(c => c.Index > 10).
-            And(c => c.IsSmaBearish(5) && c.IsSmaBullish(24) && c.IsAboveEma(96)).
+            And(c => c.IsSmaBullish(24) && c.IsAboveEma(96)).
             And(c => c.Get<MovingAverageConvergenceDivergence>(12, 26, 9)[c.Index].Tick.SignalLine > c.Get<MovingAverageConvergenceDivergence>(12, 26, 9)[c.Index].Tick.MacdLine).
             And(c => c.Get<RelativeStrengthIndex>(12, 26, 9)[c.Index].Tick.Value >= c.Get<RelativeStrengthIndex>(12, 26, 9)[c.Index - 1].Tick.Value);
         public override Predicate<IIndexedOhlcv> SellRule =>

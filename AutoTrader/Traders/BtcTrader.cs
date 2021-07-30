@@ -97,7 +97,7 @@ namespace AutoTrader.Traders
 
                     foreach (var buyCandidate in buyCandidates.ToList())
                     {
-                        if (buyCandidate.Price * 1.004 < ActualPrice.SellPrice)
+                        if (buyCandidate.Price * 1.01 < ActualPrice.SellPrice)
                         {
                             if (btcBalance >= MinBtcTradeAmount)
                             {
