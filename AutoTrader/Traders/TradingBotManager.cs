@@ -237,7 +237,7 @@ namespace AutoTrader.Traders
         {
             foreach(var bot in tradingBots)
             {
-                if (IsBotRuleMerged(bot))
+                if (IsBotRuleMerged(bot) || !BOT_OPTIMIZATION)
                 {
                     Trades.AddRange(bot.RefreshAll());
                 }
