@@ -10,6 +10,7 @@ namespace AutoTrader.Traders
 {
     public class BtcTrader : NiceHashTraderBase
     {
+        private const double MIN_PRICE_UP = 1.01;
         public static string BTC = NiceHashApi.BTC;
 
         protected DateTime lastUpdate = DateTime.MinValue;
@@ -97,7 +98,7 @@ namespace AutoTrader.Traders
 
                     foreach (var buyCandidate in buyCandidates.ToList())
                     {
-                        if (buyCandidate.Price * 1.01 < ActualPrice.SellPrice)
+                        if (buyCandidate.Price * MIN_PRICE_UP < ActualPrice.SellPrice)
                         {
                             if (btcBalance >= MinBtcTradeAmount)
                             {
