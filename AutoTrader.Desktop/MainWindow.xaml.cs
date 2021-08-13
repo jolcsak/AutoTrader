@@ -499,6 +499,17 @@ namespace AutoTrader.Desktop
             }
         }
 
+
+        private void Delete(object sender, RoutedEventArgs e)
+        {
+            var tradeOrder = (sender as Button).DataContext as TradeOrder;
+            if (tradeOrder?.State != TradeOrderState.CANCELLED)
+            {
+                tradeOrder.State = TradeOrderState.CANCELLED;
+                Store.OrderBooks.SaveOrUpdate(tradeOrder);
+            }
+        }
+
         private void Macd_Checked(object sender, RoutedEventArgs e)
         {
             TradeSettings.MacdVisible = true;

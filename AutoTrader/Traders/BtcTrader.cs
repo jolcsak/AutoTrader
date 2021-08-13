@@ -113,7 +113,7 @@ namespace AutoTrader.Traders
                             }
                             else
                             {
-                                Logger.Warn("Not enough balance.");
+                                //Logger.Warn("Not enough balance.");
                             }
                         }
                     }
