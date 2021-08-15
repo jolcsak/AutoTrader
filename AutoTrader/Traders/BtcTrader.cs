@@ -204,7 +204,7 @@ namespace AutoTrader.Traders
                     if (sellType != SellType.None)
                     {
                         buyCandidates.Clear();
-                        Logger.Info($"{TargetCurrency}: buy candidates are cleared.")
+                        Logger.Info($"{TargetCurrency}: buy candidates are cleared.");
                         Logger.Info($"{TargetCurrency}: {sellType} sell at price {actualPrice.BuyPrice}, yield: {tradeOrder.ActualYield}");
                         Sell(actualPrice, tradeOrder);
                     }
