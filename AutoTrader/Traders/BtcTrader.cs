@@ -10,7 +10,7 @@ namespace AutoTrader.Traders
 {
     public class BtcTrader : NiceHashTraderBase
     {
-        private const double MIN_PRICE_UP = 1.01;
+        private const double MIN_PRICE_UP = 1.02;
         public static string BTC = NiceHashApi.BTC;
 
         protected DateTime lastUpdate = DateTime.MinValue;
@@ -203,6 +203,7 @@ namespace AutoTrader.Traders
                     SellType sellType = seller.ShouldSell(actualPrice, tradeOrder, BotManager.LastTrade);
                     if (sellType != SellType.None)
                     {
+                        buyCandidates.Clear();
                         Logger.Info($"{TargetCurrency}: {sellType} sell at price {actualPrice.BuyPrice}, yield: {tradeOrder.ActualYield}");
                         Sell(actualPrice, tradeOrder);
                     }
