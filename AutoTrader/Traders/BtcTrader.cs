@@ -83,20 +83,16 @@ namespace AutoTrader.Traders
                     lastUpdate = DateTime.Now;
                 }
 
-                if (BotManager.LastTrade?.Type == TradeType.Sell)
-                {
-                    buyCandidates.Clear();
-                }
-
                 if (TradeSettings.CanBuy && canBuy)
                 {
                     if (BotManager.LastTrade?.Type == TradeType.Buy && BotManager.LastTrade.Date >= lastBuy.AddHours(1))
                     {
+                        buyCandidates.Clear();
                         Logger.Info("Buy singal received, a buy candidate added:" + BotManager.LastTrade);
                         buyCandidates.Add(BotManager.LastTrade);
                     }
 
-                    foreach (var buyCandidate in buyCandidates.ToList())
+                    foreach (TradeItem buyCandidate in buyCandidates.ToList())
                     {
                         if (buyCandidate.Price * MIN_PRICE_UP < ActualPrice.SellPrice)
                         {
@@ -127,12 +123,6 @@ namespace AutoTrader.Traders
             }
             else
             {
-                if (BotManager.LastTrade?.Type == TradeType.Sell)
-                {
-                    buyCandidates.Clear();
-                    Logger.Info($"{TargetCurrency}: buy candidates are cleared.");
-                }
-
                 Sell(ActualPrice);
                 HandleLimitOrders(ActualPrice);
 
