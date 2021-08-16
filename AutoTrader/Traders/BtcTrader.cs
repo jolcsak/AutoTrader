@@ -127,6 +127,12 @@ namespace AutoTrader.Traders
             }
             else
             {
+                if (BotManager.LastTrade?.Type == TradeType.Sell)
+                {
+                    buyCandidates.Clear();
+                    Logger.Info($"{TargetCurrency}: buy candidates are cleared.");
+                }
+
                 Sell(ActualPrice);
                 HandleLimitOrders(ActualPrice);
 
@@ -203,8 +209,6 @@ namespace AutoTrader.Traders
                     SellType sellType = seller.ShouldSell(actualPrice, tradeOrder, BotManager.LastTrade);
                     if (sellType != SellType.None)
                     {
-                        buyCandidates.Clear();
-                        Logger.Info($"{TargetCurrency}: buy candidates are cleared.");
                         Logger.Info($"{TargetCurrency}: {sellType} sell at price {actualPrice.BuyPrice}, yield: {tradeOrder.ActualYield}");
                         Sell(actualPrice, tradeOrder);
                     }
