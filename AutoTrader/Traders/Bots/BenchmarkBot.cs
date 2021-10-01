@@ -1,6 +1,7 @@
 ﻿using System;
 using Trady.Analysis;
 using Trady.Analysis.Extension;
+using Trady.Analysis.Indicator;
 using Trady.Core.Infrastructure;
 
 namespace AutoTrader.Traders.Bots
@@ -167,9 +168,8 @@ namespace AutoTrader.Traders.Bots
                     {
                         GenerateRules(MaxBenchProfitData);
                     }
+                    buyRule = buyRule.And(c => c.Get<RateOfChange>(24)[c.Index].Tick > MinRateOfChange);
                 }
-
-                //buyRule = buyRule.And(r => r.IsEmaBullish(24));
 
                 return buyRule;
             }
@@ -188,6 +188,7 @@ namespace AutoTrader.Traders.Bots
                     {
                         GenerateRules(MaxBenchProfitData);
                     }
+                    sellRule = sellRule.And(c => c.Get<RateOfChange>(24)[c.Index].Tick > MinRateOfChange);
                 }
                 return sellRule;
             }            

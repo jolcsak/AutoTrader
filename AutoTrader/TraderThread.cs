@@ -100,7 +100,7 @@ namespace AutoTrader
         {
             try
             {
-                trader.Trade((TradingBotManager.IsBenchmarking || trader.Order > 0) && !first);
+                trader.Trade(!first);
             }
             catch (Exception ex)
             {

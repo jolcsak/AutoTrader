@@ -29,7 +29,7 @@ namespace AutoTrader.Db.Entities
                     return 0;
                 }
                 var age = DateTime.Now - BuyDate;
-                return age.Hours;
+                return (int)(age.TotalSeconds / 60);
             }
         }
 

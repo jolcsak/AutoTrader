@@ -18,16 +18,13 @@ namespace AutoTrader.Traders.Bots
 
         public override Predicate<IIndexedOhlcv> SellRule =>
                         Rule.Create(c => c.Index > 0).
-                        And(c => c.Get<ExponentialMovingAverage>(5)[c.Index].Tick > c.Get<ExponentialMovingAverage>(20)[c.Index].Tick).
-                        And(c => c.Get<ExponentialMovingAverage>(5)[c.Index].Tick > c.Get<SimpleMovingAverage>(20)[c.Index].Tick);
+                        And(c => c.Get<MovingAverageConvergenceDivergence>(12, 26, 9)[c.Index].Tick.MacdHistogram.Value > 0).
+                        And(c => c.IsMacdOscBearish() && c.Prev.IsMacdOscBullish());
 
         public override Predicate<IIndexedOhlcv> BuyRule =>
                 Rule.Create(c => c.Index > 0).
-                And(c => c.Get<ExponentialMovingAverage>(5)[c.Index].Tick < c.Get<ExponentialMovingAverage>(20)[c.Index].Tick).
-                And(c => c.Get<ExponentialMovingAverage>(5)[c.Index].Tick < c.Get<SimpleMovingAverage>(20)[c.Index].Tick).
-                And(c => c.IsMacdBearishCross()).
-                And(c => c.IsRsiOversold(4)).
-                And(c => c.IsEmaBullish(24));
+                        And(c => c.Get<MovingAverageConvergenceDivergence>(12, 26, 9)[c.Index].Tick.MacdHistogram.Value < 0).
+                        And(c => c.IsMacdOscBullish() && c.Prev.IsMacdOscBearish());
 
         static AoBot()
         {

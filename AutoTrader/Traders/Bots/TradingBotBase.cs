@@ -9,9 +9,9 @@ namespace AutoTrader.Traders.Bots
 {
     public class TradingBotBase : ITradingBot
     {
-        protected static int ShortStopLossPercentage = -5;
+        protected static double ShortStopLossPercentage = 1.01;
 
-        protected static int LongStopLossPercentage = -5;
+        protected static double LongStopLossPercentage = 1.01;
 
         protected static int ShortTradeMaxAgeInHours = 8;
 
@@ -21,7 +21,7 @@ namespace AutoTrader.Traders.Bots
 
         protected static int LongTradeSellAgeInHours = 0;
 
-        protected static decimal MinRateOfChange = 0.05M;
+        protected static decimal MinRateOfChange = 5M;
 
         protected TradeSetting TradeSettings => TradeSetting.Instance;
 
@@ -91,8 +91,7 @@ namespace AutoTrader.Traders.Bots
 
         public virtual SellType ShouldSell(ActualPrice actualPrice, TradeOrder tradeOrder, TradeItem lastTrade)
         {
-            bool isSell = lastTrade?.Type == TradeType.Sell;
-        //    return tradeOrder.FiatProfit > 0 ? SellType.Profit : SellType.Loss;
+            bool isSell = IsSell(lastTrade);
 
             if (actualPrice.BuyPrice >= (tradeOrder.Price * TradeSettings.MinSellYield) && tradeOrder.FiatProfit > 0)
             {
@@ -103,18 +102,27 @@ namespace AutoTrader.Traders.Bots
             }
             else
             {
-                if (!IsRsiOverSold && isSell)
+                if (!IsRsiOverSold)
                 {
-                    bool isShortSell = tradeOrder.Period == TradePeriod.Short && tradeOrder.Age > ShortTradeMaxAgeInHours;
-                    bool isLongSell = tradeOrder.Period == TradePeriod.Long && tradeOrder.Age > LongTradeMaxAgeInHours;
+                    //bool isShortSell = tradeOrder.Period == TradePeriod.Short && tradeOrder.Age > ShortTradeMaxAgeInHours && tradeOrder.Price > actualPrice.BuyPrice * ShortStopLossPercentage;
+                    //bool isLongSell = tradeOrder.Period == TradePeriod.Long && tradeOrder.Age > LongTradeMaxAgeInHours && tradeOrder.Price > actualPrice.BuyPrice * LongStopLossPercentage;
+
+                    bool isShortSell = tradeOrder.Period == TradePeriod.Short && tradeOrder.Price > actualPrice.BuyPrice * ShortStopLossPercentage;
+                    bool isLongSell = tradeOrder.Period == TradePeriod.Long && tradeOrder.Price > actualPrice.BuyPrice * LongStopLossPercentage;
+
                     if (isShortSell || isLongSell)
                     {
-                        return SellType.Loss;
+                        //return SellType.Loss;
                     }
                 }
             }
 
             return SellType.None;
+        }
+
+        public virtual bool IsSell(TradeItem lastTrade)
+        {
+            return lastTrade?.Type == TradeType.Sell;
         }
     }
 }

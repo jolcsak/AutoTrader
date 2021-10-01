@@ -135,6 +135,10 @@ namespace AutoTrader.Traders
                     if (lastCandleStick != null)
                     {
                         LastTrade = Trades.FirstOrDefault(t => t.Date.Equals(lastCandleStick.Date));
+                        if (LastTrade != null)
+                        {
+                            LastTrade.Price = actualPrice.SellPrice;
+                        }
                     }
                 }
             }
@@ -254,7 +258,7 @@ namespace AutoTrader.Traders
         public static Tuple<double, double> GetTotalFiatBalance()
         {
             TotalBalance totalBalance = NiceHashApi.GetTotalBalance(FIAT);
-            var btcCurrency = totalBalance.currencies.FirstOrDefault(c => c.currency == BtcTrader.BTC);
+            var btcCurrency = totalBalance.currencies?.FirstOrDefault(c => c.currency == BtcTrader.BTC);
             if (totalBalance?.total != null && btcCurrency != null)
             {
                 return new Tuple<double, double>(totalBalance.total.totalBalance, btcCurrency.fiatRate);

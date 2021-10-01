@@ -18,9 +18,9 @@ namespace AutoTrader.Traders.Bots
 
         public override string Name => "AIBot"; 
 
-        public override Predicate<IIndexedOhlcv> BuyRule => Rule.Create( c => buyPredictionEngine.Predict(GetInput<BuyInput>(c)).Prediction);
+        public override Predicate<IIndexedOhlcv> BuyRule => Rule.Create( c => buyPredictionEngine.Predict(GetInput<BuyInput>(c)).Prediction).And(c => c.Get<RateOfChange>(24)[c.Index].Tick > MinRateOfChange);
 
-        public override Predicate<IIndexedOhlcv> SellRule => Rule.Create(c => sellPredictionEngine.Predict(GetInput<SellInput>(c)).Prediction);
+        public override Predicate<IIndexedOhlcv> SellRule => Rule.Create(c => sellPredictionEngine.Predict(GetInput<SellInput>(c)).Prediction).And(c => c.Get<RateOfChange>(24)[c.Index].Tick > MinRateOfChange);
 
         private T GetInput<T>(IIndexedOhlcv c) where T: TradeInputBase , new()
         {
@@ -49,7 +49,6 @@ namespace AutoTrader.Traders.Bots
             transformer = mlContext.Model.Load(@"..\..\..\..\AutoTrader.MachineLearning\LearningData\TrainedSellData.zip", out modelSchema);
             sellPredictionEngine = mlContext.Model.CreatePredictionEngine<SellInput, TradePrediction>(transformer);
         }
-
 
         public AiBot(TradingBotManager botManager) : base(botManager, TradePeriod.Long, COOLDOWN_IN_MINUTES)
         {

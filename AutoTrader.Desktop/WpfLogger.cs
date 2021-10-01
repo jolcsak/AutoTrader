@@ -341,7 +341,7 @@ namespace AutoTrader.Desktop
                 if (TradeSettings.PriceGraphVisible)
                 {
                     new ValueLine(graph, dateProvider, "Prices", prices.Select(p => new AnalyzableTick<decimal?>(p.DateTime, p.Close)).ToList(), priceCount, Colors.DarkGray, showPoints: false).
-                        Draw(null, 0, TradeSettings.TradesVisible ? botManager.Trades : null, TradeSettings.TradesVisible ? trader.TradeOrders : null);
+                        Draw(null, 0, TradeSettings.TradesVisible ? botManager.Trades.ToList() : null, TradeSettings.TradesVisible ? trader.TradeOrders.ToList() : null);
                 }
                 if (TradeSettings.SmaGraphVisible)
                 {
